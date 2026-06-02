@@ -14,17 +14,17 @@ const Agents = () => {
     const fetchAgents = async () => {
       try {
         if (user.role === 'office_manager') {
-          const res = await axios.get(`http://localhost:5001/api/offices/${user.office_id}`, {
+          const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/offices/${user.office_id}`, {
             headers: { Authorization: `Bearer ${token}` }
           });
           setAgents(res.data.agents || []);
         } else {
-          const resOffices = await axios.get('http://localhost:5001/api/offices', {
+          const resOffices = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/offices`, {
             headers: { Authorization: `Bearer ${token}` }
           });
           let allAgents = [];
           for (let office of resOffices.data) {
-            const resOffice = await axios.get(`http://localhost:5001/api/offices/${office.id}`, {
+            const resOffice = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/offices/${office.id}`, {
               headers: { Authorization: `Bearer ${token}` }
             });
             if (resOffice.data.agents) {

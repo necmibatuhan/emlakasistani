@@ -12,15 +12,44 @@ const { OAuth2Client } = require('google-auth-library');
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID || 'MOCK_CLIENT_ID');
 
-// Helper for Mock Email
+// Real Email Sending with Nodemailer
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: process.env.SMTP_PORT || 587,
+  secure: false, // true for 465, false for other ports
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
+
 const sendVerificationEmail = async (email, token) => {
   const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${token}`;
-  console.log(`\n\n=== E-POSTA SİMÜLASYONU ===`);
-  console.log(`Kime: ${email}`);
-  console.log(`Konu: Emlak Asistanı Hesabınızı Doğrulayın`);
-  console.log(`İçerik: Hesabınızı doğrulamak için aşağıdaki linke tıklayın:`);
-  console.log(`${verificationUrl}`);
-  console.log(`=============================\n\n`);
+  
+  if (!process.env.SMTP_USER || process.env.SMTP_USER === 'GIRILECEK_EMAIL') {
+    console.log(`\n\n=== E-POSTA SİMÜLASYONU (SMTP Kurulmamış) ===`);
+    console.log(`Kime: ${email}`);
+    console.log(`Link: ${verificationUrl}\n=============================\n\n`);
+    return;
+  }
+
+  try {
+    await transporter.sendMail({
+      from: `"Emlak Asistanı" <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: "Emlak Asistanı Hesabınızı Doğrulayın",
+      html: `
+        <h2>Emlak Asistanı'na Hoş Geldiniz!</h2>
+        <p>Hesabınızı aktifleştirmek için lütfen aşağıdaki bağlantıya tıklayın:</p>
+        <a href="${verificationUrl}" style="display:inline-block;padding:10px 20px;color:#fff;background-color:#F5A623;text-decoration:none;border-radius:5px;">Hesabımı Doğrula</a>
+        <p>Eğer butona tıklayamazsanız, bu linki kopyalayıp tarayıcınıza yapıştırın:</p>
+        <p>${verificationUrl}</p>
+      `,
+    });
+    console.log(`Doğrulama maili gönderildi: ${email}`);
+  } catch (error) {
+    console.error("Mail gönderme hatası:", error);
+  }
 };
 
 router.post('/register', async (req, res) => {
@@ -90,6 +119,10 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Geçersiz e-posta veya şifre' });
     }
 
+    if (!user.is_verified) {
+      return res.status(403).json({ message: 'Lütfen giriş yapmadan önce e-posta adresinizi doğrulayın.' });
+    }
+
     const token = jwt.sign(
       { id: user.id, role: user.role, company_id: user.company_id, office_id: user.office_id, plan: user.plan },
       process.env.JWT_SECRET,
@@ -100,17 +133,6 @@ router.post('/login', async (req, res) => {
       user: { id: user.id, role: user.role, company_id: user.company_id, office_id: user.office_id, email: user.email, name: user.name, plan: user.plan }, 
       token 
     });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Sunucu hatası' });
-  }
-});
-
-router.get('/me', authMiddleware, async (req, res) => {
-  try {
-    const user = await db.query('SELECT id, company_id, office_id, role, email, name, plan, is_verified FROM users WHERE id = $1', [req.user.id]);
-    if (user.rows.length === 0) return res.status(404).json({ message: 'Kullanıcı bulunamadı' });
-    res.json(user.rows[0]);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Sunucu hatası' });
@@ -137,48 +159,50 @@ router.post('/verify-email', async (req, res) => {
 
 router.post('/google', async (req, res) => {
   try {
-    const { credential } = req.body;
+    const { credential, role = 'agent' } = req.body;
     if (!credential) return res.status(400).json({ message: 'Google credential bulunamadı' });
 
-    // In a real scenario, uncomment and use googleClient to verify
-    /*
-    const ticket = await googleClient.verifyIdToken({
-      idToken: credential,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-    const payload = ticket.getPayload();
-    const { email, name, sub: google_id } = payload;
-    */
-    
-    // For MOCK demo, we'll parse the JWT without verification
-    const base64Url = credential.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
-    const payload = JSON.parse(jsonPayload);
+    let payload;
+    try {
+      const ticket = await googleClient.verifyIdToken({
+        idToken: credential,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+      payload = ticket.getPayload();
+    } catch (err) {
+      console.error("Google Token Hatası:", err);
+      return res.status(401).json({ message: 'Google ile giriş başarısız oldu.' });
+    }
+
     const { email, name, sub: google_id } = payload;
 
     let userRes = await db.query('SELECT * FROM users WHERE email = $1', [email]);
     let user;
 
     if (userRes.rows.length > 0) {
-      // User exists, update google_id if missing, verify them
       user = userRes.rows[0];
-      await db.query('UPDATE users SET google_id = $1, is_verified = true WHERE id = $2', [google_id, user.id]);
+      // Eğer Google ile girmiş ama verify edilmemişse, Google üzerinden girdi diye verify edebiliriz.
+      if (!user.is_verified) {
+        await db.query('UPDATE users SET is_verified = true WHERE id = $1', [user.id]);
+        user.is_verified = true;
+      }
     } else {
-      // New user, create them (with a mock company/office for demo purposes)
       await db.query('BEGIN');
-      const companyRes = await db.query('INSERT INTO companies (name) VALUES ($1) RETURNING id', [`${name} Emlak`]);
+      const companyRes = await db.query(
+        'INSERT INTO companies (name) VALUES ($1) RETURNING id',
+        [`${name} Emlak`]
+      );
       const companyId = companyRes.rows[0].id;
-      const officeRes = await db.query('INSERT INTO offices (company_id, name, city) VALUES ($1, $2, $3) RETURNING id', [companyId, 'Merkez Ofis', 'İstanbul']);
+      const officeRes = await db.query(
+        'INSERT INTO offices (company_id, name, city) VALUES ($1, $2, $3) RETURNING id',
+        [companyId, 'Merkez Ofis', 'İstanbul']
+      );
       const officeId = officeRes.rows[0].id;
-
       const newUser = await db.query(
-        `INSERT INTO users (company_id, office_id, email, name, role, google_id, is_verified) 
+        `INSERT INTO users (company_id, office_id, email, name, password_hash, role, is_verified) 
          VALUES ($1, $2, $3, $4, $5, $6, $7) 
-         RETURNING id, company_id, office_id, role, email, name, plan`,
-        [companyId, officeId, email, name, 'agent', google_id, true]
+         RETURNING id, company_id, office_id, role, email, name, plan, is_verified`,
+        [companyId, officeId, email, name, 'google_login_no_password', role, true]
       );
       await db.query('COMMIT');
       user = newUser.rows[0];
@@ -198,6 +222,31 @@ router.post('/google', async (req, res) => {
     await db.query('ROLLBACK');
     console.error(err);
     res.status(500).json({ message: 'Sunucu hatası' });
+  }
+});
+// GET /me (Get current user)
+router.get('/me', authMiddleware, async (req, res) => {
+  try {
+    const user = await db.query('SELECT id, company_id, office_id, role, email, name, plan, is_verified FROM users WHERE id = $1', [req.user.id]);
+    if (user.rows.length === 0) return res.status(404).json({ message: 'Kullanıcı bulunamadı' });
+    res.json(user.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Sunucu hatası' });
+  }
+});
+
+// DELETE /me (Hard delete user and all associated data)
+router.delete('/me', authMiddleware, async (req, res) => {
+  try {
+    const deleteRes = await db.query('DELETE FROM users WHERE id = $1 RETURNING id', [req.user.id]);
+    if (deleteRes.rowCount === 0) {
+      return res.status(404).json({ message: 'Kullanıcı bulunamadı veya zaten silinmiş.' });
+    }
+    res.json({ message: 'Kullanıcı hesabı ve tüm verileri kalıcı olarak silindi.' });
+  } catch (err) {
+    console.error('Delete User Error:', err);
+    res.status(500).json({ message: 'Kullanıcı hesabı silinirken sunucu hatası oluştu.' });
   }
 });
 

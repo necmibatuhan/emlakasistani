@@ -5,6 +5,7 @@ import { AuthContext } from '../contexts/AuthContext';
 import { Users, PhoneCall, TrendingUp, Calendar, ChevronRight, Plus, Search, Filter, Phone, Mail, MoreHorizontal, MessageSquare, Send, CheckCircle2, AlertCircle, RefreshCw, LogOut, Copy, Check, Menu, Mic, Clock, Activity } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import VoiceNote from '../components/VoiceNote';
+import VoiceToText from '../components/VoiceToText';
 import clsx from 'clsx';
 import { format, isToday, isPast } from 'date-fns';
 import { tr } from 'date-fns/locale';
@@ -28,7 +29,7 @@ const AgentDashboard = () => {
   const { data: leads = [], isLoading: loading } = useQuery({
     queryKey: ['leads'],
     queryFn: async () => {
-      const res = await axios.get('http://localhost:5001/api/leads', {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return res.data;
@@ -39,7 +40,7 @@ const AgentDashboard = () => {
   const { data: leadDetails, isLoading: detailsLoading } = useQuery({
     queryKey: ['lead', selectedLeadId],
     queryFn: async () => {
-      const res = await axios.get(`http://localhost:5001/api/leads/${selectedLeadId}`, {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/${selectedLeadId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return res.data;
@@ -52,7 +53,7 @@ const AgentDashboard = () => {
     setAnalyzing(true);
     setAnalyzeError('');
     try {
-      const res = await axios.post('http://localhost:5001/api/leads/analyze', {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/analyze`, {
         name, phone, message
       }, { headers: { Authorization: `Bearer ${token}` } });
       
@@ -69,7 +70,7 @@ const AgentDashboard = () => {
   const handleStatusChange = async (newStatus) => {
     if (!leadDetails) return;
     try {
-      await axios.put(`http://localhost:5001/api/leads/${leadDetails.id}`, { status: newStatus }, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/${leadDetails.id}`, { status: newStatus }, { headers: { Authorization: `Bearer ${token}` } });
       await queryClient.invalidateQueries(['lead', leadDetails.id]);
       await queryClient.invalidateQueries(['leads']);
     } catch (err) {
@@ -80,7 +81,7 @@ const AgentDashboard = () => {
   const handleReminderChange = async (date) => {
     if (!leadDetails) return;
     try {
-      await axios.put(`http://localhost:5001/api/leads/${leadDetails.id}`, { reminder_date: date }, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/${leadDetails.id}`, { reminder_date: date }, { headers: { Authorization: `Bearer ${token}` } });
       await queryClient.invalidateQueries(['lead', leadDetails.id]);
       await queryClient.invalidateQueries(['leads']);
     } catch (err) {
@@ -203,11 +204,10 @@ const AgentDashboard = () => {
             </form>
 
             <div className="mt-4 pt-4 border-t border-[#2A2D35]">
-               {/* Sadece UI tarafında göstermek için, asıl işlev VoiceNote detayda */}
-              <button className="w-full bg-transparent border border-[#2A2D35] text-[#7C8090] hover:text-[#F1F2F4] hover:bg-[#1E2028] transition-colors py-2 rounded-md text-[13px] font-medium flex items-center justify-center space-x-2">
-                <Mic size={14} />
-                <span>Sesli not</span>
-              </button>
+              <VoiceToText onLeadCreated={(newLead) => {
+                queryClient.invalidateQueries(['leads']);
+                setSelectedLeadId(newLead.id);
+              }} />
             </div>
           </div>
 

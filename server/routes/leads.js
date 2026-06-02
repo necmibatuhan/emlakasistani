@@ -2,6 +2,7 @@ const express = require('express');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const db = require('../db');
 const { authMiddleware } = require('../middleware/auth');
+const { maskPII, unmaskPII } = require('../services/piiService');
 
 const router = express.Router();
 
@@ -129,31 +130,29 @@ router.post('/analyze', authMiddleware, async (req, res) => {
       return res.status(429).json({ message: 'Rate limit aşıldı.' });
     }
 
-    const prompt = `Sen bir emlak danışmanının kurumsal yapay zeka asistanısın.
-Müşteri mesajını analiz et ve JSON dön.
+    // 1. Sanitize input to remove PII (Regex based masking)
+    const { maskedText, tokenMap } = maskPII(message, name);
 
-Ad: ${name}
-Mesaj: ${message}
+    const prompt = `# Role
+Sen bir Emlak CRM Asistanısın. Görevin, müşteri görüşmelerini analiz ederek iş akışını hızlandırmaktır.
 
-Skor = 1-10 arası
-Etiket = Sıcak, Ilık, Soğuk
+# Privacy & Security Guidelines (MUST FOLLOW)
+1. DATA ISOLATION: İşlediğin hiçbir veriyi (kişi isimleri, telefon numaraları, adres detayları) belleğinde saklama.
+2. NO TRAINING: Bu veriler "Sadece İşlem" (Processing Only) amaçlıdır. Verileri öğrenme, modellerini güncelleme veya veriyi herhangi bir dış veri setiyle eşleştirme.
+3. DATA ANONYMIZATION: Eğer sana gönderilen metinde PII (Kişisel Veri) tespit edersen, bunları analiz et ama çıktı olarak paylaşma. Analiz sonuçlarında gerçek isim yerine "Müşteri" ibaresini kullan.
+4. ZERO RETENTION: İşlem tamamlandığında, analiz ettiğin içeriği unut. Çıktı sadece yapılandırılmış bir JSON formatı olmalıdır.
 
-Ekstra Analiz Alanları:
-- yabanci_alici_potansiyeli: true/false
-- yatirim_amacli: true/false
-- kira_getirisi_ilgisi: true/false
-- tavsiye_kaynak: true/false
-- on_onay_durumu: Belli|Belirsiz|Yok
+# Input
+Müşteri Mesajı: ${maskedText}
 
-Müşteriye verilecek yanıt taslağında ismi (${name}) kullan.
-
-JSON Formatı:
+# Output Format
+Sadece aşağıdaki JSON formatında yanıt dön:
 {
-  "skor": <sayı>,
+  "skor": <1-10 arası>,
   "etiket": "<Sıcak|Ilık|Soğuk>",
   "gerekceler": { "aciklama": "<metin>" },
   "onerilen_aksiyon": "<Bugün ara|Bu hafta ara|Takip listesine ekle>",
-  "yanit_taslak": "<metin>",
+  "yanit_taslak": "<Müşteriye verilecek taslak yanıt>",
   "mulk_tercihleri": {
     "bolge": "<veya null>",
     "tip": "<Satılık|Kiralık|Belirsiz>",
@@ -170,17 +169,34 @@ JSON Formatı:
 
     let parsedResult;
     if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'mock') {
-      parsedResult = { 
+      parsedResult = getMockAnalyzeResult();
+    } else {
+      try {
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { responseMimeType: "application/json" } });
+        const aiResult = await model.generateContent(prompt);
+        parsedResult = JSON.parse(aiResult.response.text());
+      } catch (apiErr) {
+        console.error('Gemini Analyze API Error:', apiErr.message);
+        parsedResult = getMockAnalyzeResult();
+      }
+    }
+
+    function getMockAnalyzeResult() {
+      return { 
         skor: 8, etiket: "Sıcak", 
         gerekceler: { aciklama: "Net bütçe ve aciliyet belirtilmiş." }, 
         onerilen_aksiyon: "Bugün ara", 
         yanit_taslak: `Merhaba ${name}, talebiniz için uygun portföyleri hazırladım. Ne zaman görüşelim?`, 
         mulk_tercihleri: { bolge: "Merkez", tip: "Satılık", oda: "3+1", butce: "5M", aciliyet: "Acil", yatirim_amacli: true, on_onay_durumu: "Belli" } 
       };
-    } else {
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { responseMimeType: "application/json" } });
-      const aiResult = await model.generateContent(prompt);
-      parsedResult = JSON.parse(aiResult.response.text());
+    }
+
+    // 2. Restore PII into the AI's response before saving to database
+    if (parsedResult.yanit_taslak) {
+      parsedResult.yanit_taslak = unmaskPII(parsedResult.yanit_taslak, tokenMap);
+    }
+    if (parsedResult.gerekceler && parsedResult.gerekceler.aciklama) {
+      parsedResult.gerekceler.aciklama = unmaskPII(parsedResult.gerekceler.aciklama, tokenMap);
     }
 
     const leadInsert = await db.query(

@@ -403,6 +403,34 @@ const Landing = () => {
         </div>
       )}
 
+      {/* FOOTER & PRIVACY NOTICE */}
+      <footer className="border-t border-[#2A2D35] bg-[#0A0B0D] py-12 px-6 sm:px-12 lg:px-24">
+        <div className="max-w-[1200px] mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+          <div className="max-w-2xl">
+            <div className="flex items-center space-x-2 mb-4">
+              <div className="w-8 h-8 bg-[#1E2025] rounded-[6px] flex items-center justify-center">
+                <span className="text-[#F1F2F4] font-bold text-[14px] tracking-tight">EA</span>
+              </div>
+              <span className="text-[#F1F2F4] font-semibold tracking-tight text-[18px]">Emlak Asistanı</span>
+            </div>
+            <p className="text-[#7C8090] text-[13px] leading-relaxed mb-4">
+              <strong className="text-[#F1F2F4] font-medium block mb-1">Veri Gizliliği Bildirimi ("Privacy by Design"):</strong>
+              Emlak Asistanı, KVKK uyumlu altyapısı ile tasarlanmıştır. Verileriniz, anonimleştirme teknolojileri ile korunur. Yapay zeka süreçlerimizde, müşteri bilgileriniz (ad, telefon, e-posta) analiz edilmeden önce maskelenir ve dış sistemlerde veya modellerin eğitiminde asla depolanmaz/kullanılmaz.
+            </p>
+            <div className="flex items-center space-x-4 text-[13px]">
+              <a href="/aydinlatma-metni" className="text-[#F5A623] hover:text-[#FFA000] transition-colors font-medium">Aydınlatma Metni</a>
+              <span className="text-[#2A2D35]">•</span>
+              <a href="/gizlilik-politikasi" className="text-[#F5A623] hover:text-[#FFA000] transition-colors font-medium">Gizlilik Politikası</a>
+            </div>
+          </div>
+          
+          <div className="text-[#7C8090] text-[13px] text-left md:text-right">
+            <p>© {new Date().getFullYear()} Emlak Asistanı.</p>
+            <p className="mt-1">Tüm Hakları Saklıdır.</p>
+          </div>
+        </div>
+      </footer>
+
     </div>
   );
 };

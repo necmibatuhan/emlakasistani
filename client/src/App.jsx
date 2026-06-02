@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthContext, AuthProvider } from './contexts/AuthContext';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 import Landing from './pages/Landing';
 import Auth from './pages/Auth';
@@ -17,6 +18,8 @@ import Agents from './pages/Agents';
 import Reports from './pages/Reports';
 import OfficeDetail from './pages/OfficeDetail';
 import VerifyEmail from './pages/VerifyEmail';
+import AydinlatmaMetni from './pages/AydinlatmaMetni';
+import GizlilikPolitikasi from './pages/GizlilikPolitikasi';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
@@ -48,7 +51,9 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Landing />} />
       <Route path="/auth" element={user ? <Navigate to="/dashboard" /> : <Auth />} />
-      <Route path="/verify-email" element={user ? <Navigate to="/dashboard" /> : <VerifyEmail />} />
+      <Route path="/verify-email" element={<VerifyEmail />} />
+      <Route path="/aydinlatma-metni" element={<AydinlatmaMetni />} />
+      <Route path="/gizlilik-politikasi" element={<GizlilikPolitikasi />} />
       <Route path="/dashboard" element={<ProtectedRoute><RoleBasedDashboard /></ProtectedRoute>} />
       <Route path="/leads" element={<ProtectedRoute><RoleBasedDashboard /></ProtectedRoute>} />
       <Route path="/whatsapp" element={<ProtectedRoute><WhatsApp /></ProtectedRoute>} />
@@ -66,11 +71,13 @@ const AppRoutes = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <AppRoutes />
-      </Router>
-    </AuthProvider>
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || 'GIRILECEK_GOOGLE_CLIENT_ID'}>
+      <AuthProvider>
+        <Router>
+          <AppRoutes />
+        </Router>
+      </AuthProvider>
+    </GoogleOAuthProvider>
   );
 }
 

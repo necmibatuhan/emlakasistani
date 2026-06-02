@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
+import ReCAPTCHA from 'react-google-recaptcha';
 import axios from 'axios';
 import { User, Building, Building2, ArrowLeft } from 'lucide-react';
 import clsx from 'clsx';
@@ -9,19 +10,21 @@ import clsx from 'clsx';
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [registerStep, setRegisterStep] = useState(1);
+  const [kvkkAccepted, setKvkkAccepted] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState(null);
   
   const { login, register, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      const res = await axios.post('http://localhost:5001/api/auth/google', {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/auth/google`, {
         credential: credentialResponse.credential
       });
       setUser(res.data.user);
@@ -41,6 +44,14 @@ const Auth = () => {
     setError('');
     setMessage('');
     
+    // Yalnızca lokal test için devrede bırakılabilir, ama production'da zorunludur:
+    if (import.meta.env.VITE_RECAPTCHA_SITE_KEY && import.meta.env.VITE_RECAPTCHA_SITE_KEY !== 'GIRILECEK_RECAPTCHA_SITE_KEY') {
+      if (!captchaToken) {
+        setError('Lütfen robot olmadığınızı doğrulayın.');
+        return;
+      }
+    }
+    
     if (isLogin) {
       try {
         await login(email, password);
@@ -49,6 +60,10 @@ const Auth = () => {
         setError(err.response?.data?.message || 'Bir hata oluştu');
       }
     } else {
+      if (!kvkkAccepted) {
+        setError('Kayıt olmak için KVKK Aydınlatma Metni ve Gizlilik Politikasını onaylamanız gerekmektedir.');
+        return;
+      }
       setRegisterStep(2);
     }
   };
@@ -129,6 +144,35 @@ const Auth = () => {
                   value={password} onChange={e => setPassword(e.target.value)}
                 />
               </div>
+              {!isLogin && registerStep === 1 && (
+                <div className="flex items-start mt-4 mb-2">
+                  <div className="flex items-center h-5">
+                    <input
+                      id="kvkk"
+                      type="checkbox"
+                      checked={kvkkAccepted}
+                      onChange={(e) => setKvkkAccepted(e.target.checked)}
+                      className="w-4 h-4 bg-[#1E2028] border border-[#2A2D35] rounded focus:ring-[#F5A623] focus:ring-offset-0 text-[#F5A623]"
+                    />
+                  </div>
+                  <div className="ml-3 text-sm">
+                    <label htmlFor="kvkk" className="text-[#7C8090] text-[12px] leading-snug cursor-pointer">
+                      <a href="/aydinlatma-metni" target="_blank" rel="noopener noreferrer" className="text-[#F5A623] hover:underline">Aydınlatma Metni</a>'ni ve <a href="/gizlilik-politikasi" target="_blank" rel="noopener noreferrer" className="text-[#F5A623] hover:underline">Gizlilik Politikası</a>'nı okudum. Müşteri görüşmelerimin AI ile analiz edilmesine onay veriyorum.
+                    </label>
+                  </div>
+                </div>
+              )}
+
+              {import.meta.env.VITE_RECAPTCHA_SITE_KEY && import.meta.env.VITE_RECAPTCHA_SITE_KEY !== 'GIRILECEK_RECAPTCHA_SITE_KEY' && (
+                <div className="flex justify-center my-4">
+                  <ReCAPTCHA
+                    sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                    onChange={(token) => setCaptchaToken(token)}
+                    theme="dark"
+                  />
+                </div>
+              )}
+
               <button 
                 type="submit" 
                 className="w-full bg-[#F5A623] text-[#0A0B0D] font-medium text-[13px] py-2.5 rounded-[6px] hover:bg-[#d9921e] transition-colors mt-2"

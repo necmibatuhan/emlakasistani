@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 
 const fetchProperties = async (token) => {
-  const { data } = await axios.get('http://localhost:5001/api/properties', {
+  const { data } = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/properties`, {
     headers: { Authorization: `Bearer ${token}` }
   });
   return data;
@@ -27,7 +27,7 @@ const Properties = () => {
   });
 
   const createMutation = useMutation({
-    mutationFn: (newProp) => axios.post('http://localhost:5001/api/properties', newProp, {
+    mutationFn: (newProp) => axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/properties`, newProp, {
       headers: { Authorization: `Bearer ${token}` }
     }),
     onSuccess: () => {

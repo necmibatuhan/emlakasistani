@@ -6,6 +6,8 @@ CREATE TABLE users (
   name TEXT NOT NULL,
   password_hash TEXT NOT NULL,
   plan TEXT NOT NULL DEFAULT 'free' CHECK (plan IN ('free','pro','proplus')),
+  verification_token TEXT,
+  is_verified BOOLEAN DEFAULT false,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

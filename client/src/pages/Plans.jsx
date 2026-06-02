@@ -21,7 +21,7 @@ const Plans = () => {
         throw new Error('Geçersiz beta kodu.');
       }
 
-      const res = await axios.post('http://localhost:5001/api/auth/upgrade', {}, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/auth/upgrade`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUser(res.data.user);

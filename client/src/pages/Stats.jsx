@@ -12,7 +12,7 @@ const Stats = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await axios.get('http://localhost:5001/api/stats', {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/stats`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setStats(res.data);
