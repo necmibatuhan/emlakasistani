@@ -260,31 +260,7 @@ const Auth = () => {
           </div>
         )}
 
-        {isLogin && (
-          <div className="mt-8 pt-6 border-t border-[#2A2D35]">
-            <p className="text-[10px] font-bold text-[#7C8090] uppercase tracking-[0.1em] text-center mb-4">Hızlı Demo Girişi</p>
-            <div className="space-y-2">
-              <button 
-                onClick={() => { setEmail('admin@c21.com'); setPassword('123456'); }}
-                className="w-full bg-transparent border border-[#2A2D35] text-[#7C8090] hover:text-[#F1F2F4] hover:bg-[#1E2028] text-[12px] font-medium py-2 rounded-[6px] transition-colors"
-              >
-                🏢 Şirket Yöneticisi (Admin) Olarak Doldur
-              </button>
-              <button 
-                onClick={() => { setEmail('manager@c21.com'); setPassword('123456'); }}
-                className="w-full bg-transparent border border-[#2A2D35] text-[#7C8090] hover:text-[#F1F2F4] hover:bg-[#1E2028] text-[12px] font-medium py-2 rounded-[6px] transition-colors"
-              >
-                👔 Ofis Yöneticisi (Manager) Olarak Doldur
-              </button>
-              <button 
-                onClick={() => { setEmail('agent@c21.com'); setPassword('123456'); }}
-                className="w-full bg-transparent border border-[#2A2D35] text-[#7C8090] hover:text-[#F1F2F4] hover:bg-[#1E2028] text-[12px] font-medium py-2 rounded-[6px] transition-colors"
-              >
-                👤 Danışman (Agent) Olarak Doldur
-              </button>
-            </div>
-          </div>
-        )}
+
       </div>
     </div>
   );
