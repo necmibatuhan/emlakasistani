@@ -98,9 +98,9 @@ router.post('/register', async (req, res) => {
     // Front-end tarafı bu mesajı görünce "lütfen mailinizi onaylayın" desin.
     res.status(201).json({ message: 'Kayıt başarılı. Lütfen e-postanıza gönderilen doğrulama linkine tıklayın.', user });
   } catch (err) {
-    await db.query('ROLLBACK');
+    try { await db.query('ROLLBACK'); } catch(e) {}
     console.error(err);
-    res.status(500).json({ message: 'Sunucu hatası' });
+    res.status(500).json({ message: 'Sunucu hatası', error: err.message, stack: err.stack });
   }
 });
 
