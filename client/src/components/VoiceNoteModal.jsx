@@ -91,6 +91,10 @@ const VoiceNoteModal = ({ isOpen, onClose, onRecordingComplete }) => {
               <span className="material-symbols-outlined text-[18px]">fiber_manual_record</span>
               Kaydı başlat
             </button>
+            <div className="mt-4 flex items-center gap-2 text-xs text-[#10B981] font-medium bg-[#10B981]/10 px-3 py-1.5 rounded-full">
+              <span className="material-symbols-outlined text-[14px]">lock</span>
+              Uçtan Uca Şifreli & Güvenli
+            </div>
           </div>
         )}
 

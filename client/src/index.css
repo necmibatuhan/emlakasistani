@@ -178,3 +178,15 @@ input:focus, select:focus, textarea:focus {
 .animate-fade-in-up {
   animation: fadeInUp 0.4s ease-out forwards;
 }
+
+.custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: #2A2D35; border-radius: 10px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #424652; }
+
+@keyframes bounceCustom {
+  0%, 100% { transform: translateY(-5%); animation-timing-function: cubic-bezier(0.8,0,1,1); }
+  50% { transform: none; animation-timing-function: cubic-bezier(0,0,0.2,1); }
+}
+.animate-bounce-custom { animation: bounceCustom 1s infinite; }
+
