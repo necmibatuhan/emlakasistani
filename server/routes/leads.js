@@ -133,14 +133,17 @@ router.post('/analyze', authMiddleware, async (req, res) => {
     // 1. Sanitize input to remove PII (Regex based masking)
     const { maskedText, tokenMap } = maskPII(message, name);
 
-    const prompt = `# Role
-Sen bir Emlak CRM Asistanısın. Görevin, müşteri görüşmelerini analiz ederek iş akışını hızlandırmaktır.
+    const prompt = `Sen profesyonel bir emlak danışmanlığı AI asistanısın. 10+ yıllık tecrübeye sahip, detaycı, gerçekçi ve Türkiye'deki emlak piyasasını çok iyi bilen bir uzmansın.
 
-# Privacy & Security Guidelines (MUST FOLLOW)
-1. DATA ISOLATION: İşlediğin hiçbir veriyi (kişi isimleri, telefon numaraları, adres detayları) belleğinde saklama.
-2. NO TRAINING: Bu veriler "Sadece İşlem" (Processing Only) amaçlıdır. Verileri öğrenme, modellerini güncelleme veya veriyi herhangi bir dış veri setiyle eşleştirme.
-3. DATA ANONYMIZATION: Eğer sana gönderilen metinde PII (Kişisel Veri) tespit edersen, bunları analiz et ama çıktı olarak paylaşma. Analiz sonuçlarında gerçek isim yerine "Müşteri" ibaresini kullan.
-4. ZERO RETENTION: İşlem tamamlandığında, analiz ettiğin içeriği unut. Çıktı sadece yapılandırılmış bir JSON formatı olmalıdır.
+Görevin: Kullanıcı mesajı veya sesli not transkriptini analiz edip aşağıdaki JSON formatında yapılandırılmış çıktı üretmek.
+
+KURALLAR (Çok Önemli):# Privacy & Security Guidelines (MUST FOLLOW)
+1. Sadece gerçek metinde geçen bilgileri kullan. Bilmiyorsan null veya boş array koy.
+2. Halüsinasyon yapma! Tahmin etme, varsayımda bulundurma.
+3. Bütçe analizi yaparken Türkiye'deki gerçekçi piyasa koşullarını göz önünde bulundur.
+4. Aciliyet ve ciddiyet skorunu sadece metindeki dil, tekrarlar ve vurguya göre ver.
+5. Overall lead score = (Bütçe skoru × 0.35) + (Ciddiyet skoru × 0.40) + (Aciliyet skoru × 0.25) formülüyle hesapla.
+6. DATA ISOLATION & ANONYMIZATION: PII tespit edersen analiz et ama "Müşteri" olarak kullan. İşlem bitince unut.
 
 # Input
 Müşteri Mesajı: ${maskedText}
@@ -148,33 +151,45 @@ Müşteri Mesajı: ${maskedText}
 # Output Format
 Sadece aşağıdaki JSON formatında yanıt dön:
 {
-  "skor": <1-10 arası>,
-  "etiket": "<Sıcak|Ilık|Soğuk>",
-  "gerekceler": { "aciklama": "<metin>" },
-  "onerilen_aksiyon": "<Bugün ara|Bu hafta ara|Takip listesine ekle>",
-  "yanit_taslak": "<Müşteriye verilecek taslak yanıt>",
-  "mulk_tercihleri": {
-    "bolge": "<veya null>",
-    "tip": "<Satılık|Kiralık|Belirsiz>",
-    "oda": "<veya Belirsiz>",
-    "butce": "<veya null>",
-    "aciliyet": "<Acil|Bu ay|Bu yıl|Belirsiz>",
-    "yabanci_alici_potansiyeli": false,
-    "yatirim_amacli": false,
-    "kira_getirisi_ilgisi": false,
-    "tavsiye_kaynak": false,
-    "on_onay_durumu": "Yok"
-  }
-}`;
+  "customer_intent": "buyer" | "seller" | "investor" | "renter" | "unknown",
+  "budget": {
+    "min": "number | null",
+    "max": "number | null",
+    "currency": "TRY" | "USD" | "EUR",
+    "confidence": "high" | "medium" | "low"
+  },
+  "location_preferences": ["semt1", "semt2"],
+  "property_type": ["daire", "villa", "rezidans", "ofis"],
+  "room_count": {
+    "min": "number | null",
+    "max": "number | null"
+  },
+  "urgency": "very_urgent" | "urgent" | "moderate" | "exploring" | "low",
+  "seriousness_score": "1-10 arası",
+  "budget_score": "1-10 arası",
+  "overall_lead_score": "1-100 arası",
+  
+  "skor": "1-10 arası (overall_lead_score/10 yuvarlanmış hali)",
+  "etiket": "Sıcak (overall 75+ ise) | Ilık (40-74 arası) | Soğuk (0-39 arası)",
+  
+  "key_motivations": ["sebep1", "sebep2"],
+  "potential_risks": ["risk1", "risk2"],
+  "recommended_next_action": "Bugün ara | Bu hafta ara | Takip listesine ekle",
+  "suggested_whatsapp_reply": "hazır mesaj taslağı (en fazla 2-3 cümle, samimi ve profesyonel)",
+  "extracted_raw_quotes": ["müşterinin tam söylediği önemli cümleler"]
+}
+\`;
 
     let parsedResult;
     if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'mock') {
       parsedResult = getMockAnalyzeResult();
     } else {
       try {
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { responseMimeType: "application/json" } });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { responseMimeType: "application/json", temperature: 0.2 } });
         const aiResult = await model.generateContent(prompt);
-        parsedResult = JSON.parse(aiResult.response.text());
+        let respText = aiResult.response.text().trim();
+        if (respText.startsWith('\`\`\`json')) respText = respText.replace('\`\`\`json', '').replace('\`\`\`', '').trim();
+        parsedResult = JSON.parse(respText);
       } catch (apiErr) {
         console.error('Gemini Analyze API Error:', apiErr.message);
         parsedResult = getMockAnalyzeResult();
@@ -192,23 +207,29 @@ Sadece aşağıdaki JSON formatında yanıt dön:
     }
 
     // 2. Restore PII into the AI's response before saving to database
-    if (parsedResult.yanit_taslak) {
-      parsedResult.yanit_taslak = unmaskPII(parsedResult.yanit_taslak, tokenMap);
+    if (parsedResult.suggested_whatsapp_reply) {
+      parsedResult.suggested_whatsapp_reply = unmaskPII(parsedResult.suggested_whatsapp_reply, tokenMap);
     }
-    if (parsedResult.gerekceler && parsedResult.gerekceler.aciklama) {
-      parsedResult.gerekceler.aciklama = unmaskPII(parsedResult.gerekceler.aciklama, tokenMap);
+    if (parsedResult.extracted_raw_quotes) {
+      parsedResult.extracted_raw_quotes = parsedResult.extracted_raw_quotes.map(q => unmaskPII(q, tokenMap));
     }
 
     const finalName = name?.trim() ? name.trim() : '[İsim Belirtilmedi]';
     const finalPhone = phone?.trim() ? phone.trim() : '[Telefon Belirtilmedi]';
+
+    const reasoningText = `Motivasyon: ${(parsedResult.key_motivations || []).join(', ')}. Riskler: ${(parsedResult.potential_risks || []).join(', ')}. Intent: ${parsedResult.customer_intent}`;
 
     const leadInsert = await db.query(
       `INSERT INTO leads (company_id, office_id, assigned_to, source, name, phone, message, score, label, reasoning, recommended_action, whatsapp_draft, properties) 
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`,
       [
         req.user.company_id, req.user.office_id, req.user.id, 'manual', finalName, finalPhone, message, 
-        parsedResult.skor, parsedResult.etiket, parsedResult.gerekceler.aciklama, 
-        parsedResult.onerilen_aksiyon, parsedResult.yanit_taslak, JSON.stringify(parsedResult.mulk_tercihleri)
+        parsedResult.skor || Math.ceil(parsedResult.overall_lead_score / 10), 
+        parsedResult.etiket, 
+        reasoningText, 
+        parsedResult.recommended_next_action, 
+        parsedResult.suggested_whatsapp_reply, 
+        JSON.stringify(parsedResult)
       ]
     );
 

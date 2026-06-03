@@ -51,37 +51,43 @@ router.post('/transcribe', authMiddleware, upload.single('audio'), async (req, r
 });
 
 const VOICE_SYSTEM_PROMPT = `
-# Role
-Sen bir Emlak CRM Asistanısın. Görevin, müşteri görüşmelerini (sesli notları) analiz ederek iş akışını hızlandırmaktır.
+Sen profesyonel bir emlak danışmanlığı AI asistanısın. 10+ yıllık tecrübeye sahip, detaycı, gerçekçi ve Türkiye'deki emlak piyasasını çok iyi bilen bir uzmansın.
+Görevin: Müşteri sesli notunu analiz edip müşterinin sistemdeki mevcut durumunu (skor, etiket, aşama) güncellemek ve JSON çıktısı üretmek.
 
-# Privacy & Security Guidelines (MUST FOLLOW)
-1. DATA ISOLATION: İşlediğin hiçbir veriyi (kişi isimleri, telefon numaraları, adres detayları) belleğinde saklama.
-2. NO TRAINING: Bu veriler "Sadece İşlem" (Processing Only) amaçlıdır. Verileri öğrenme, modellerini güncelleme veya veriyi herhangi bir dış veri setiyle eşleştirme.
-3. DATA ANONYMIZATION: Eğer sana gönderilen metinde PII (Kişisel Veri) tespit edersen, bunları analiz et ama çıktı olarak paylaşma. Analiz sonuçlarında gerçek isim yerine "Müşteri" ibaresini kullan.
-4. ZERO RETENTION: İşlem tamamlandığında, analiz ettiğin içeriği unut. Çıktı sadece yapılandırılmış bir JSON formatı olmalıdır.
+KURALLAR:
+1. Sadece gerçek metinde geçen bilgileri kullan. Bilmiyorsan null veya boş array koy.
+2. Halüsinasyon yapma! Tahmin etme.
+3. Bütçe analizi yaparken Türkiye'deki gerçekçi piyasa koşullarını göz önünde bulundur.
+4. Aciliyet ve ciddiyet skorunu sese/metne göre ver.
+5. Overall lead score = (Bütçe skoru × 0.35) + (Ciddiyet skoru × 0.40) + (Aciliyet skoru × 0.25) formülüyle hesapla.
 
 # Output Format
-SADECE JSON döndür, başka hiçbir şey yazma (markdown \`\`\`json vs kullanma, doğrudan saf JSON döndür).
-
-JSON şeması:
+SADECE aşağıdaki JSON şemasında yanıt dön:
 {
-  "ozet": "<2-3 cümle net özet>",
-  "guncelleme": {
-    "yeni_skor": <1-10 veya null>,
-    "yeni_etiket": "<Sıcak|Ilık|Soğuk veya null>",
-    "yeni_durum": "<Takipte|Arandı|Randevu Alındı|Teklif Verildi|Sözleşme Aşamasında|Satış Tamamlandı|İptal veya null>"
+  "customer_intent": "buyer" | "seller" | "investor" | "renter" | "unknown",
+  "budget": {
+    "min": "number | null",
+    "max": "number | null",
+    "currency": "TRY" | "USD" | "EUR",
+    "confidence": "high" | "medium" | "low"
   },
-  "mulk_tercihleri": {
-    "bolge": "<veya null>",
-    "butce_min": <sayı veya null>,
-    "butce_max": <sayı veya null>,
-    "oda": "<veya null>"
-  },
-  "hatirlatici": {
-    "gerekli_mi": true/false,
-    "tarih_ipucu": "<'yarın', 'cuma', 'bu hafta' gibi ifade veya null>"
-  },
-  "whatsapp_taslak": "<güncellenen bilgilere göre yeni taslak veya null>"
+  "location_preferences": ["semt1", "semt2"],
+  "property_type": ["daire", "villa", "rezidans", "ofis"],
+  "room_count": { "min": "number | null", "max": "number | null" },
+  "urgency": "very_urgent" | "urgent" | "moderate" | "exploring" | "low",
+  "seriousness_score": "1-10",
+  "budget_score": "1-10",
+  "overall_lead_score": "1-100",
+  
+  "skor": "1-10 (overall_lead_score'un 10'a bölünmüş hali)",
+  "etiket": "Sıcak (overall 75+ ise) | Ilık (40-74 arası) | Soğuk (0-39 arası)",
+  "yeni_durum": "Takipte | Arandı | Randevu Alındı | Teklif Verildi | Sözleşme Aşamasında | Satış Tamamlandı | İptal (Durum değişmiyorsa mevcut durumu koru)",
+
+  "key_motivations": ["sebep1", "sebep2"],
+  "potential_risks": ["risk1", "risk2"],
+  "recommended_next_action": "Bugün ara | Bu hafta ara | Takip listesine ekle",
+  "suggested_whatsapp_reply": "hazır mesaj taslağı (en fazla 2-3 cümle)",
+  "extracted_raw_quotes": ["tam cümleler"]
 }
 `;
 
@@ -110,7 +116,7 @@ Danışmanın sesli notu:
       analysis = getMockAnalysis();
     } else {
       try {
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash', generationConfig: { responseMimeType: "application/json", temperature: 0.1 } });
         const result = await model.generateContent([
           { text: VOICE_SYSTEM_PROMPT },
           { text: userPrompt }
@@ -137,20 +143,25 @@ Danışmanın sesli notu:
 
     function getMockAnalysis() {
       return {
-        ozet: "Müşteri ile fiyat konusunda anlaşıldı, yarın ofiste yüz yüze görüşülecek.",
-        guncelleme: { yeni_skor: 9, yeni_etiket: "Sıcak", yeni_durum: "Randevu Alındı" },
-        mulk_tercihleri: { bolge: "Kadıköy", oda: "3+1" },
-        hatirlatici: { gerekli_mi: true, tarih_ipucu: "yarın" },
-        whatsapp_taslak: "Merhaba [MÜŞTERİ], yarın ofisimizde görüşmek üzere."
+        customer_intent: "buyer",
+        overall_lead_score: 90,
+        skor: 9, 
+        etiket: "Sıcak", 
+        yeni_durum: "Randevu Alındı",
+        budget: { min: 3000000, max: 5000000, currency: "TRY" },
+        location_preferences: ["Kadıköy"],
+        room_count: { min: 3, max: 4 },
+        recommended_next_action: "Bugün ara",
+        suggested_whatsapp_reply: "Merhaba [MÜŞTERİ], yarın ofisimizde görüşmek üzere."
       };
     }
 
     // Restore names in summary and draft
-    if (analysis.ozet) {
-      analysis.ozet = unmaskPII(analysis.ozet, tokenMap);
-    }
-    if (analysis.whatsapp_taslak) {
-      analysis.whatsapp_taslak = unmaskPII(analysis.whatsapp_taslak, tokenMap);
+    const ozetStr = `Niyet: ${analysis.customer_intent}. Riskler: ${(analysis.potential_risks || []).join(', ')}`;
+    analysis.ozet = unmaskPII(ozetStr, tokenMap);
+    
+    if (analysis.suggested_whatsapp_reply) {
+      analysis.suggested_whatsapp_reply = unmaskPII(analysis.suggested_whatsapp_reply, tokenMap);
     }
 
     await db.query('BEGIN');
@@ -167,49 +178,53 @@ Danışmanın sesli notu:
     let setClause = [];
     let idx = 1;
 
-    if (analysis.guncelleme.yeni_skor !== null && analysis.guncelleme.yeni_skor !== undefined) {
-      setClause.push(`score = $${idx++}`);
-      values.push(analysis.guncelleme.yeni_skor);
-    }
-    if (analysis.guncelleme.yeni_etiket) {
+    let newScore = analysis.skor || Math.ceil((analysis.overall_lead_score || 50) / 10);
+    setClause.push(`score = $${idx++}`);
+    values.push(newScore);
+
+    if (analysis.etiket) {
       setClause.push(`label = $${idx++}`);
-      values.push(analysis.guncelleme.yeni_etiket);
+      values.push(analysis.etiket);
     }
-    if (analysis.guncelleme.yeni_durum) {
+    if (analysis.yeni_durum) {
       setClause.push(`status = $${idx++}`);
-      values.push(analysis.guncelleme.yeni_durum);
+      values.push(analysis.yeni_durum);
     }
-    if (analysis.whatsapp_taslak) {
+    if (analysis.suggested_whatsapp_reply) {
       setClause.push(`whatsapp_draft = $${idx++}`);
-      values.push(analysis.whatsapp_taslak);
+      values.push(analysis.suggested_whatsapp_reply);
     }
 
     // Property preferences updates (storing them in the leads table since we don't have lead_properties table logic active)
     let currentProperties = lead.properties || {};
     let propsUpdated = false;
     
-    if (analysis.mulk_tercihleri) {
-      if (analysis.mulk_tercihleri.bolge) {
-        currentProperties.bolge = analysis.mulk_tercihleri.bolge;
-        propsUpdated = true;
-      }
-      if (analysis.mulk_tercihleri.oda) {
-        currentProperties.oda = analysis.mulk_tercihleri.oda;
-        propsUpdated = true;
-      }
-      if (analysis.mulk_tercihleri.butce_min !== null && analysis.mulk_tercihleri.butce_min !== undefined) {
-        setClause.push(`budget_min = $${idx++}`);
-        values.push(analysis.mulk_tercihleri.butce_min);
-      }
-      if (analysis.mulk_tercihleri.butce_max !== null && analysis.mulk_tercihleri.butce_max !== undefined) {
-        setClause.push(`budget_max = $${idx++}`);
-        values.push(analysis.mulk_tercihleri.butce_max);
-      }
+    currentProperties = { ...currentProperties, ...analysis };
+    
+    if (analysis.budget && analysis.budget.min !== null) {
+      currentProperties.butce_min = analysis.budget.min;
+      propsUpdated = true;
+    }
+    if (analysis.budget && analysis.budget.max !== null) {
+      currentProperties.butce_max = analysis.budget.max;
+      propsUpdated = true;
     }
 
     if (propsUpdated) {
       setClause.push(`properties = $${idx++}`);
-      values.push(currentProperties);
+      values.push(JSON.stringify(currentProperties));
+    }
+
+    // Add reminder logic based on AI action
+    if (analysis.recommended_next_action === "Bugün ara" || analysis.recommended_next_action === "Bu hafta ara") {
+      let reminderDate = new Date();
+      if (analysis.recommended_next_action === "Bugün ara") {
+        reminderDate.setHours(reminderDate.getHours() + 2); // 2 hours later
+      } else {
+        reminderDate.setDate(reminderDate.getDate() + 2); // 2 days later
+      }
+      setClause.push(`reminder_date = $${idx++}`);
+      values.push(reminderDate);
     }
 
     if (setClause.length > 0) {
@@ -218,10 +233,10 @@ Danışmanın sesli notu:
     }
 
     // 3. Reminders
-    if (analysis.hatirlatici && analysis.hatirlatici.gerekli_mi) {
+    if (analysis.recommended_next_action) {
       await db.query(
         'INSERT INTO lead_events (lead_id, event_type, description) VALUES ($1, $2, $3)',
-        [leadId, 'voice_note_added', `Sesli not eklendi. Önerilen takip: ${analysis.hatirlatici.tarih_ipucu || 'Belirtilmedi'}`]
+        [leadId, 'voice_note_added', `Sesli not eklendi. Önerilen takip: ${analysis.recommended_next_action}`]
       );
     }
 
