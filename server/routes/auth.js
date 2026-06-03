@@ -33,8 +33,9 @@ const sendVerificationEmail = async (email, token) => {
   }
 
   try {
+    const fromEmail = process.env.SMTP_FROM || process.env.SMTP_USER;
     const info = await transporter.sendMail({
-      from: `"Kapora" <${process.env.SMTP_USER}>`,
+      from: `"Kapora" <${fromEmail}>`,
       to: email,
       subject: "Kapora Hesabınızı Doğrulayın",
       html: `
@@ -240,8 +241,9 @@ router.post('/forgot-password', async (req, res) => {
     
     if (process.env.SMTP_USER && process.env.SMTP_PASS) {
       try {
+        const fromEmail = process.env.SMTP_FROM || process.env.SMTP_USER;
         await transporter.sendMail({
-          from: `"Kapora" <${process.env.SMTP_USER}>`,
+          from: `"Kapora" <${fromEmail}>`,
           to: email,
           subject: "Kapora Şifre Sıfırlama İsteği",
           html: `
