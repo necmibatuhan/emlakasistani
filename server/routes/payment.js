@@ -15,9 +15,8 @@ router.post('/shopier-checkout', authMiddleware, async (req, res) => {
     }
 
     const price = plan === 'pro' ? 299 : 599;
-    const user = req.user; // authMiddleware'den geliyor
+    const user = req.user;
     
-    // Veritabanından kullanıcı detaylarını al
     const userRes = await db.query('SELECT * FROM users WHERE id = $1', [user.id]);
     if (userRes.rows.length === 0) return res.status(404).json({ message: 'Kullanıcı bulunamadı' });
     
@@ -26,50 +25,42 @@ router.post('/shopier-checkout', authMiddleware, async (req, res) => {
     const buyerName = userNameParts[0] || 'Müşteri';
     const buyerSurname = userNameParts.slice(1).join(' ') || 'Soyadı';
 
-    // Sipariş numarası oluştur
     const orderId = `KAPORA_${Date.now()}_${dbUser.id}`;
 
-    // Veritabanına bekleyen siparişi (pending) kaydet
-    // (Önce tablomuz yoksa hızlıca bir 'orders' tablosu gereksinimi var, 
-    // ancak şu an basit tutmak için user tablosundaki bir metadata veya direkt callback üzerinden çözebiliriz.
-    // Daha güvenli olması için orders tablosu eklenebilir. Şu anlık callback'e parametre gönderiyoruz.)
-
-    // API Anahtarları (.env'den alınacak, yoksa test verisi)
     const API_KEY = process.env.SHOPIER_API_KEY || 'TEST_API_KEY';
     const API_SECRET = process.env.SHOPIER_API_SECRET || 'TEST_API_SECRET';
     const CALLBACK_URL = `${process.env.VITE_API_URL || 'http://localhost:5001'}/api/payment/shopier-callback`;
 
-    // Shopier Hash oluşturma
-    // Hash Mantığı: API_SECRET + orderId + totalAmount + currency
+    // Shopier variables
+    const random_nr = Math.floor(Math.random() * 1000000).toString();
     const totalAmount = price; 
     const currency = 0; // 0 = TL
-    const randomString = crypto.randomBytes(4).toString('hex');
 
-    // Yeni sistem HMAC SHA256 Hash
-    const hashString = orderId + totalAmount + currency;
+    // Shopier HMAC SHA256 Hash
+    const hashString = random_nr + orderId + totalAmount + currency;
     const hmac = crypto.createHmac('sha256', API_SECRET);
     hmac.update(hashString);
     const signature = hmac.digest('base64');
 
-    // Dönen form HTML'ini veya verileri frontend'e verelim.
-    // Shopier, arka planda form submit yapmayı sever.
     res.json({
       success: true,
       data: {
         API_KEY,
         signature,
-        orderId,
-        totalAmount,
+        platform_order_id: orderId,
+        random_nr,
+        product_name: plan === 'pro' ? 'Emlak Asistanı Pro' : 'Emlak Asistanı Pro+',
+        product_type: 2, // Digital
+        product_price: totalAmount,
         currency,
-        buyerName,
-        buyerSurname,
-        buyerEmail: dbUser.email,
-        buyerPhone: '05555555555', // Geliştirilecek
-        buyerAddress: 'İstanbul, Türkiye', // Geliştirilecek
-        callbackUrl: CALLBACK_URL,
-        buyerAccountAge: 0,
-        buyerId: dbUser.id,
-        customData: plan // Hangi planı aldığını Shopier'e custom veri olarak iletiyoruz
+        buyer_name: buyerName,
+        buyer_surname: buyerSurname,
+        buyer_email: dbUser.email,
+        buyer_phone: '05555555555',
+        buyer_idnr: dbUser.id,
+        buyer_account_age: 0,
+        custom_data: plan,
+        callback: CALLBACK_URL
       }
     });
 
@@ -91,47 +82,42 @@ router.post('/shopier-callback', async (req, res) => {
       currency, 
       installment, 
       custom_data, 
-      signature
+      signature,
+      random_nr
     } = req.body;
 
     const API_SECRET = process.env.SHOPIER_API_SECRET || 'TEST_API_SECRET';
 
-    // Güvenlik doğrulaması (Hash kontrolü)
-    const expectedHashString = random_nr + order_id + total_amount + currency; 
-    // Shopier dökümantasyonuna göre POST edilen verideki random_nr'yi alıp signature doğrulanır.
-    const random_nr = req.body.random_nr;
+    // Verify Signature
     const hash_str = random_nr + order_id + total_amount + currency;
     const hmac = crypto.createHmac('sha256', API_SECRET);
     hmac.update(hash_str);
     const expectedSignature = hmac.digest('base64');
 
     if (signature !== expectedSignature) {
-      console.error('Shopier geçersiz imza (signature mismatch)');
+      console.error('Shopier signature mismatch');
       return res.status(400).send('Geçersiz İmza');
     }
 
     if (status === 'success') {
-      // custom_data içerisinden planı ve kullanıcı ID'sini order_id'den çıkarabiliriz.
-      // order_id formatımız: KAPORA_123456789_userId
       const orderParts = order_id.split('_');
       const userId = orderParts[2];
-      const plan = custom_data || 'pro'; // varsayılan
+      const plan = custom_data || 'pro';
 
       if (userId) {
         await db.query('UPDATE users SET plan = $1 WHERE id = $2', [plan, userId]);
-        console.log(`Kullanıcı ${userId} planı ${plan} olarak güncellendi.`);
+        console.log(`User ${userId} upgraded to ${plan}`);
         
-        // Kullanıcıyı frontend başarılı sayfasına yönlendir (GET / POST method farkından dolayı frontend yönlendirmesi yapıyoruz)
         return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/payment-result?status=success`);
       }
     } else {
-      console.error(`Shopier ödeme başarısız: ${order_id}`);
+      console.error(`Shopier failed payment: ${order_id}`);
       return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/payment-result?status=fail`);
     }
 
   } catch (err) {
     console.error('Shopier callback error:', err);
-    res.status(500).send('Webhook Hatası');
+    res.status(500).send('Webhook Error');
   }
 });
 

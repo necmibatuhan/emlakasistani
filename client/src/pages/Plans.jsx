@@ -22,7 +22,6 @@ const Plans = () => {
       
       const { data } = res.data;
       
-      // Shopier'e yönlendirmek için dinamik form oluştur
       const form = document.createElement('form');
       form.method = 'POST';
       form.action = 'https://shopier.com/ShowProduct/api_pay4.php';
@@ -30,18 +29,20 @@ const Plans = () => {
       const fields = {
         API_KEY: data.API_KEY,
         signature: data.signature,
-        buyer_idnr: data.buyerId,
-        product_name: plan === 'pro' ? 'Pro Plan Aylık' : 'Pro+ Plan Aylık',
-        product_price: data.totalAmount,
+        platform_order_id: data.platform_order_id,
+        random_nr: data.random_nr,
+        product_name: data.product_name,
+        product_type: data.product_type,
+        product_price: data.product_price,
         currency: data.currency,
-        buyer_name: data.buyerName,
-        buyer_surname: data.buyerSurname,
-        buyer_email: data.buyerEmail,
-        buyer_phone: data.buyerPhone,
-        buyer_account_age: data.buyerAccountAge,
-        buyer_id: data.buyerId,
-        custom_data: data.customData,
-        callback: data.callbackUrl
+        buyer_name: data.buyer_name,
+        buyer_surname: data.buyer_surname,
+        buyer_email: data.buyer_email,
+        buyer_phone: data.buyer_phone,
+        buyer_idnr: data.buyer_idnr,
+        buyer_account_age: data.buyer_account_age,
+        custom_data: data.custom_data,
+        callback: data.callback
       };
       
       Object.keys(fields).forEach(key => {
