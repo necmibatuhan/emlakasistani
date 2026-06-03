@@ -15,18 +15,15 @@ export default defineConfig({
       debugger: true, // Enable debugger statements logic in obfuscator
       options: {
         compact: true,
-        controlFlowFlattening: true,
-        controlFlowFlatteningThreshold: 0.75,
-        deadCodeInjection: true,
-        deadCodeInjectionThreshold: 0.4,
-        debugProtection: true, // Prevent DevTools/F12
-        debugProtectionInterval: 2000,
+        controlFlowFlattening: false,
+        deadCodeInjection: false,
+        debugProtection: false, // Prevent DevTools/F12 freezing the app completely
         disableConsoleOutput: true,
         identifierNamesGenerator: 'hexadecimal',
         log: false,
         renameGlobals: false,
         rotateStringArray: true,
-        selfDefending: true,
+        selfDefending: false,
         stringArray: true,
         stringArrayEncoding: ['base64'],
         stringArrayThreshold: 0.75,
