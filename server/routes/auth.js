@@ -13,9 +13,9 @@ const { OAuth2Client } = require('google-auth-library');
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID || 'MOCK_CLIENT_ID');
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.hostinger.com",
-  port: 465,
-  secure: true, // true for 465, false for other ports
+  host: process.env.SMTP_HOST || "smtp.hostinger.com",
+  port: parseInt(process.env.SMTP_PORT || "465"),
+  secure: process.env.SMTP_PORT === "587" ? false : true, // true for 465, false for other ports
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
@@ -223,6 +223,79 @@ router.post('/google', async (req, res) => {
     res.status(500).json({ message: 'Sunucu hatası' });
   }
 });
+// Şifremi Unuttum (Forgot Password)
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    
+    const userResult = await db.query('SELECT * FROM users WHERE email = $1', [email]);
+    if (userResult.rows.length === 0) {
+      return res.json({ message: 'Eğer bu e-posta adresi sistemimizde kayıtlıysa, şifre sıfırlama bağlantısı gönderildi.' });
+    }
+    
+    const user = userResult.rows[0];
+    const resetSecret = (process.env.JWT_SECRET || 'gizli_anahtar') + user.password_hash;
+    const resetToken = jwt.sign({ userId: user.id, email: user.email }, resetSecret, { expiresIn: '1h' });
+    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${resetToken}&id=${user.id}`;
+    
+    if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+      try {
+        await transporter.sendMail({
+          from: `"Kapora" <${process.env.SMTP_USER}>`,
+          to: email,
+          subject: "Kapora Şifre Sıfırlama İsteği",
+          html: `
+            <h2>Şifrenizi Sıfırlayın</h2>
+            <p>Şifrenizi sıfırlamak için aşağıdaki bağlantıya tıklayın. Bu bağlantı 1 saat boyunca geçerlidir.</p>
+            <a href="${resetUrl}" style="display:inline-block;padding:10px 20px;color:#fff;background-color:#F5A623;text-decoration:none;border-radius:5px;">Şifremi Sıfırla</a>
+            <p>Eğer butona tıklayamazsanız, bu linki kopyalayıp tarayıcınıza yapıştırın:</p>
+            <p>${resetUrl}</p>
+          `,
+        });
+      } catch (mailErr) {
+        console.error('SMTP Mail Gönderme Hatası:', mailErr);
+        return res.status(500).json({ message: `Mail gönderilemedi. Lütfen sistem yöneticisiyle iletişime geçin. (Hata: ${mailErr.message})` });
+      }
+    }
+    
+    res.json({ message: 'Eğer bu e-posta adresi sistemimizde kayıtlıysa, şifre sıfırlama bağlantısı gönderildi.' });
+    
+  } catch (err) {
+    console.error('Forgot password error:', err);
+    res.status(500).json({ message: 'Sunucu hatası.' });
+  }
+});
+
+// Şifre Sıfırlama (Reset Password)
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { userId, token, newPassword } = req.body;
+    
+    const userResult = await db.query('SELECT * FROM users WHERE id = $1', [userId]);
+    if (userResult.rows.length === 0) return res.status(400).json({ message: 'Geçersiz bağlantı.' });
+    
+    const user = userResult.rows[0];
+    const resetSecret = (process.env.JWT_SECRET || 'gizli_anahtar') + user.password_hash;
+    
+    try {
+      jwt.verify(token, resetSecret);
+    } catch (err) {
+      return res.status(400).json({ message: 'Şifre sıfırlama bağlantısı geçersiz veya süresi dolmuş.' });
+    }
+    
+    const salt = await bcrypt.genSalt(10);
+    const newPasswordHash = await bcrypt.hash(newPassword, salt);
+    
+    await db.query('UPDATE users SET password_hash = $1 WHERE id = $2', [newPasswordHash, userId]);
+    
+    res.json({ message: 'Şifreniz başarıyla sıfırlandı. Artık giriş yapabilirsiniz.' });
+    
+  } catch (err) {
+    console.error('Reset password error:', err);
+    res.status(500).json({ message: 'Sunucu hatası.' });
+  }
+});
+
 // GET /me (Get current user)
 router.get('/me', authMiddleware, async (req, res) => {
   try {
