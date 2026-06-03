@@ -7,35 +7,25 @@ const { authMiddleware } = require('../middleware/auth');
 const router = express.Router();
 
 const crypto = require('crypto');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const { OAuth2Client } = require('google-auth-library');
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID || 'MOCK_CLIENT_ID');
-
-// Real Email Sending with Nodemailer
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: process.env.SMTP_PORT || 587,
-  secure: false, // true for 465, false for other ports
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendVerificationEmail = async (email, token) => {
   const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${token}`;
   
-  if (!process.env.SMTP_USER || process.env.SMTP_USER === 'GIRILECEK_EMAIL') {
-    console.log(`\n\n=== E-POSTA SİMÜLASYONU (SMTP Kurulmamış) ===`);
+  if (!process.env.RESEND_API_KEY) {
+    console.log(`\n\n=== E-POSTA SİMÜLASYONU (Resend Kurulmamış) ===`);
     console.log(`Kime: ${email}`);
     console.log(`Link: ${verificationUrl}\n=============================\n\n`);
     return;
   }
 
   try {
-    await transporter.sendMail({
-      from: `"Emlak Asistanı" <${process.env.SMTP_USER}>`,
+    await resend.emails.send({
+      from: 'Emlak Asistanı <onboarding@resend.dev>', // Resend test sender
       to: email,
       subject: "Emlak Asistanı Hesabınızı Doğrulayın",
       html: `
