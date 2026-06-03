@@ -31,7 +31,7 @@ const GizlilikPolitikasi = () => {
             <section>
               <h2 className="text-lg font-semibold text-[#F1F2F4] mb-3">1. Toplanan Veriler ve Kullanım Amacı</h2>
               <p>
-                Takip.ai olarak, yalnızca size daha iyi bir hizmet sunabilmek ve platformun temel CRM işlevlerini yerine getirebilmek için gerekli olan minimum veriyi toplarız. Bunlar, platforma kayıt olurken verdiğiniz profil bilgileriniz ile sisteme eklediğiniz müşteri (lead) kayıtlarından ibarettir.
+                Kapora olarak, yalnızca size daha iyi bir hizmet sunabilmek ve platformun temel CRM işlevlerini yerine getirebilmek için gerekli olan minimum veriyi toplarız. Bunlar, platforma kayıt olurken verdiğiniz profil bilgileriniz ile sisteme eklediğiniz müşteri (lead) kayıtlarından ibarettir.
               </p>
             </section>
 

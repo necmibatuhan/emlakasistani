@@ -28,7 +28,7 @@ app.use('/api/offices', officesRoutes);
 app.use('/api/voice', voiceRoutes);
 
 app.get('/', (req, res) => {
-  res.send('Takip.ai API');
+  res.send('Kapora API');
 });
 
 app.listen(PORT, () => {

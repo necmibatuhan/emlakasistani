@@ -27,7 +27,7 @@ const Sidebar = () => {
           EA
         </div>
         <div>
-          <h1 className="font-headline-md text-headline-md font-bold text-primary dark:text-primary">Takip.ai</h1>
+          <h1 className="font-headline-md text-headline-md font-bold text-primary dark:text-primary">Kapora</h1>
           <p className="font-body-sm text-body-sm text-on-surface-variant">Emlak Yönetimi</p>
         </div>
       </div>
