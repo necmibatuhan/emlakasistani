@@ -178,7 +178,7 @@ Sadece aşağıdaki JSON formatında yanıt dön:
   "suggested_whatsapp_reply": "hazır mesaj taslağı (en fazla 2-3 cümle, samimi ve profesyonel)",
   "extracted_raw_quotes": ["müşterinin tam söylediği önemli cümleler"]
 }
-\`;
+`;
 
     let parsedResult;
     if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'mock') {
