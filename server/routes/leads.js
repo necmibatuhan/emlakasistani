@@ -198,11 +198,14 @@ Sadece aşağıdaki JSON formatında yanıt dön:
 
     function getMockAnalyzeResult() {
       return { 
-        skor: 8, etiket: "Sıcak", 
-        gerekceler: { aciklama: "Net bütçe ve aciliyet belirtilmiş." }, 
-        onerilen_aksiyon: "Bugün ara", 
-        yanit_taslak: `Merhaba ${name}, talebiniz için uygun portföyleri hazırladım. Ne zaman görüşelim?`, 
-        mulk_tercihleri: { bolge: "Merkez", tip: "Satılık", oda: "3+1", butce: "5M", aciliyet: "Acil", yatirim_amacli: true, on_onay_durumu: "Belli" } 
+        customer_intent: "buyer",
+        key_motivations: ["Deneme/Mock verisi", "AI bağlantısı kurulamadı"],
+        potential_risks: ["API anahtarı eksik"],
+        overall_lead_score: 80,
+        skor: 8, 
+        etiket: "Sıcak", 
+        recommended_next_action: "Sistem yöneticisi ile görüşüp GEMINI_API_KEY ayarını Render'a ekle.", 
+        suggested_whatsapp_reply: `Merhaba ${name}, sistem AI entegrasyonu tamamlanmadığı için size bu test mesajını iletiyorum.`, 
       };
     }
 
