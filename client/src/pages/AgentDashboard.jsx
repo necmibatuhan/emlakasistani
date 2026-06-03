@@ -183,7 +183,8 @@ const AgentDashboard = () => {
                   onClick={() => setIsVoiceModalOpen(true)}
                   className="w-full bg-transparent border border-[#2A2D35] hover:bg-[#1C1E24] text-[#F1F2F4] font-medium py-2 px-4 rounded transition-colors flex items-center justify-center gap-2"
                 >
-                  🎙️ Sesli not
+                  <span className="material-symbols-outlined text-[18px]">mic</span>
+                  Sesli not
                 </button>
               </div>
             </div>
