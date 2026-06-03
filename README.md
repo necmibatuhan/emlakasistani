@@ -1,4 +1,4 @@
-# Emlak Asistanı
+# Takip.ai
 
 Bu proje, emlak danışmanları için geliştirilmiş, WhatsApp mesajlarını yapay zeka ile analiz eden ve potansiyel müşterileri (lead'leri) önceliklendiren bir CRM sistemidir.
 

@@ -25,11 +25,11 @@ const sendVerificationEmail = async (email, token) => {
 
   try {
     await resend.emails.send({
-      from: 'Emlak Asistanı <onboarding@resend.dev>', // Resend test sender
+      from: 'Takip.ai <onboarding@resend.dev>', // Resend test sender
       to: email,
-      subject: "Emlak Asistanı Hesabınızı Doğrulayın",
+      subject: "Takip.ai Hesabınızı Doğrulayın",
       html: `
-        <h2>Emlak Asistanı'na Hoş Geldiniz!</h2>
+        <h2>Takip.ai'a Hoş Geldiniz!</h2>
         <p>Hesabınızı aktifleştirmek için lütfen aşağıdaki bağlantıya tıklayın:</p>
         <a href="${verificationUrl}" style="display:inline-block;padding:10px 20px;color:#fff;background-color:#F5A623;text-decoration:none;border-radius:5px;">Hesabımı Doğrula</a>
         <p>Eğer butona tıklayamazsanız, bu linki kopyalayıp tarayıcınıza yapıştırın:</p>

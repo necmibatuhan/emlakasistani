@@ -23,7 +23,7 @@ const AydinlatmaMetni = () => {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-[#F1F2F4]">KVKK Aydınlatma Metni</h1>
-              <p className="text-[#7C8090] mt-1">Emlak Asistanı Veri İşleme Politikaları</p>
+              <p className="text-[#7C8090] mt-1">Takip.ai Veri İşleme Politikaları</p>
             </div>
           </div>
 
@@ -31,7 +31,7 @@ const AydinlatmaMetni = () => {
             <section>
               <h2 className="text-lg font-semibold text-[#F1F2F4] mb-3">1. Veri İşleme Amacımız</h2>
               <p>
-                Emlak Asistanı olarak öncelikli amacımız, gayrimenkul danışmanlarının iş süreçlerini hızlandırmak, müşteri görüşmelerini (lead) dijital ortamda düzenlemek ve akıllı bir CRM kaydı oluşturmaktır. Toplanan veriler, yalnızca sizin işinizi kolaylaştırmak ve portföy eşleştirmelerini otomatize etmek için kullanılır.
+                Takip.ai olarak öncelikli amacımız, gayrimenkul danışmanlarının iş süreçlerini hızlandırmak, müşteri görüşmelerini (lead) dijital ortamda düzenlemek ve akıllı bir CRM kaydı oluşturmaktır. Toplanan veriler, yalnızca sizin işinizi kolaylaştırmak ve portföy eşleştirmelerini otomatize etmek için kullanılır.
               </p>
             </section>
 

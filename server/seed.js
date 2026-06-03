@@ -85,7 +85,7 @@ async function seed() {
       [
         office1Id, agent1Id, 'Caner Yılmaz', '+905321112233', 'Sıcak', 9, 'Randevu Alındı', 'WhatsApp',
         "Müşteri evli ve 2 çocuk babası. Çocukların okulları Moda'da olduğu için kesinlikle Moda veya Fenerbahçe civarında 3+1 ev arıyor. Bütçesi 10 Milyon TL'ye kadar çıkabiliyor. Krediye uygun olması şart. Eşi mimar olduğu için içi yapılı evleri tercih ediyor. Hafta sonu evleri gezmek için müsaitler.",
-        "Merhaba Caner Bey, Emlak Asistanı'ndan Mehmet ben. WhatsApp üzerinden Moda ve Fenerbahçe civarında 3+1 ev arayışınız olduğunu belirtmiştiniz. Portföyümüze tam tarif ettiğiniz gibi, çocukların okullarına çok yakın ve içi tamamen yenilenmiş harika bir daire eklendi. Üstelik krediye de uygun. Eşinizle birlikte hafta sonu bu evi görmek ister misiniz? Müsaitlik durumunuzu paylaşırsanız hemen randevu oluşturabilirim. İyi günler dilerim."
+        "Merhaba Caner Bey, Takip.ai'dan Mehmet ben. WhatsApp üzerinden Moda ve Fenerbahçe civarında 3+1 ev arayışınız olduğunu belirtmiştiniz. Portföyümüze tam tarif ettiğiniz gibi, çocukların okullarına çok yakın ve içi tamamen yenilenmiş harika bir daire eklendi. Üstelik krediye de uygun. Eşinizle birlikte hafta sonu bu evi görmek ister misiniz? Müsaitlik durumunuzu paylaşırsanız hemen randevu oluşturabilirim. İyi günler dilerim."
       ],
       [
         office1Id, agent1Id, 'Elif Hanım', '+905445556677', 'Ilık', 6, 'Arandı', 'Instagram',

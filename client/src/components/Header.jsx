@@ -23,7 +23,7 @@ const Header = () => {
             <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center">
               <span className="text-accent-gold font-bold">EA</span>
             </div>
-            <span className="font-semibold text-lg tracking-tight">Emlak Asistanı</span>
+            <span className="font-semibold text-lg tracking-tight">Takip.ai</span>
           </Link>
           
           <nav className="hidden md:flex items-center space-x-1">

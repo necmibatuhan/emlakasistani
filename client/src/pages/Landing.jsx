@@ -62,7 +62,7 @@ const Landing = () => {
             <div className="w-7 h-7 bg-[#1E2025] flex items-center justify-center rounded-[4px]">
               <span className="text-[#F1F2F4] text-[16px] font-bold tracking-tight">EA</span>
             </div>
-            <span className="text-[14px] font-medium tracking-wide">Emlak Asistanı</span>
+            <span className="text-[14px] font-medium tracking-wide">Takip.ai</span>
           </div>
           
           {/* Right Nav */}
@@ -368,7 +368,7 @@ const Landing = () => {
       <footer className="border-t border-[#1E2025] py-8">
         <div className="max-w-[1200px] mx-auto px-6 flex items-center justify-between">
           <div className="text-[12px] text-[#7C8090]">
-            © 2026 Emlak Asistanı
+            © 2026 Takip.ai
           </div>
           <div className="flex items-center space-x-6 text-[12px] text-[#7C8090]">
             <a href="#" className="hover:text-[#F1F2F4] transition-colors">Gizlilik</a>
@@ -411,11 +411,11 @@ const Landing = () => {
               <div className="w-8 h-8 bg-[#1E2025] rounded-[6px] flex items-center justify-center">
                 <span className="text-[#F1F2F4] font-bold text-[14px] tracking-tight">EA</span>
               </div>
-              <span className="text-[#F1F2F4] font-semibold tracking-tight text-[18px]">Emlak Asistanı</span>
+              <span className="text-[#F1F2F4] font-semibold tracking-tight text-[18px]">Takip.ai</span>
             </div>
             <p className="text-[#7C8090] text-[13px] leading-relaxed mb-4">
               <strong className="text-[#F1F2F4] font-medium block mb-1">Veri Gizliliği Bildirimi ("Privacy by Design"):</strong>
-              Emlak Asistanı, KVKK uyumlu altyapısı ile tasarlanmıştır. Verileriniz, anonimleştirme teknolojileri ile korunur. Yapay zeka süreçlerimizde, müşteri bilgileriniz (ad, telefon, e-posta) analiz edilmeden önce maskelenir ve dış sistemlerde veya modellerin eğitiminde asla depolanmaz/kullanılmaz.
+              Takip.ai, KVKK uyumlu altyapısı ile tasarlanmıştır. Verileriniz, anonimleştirme teknolojileri ile korunur. Yapay zeka süreçlerimizde, müşteri bilgileriniz (ad, telefon, e-posta) analiz edilmeden önce maskelenir ve dış sistemlerde veya modellerin eğitiminde asla depolanmaz/kullanılmaz.
             </p>
             <div className="flex items-center space-x-4 text-[13px]">
               <a href="/aydinlatma-metni" className="text-[#F5A623] hover:text-[#FFA000] transition-colors font-medium">Aydınlatma Metni</a>
@@ -425,7 +425,7 @@ const Landing = () => {
           </div>
           
           <div className="text-[#7C8090] text-[13px] text-left md:text-right">
-            <p>© {new Date().getFullYear()} Emlak Asistanı.</p>
+            <p>© {new Date().getFullYear()} Takip.ai.</p>
             <p className="mt-1">Tüm Hakları Saklıdır.</p>
           </div>
         </div>

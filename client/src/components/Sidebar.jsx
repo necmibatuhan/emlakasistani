@@ -28,7 +28,7 @@ const Sidebar = () => {
         <div className="w-7 h-7 bg-[#2A2D35] rounded-md flex items-center justify-center mr-3">
           <span className="text-white font-bold text-[13px] tracking-wider">EA</span>
         </div>
-        <span className="text-[#F1F2F4] font-medium text-[13px]">Emlak Asistanı</span>
+        <span className="text-[#F1F2F4] font-medium text-[13px]">Takip.ai</span>
       </div>
 
       {/* Navigation */}

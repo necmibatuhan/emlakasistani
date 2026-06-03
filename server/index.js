@@ -28,7 +28,7 @@ app.use('/api/offices', officesRoutes);
 app.use('/api/voice', voiceRoutes);
 
 app.get('/', (req, res) => {
-  res.send('Emlak Asistanı API');
+  res.send('Takip.ai API');
 });
 
 app.listen(PORT, () => {
