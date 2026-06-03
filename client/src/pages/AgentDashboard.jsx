@@ -2,12 +2,11 @@ import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AuthContext } from '../contexts/AuthContext';
-import { Users, PhoneCall, TrendingUp, Calendar, ChevronRight, Plus, Search, Filter, Phone, Mail, MoreHorizontal, MessageSquare, Send, CheckCircle2, AlertCircle, RefreshCw, LogOut, Copy, Check, Menu, Mic, Clock, Activity } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
-import VoiceNote from '../components/VoiceNote';
-import VoiceToText from '../components/VoiceToText';
+import Header from '../components/Header';
+import VoiceNoteModal from '../components/VoiceNoteModal';
 import clsx from 'clsx';
-import { format, isToday, isPast } from 'date-fns';
+import { format, isToday } from 'date-fns';
 import { tr } from 'date-fns/locale';
 
 const AgentDashboard = () => {
@@ -24,7 +23,8 @@ const AgentDashboard = () => {
   const [analyzing, setAnalyzing] = useState(false);
   const [analyzeError, setAnalyzeError] = useState('');
 
-  const [copied, setCopied] = useState(false);
+  // Voice Note Modal State
+  const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
 
   const { data: leads = [], isLoading: loading } = useQuery({
     queryKey: ['leads'],
@@ -49,7 +49,7 @@ const AgentDashboard = () => {
   });
 
   const handleAnalyze = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     setAnalyzing(true);
     setAnalyzeError('');
     try {
@@ -67,32 +67,22 @@ const AgentDashboard = () => {
     }
   };
 
-  const handleStatusChange = async (newStatus) => {
-    if (!leadDetails) return;
+  const handleVoiceNoteComplete = async (audioBlob) => {
     try {
-      await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/${leadDetails.id}`, { status: newStatus }, { headers: { Authorization: `Bearer ${token}` } });
-      await queryClient.invalidateQueries(['lead', leadDetails.id]);
+      const formData = new FormData();
+      formData.append('audio', audioBlob);
+      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/voice`, formData, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
       await queryClient.invalidateQueries(['leads']);
+      setSelectedLeadId(res.data.id);
     } catch (err) {
       console.error(err);
+      alert('Sesli not analiz hatası.');
     }
-  };
-
-  const handleReminderChange = async (date) => {
-    if (!leadDetails) return;
-    try {
-      await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/${leadDetails.id}`, { reminder_date: date }, { headers: { Authorization: `Bearer ${token}` } });
-      await queryClient.invalidateQueries(['lead', leadDetails.id]);
-      await queryClient.invalidateQueries(['leads']);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
   };
 
   const filteredLeads = filter === 'Tümü' ? leads : leads.filter(l => l.label === filter);
@@ -103,286 +93,252 @@ const AgentDashboard = () => {
 
   const remindersToday = leads.filter(l => l.reminder_date && isToday(new Date(l.reminder_date)));
 
-  const getLabelColorHex = (label) => {
-    if (label === 'Sıcak') return '#EF4444';
-    if (label === 'Ilık') return '#F5A623';
-    return '#3B82F6';
-  };
-
   return (
-    <div className="flex h-screen bg-[#0F1117] text-[#F1F2F4] overflow-hidden">
-      
-      {/* Sidebar (220px fixed) */}
+    <div className="flex h-screen overflow-hidden">
       <Sidebar />
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden">
-        
-        {/* Top Metric Bar */}
-        <div className="h-16 flex-shrink-0 border-b border-[#2A2D35] flex items-center justify-between px-6 bg-[#0F1117]">
-          <div className="flex items-center space-x-8 h-full">
-            <div className="flex items-center space-x-3">
-              <span className="font-mono text-2xl font-semibold">{leads.length}</span>
-              <span className="text-[#7C8090] text-xs">Bu ay lead</span>
-            </div>
-            <div className="w-[1px] h-8 bg-[#2A2D35]" />
-            <div className="flex items-center space-x-3">
-              <span className="font-mono text-2xl font-semibold text-[#EF4444]">{hotLeads}</span>
-              <span className="text-[#7C8090] text-xs">Sıcak</span>
-            </div>
-            <div className="w-[1px] h-8 bg-[#2A2D35]" />
-            <div className="flex items-center space-x-3">
-              <span className="font-mono text-2xl font-semibold text-[#F5A623]">{warmLeads}</span>
-              <span className="text-[#7C8090] text-xs">Ilık</span>
-            </div>
-            <div className="w-[1px] h-8 bg-[#2A2D35]" />
-            <div className="flex items-center space-x-3">
-              <span className="font-mono text-2xl font-semibold text-[#3B82F6]">{coldLeads}</span>
-              <span className="text-[#7C8090] text-xs">Soğuk</span>
-            </div>
-          </div>
-          
-          <button className="flex items-center space-x-2 text-[#7C8090] hover:text-[#F1F2F4] transition-colors text-[13px] font-medium">
-            <Activity size={14} />
-            <span>Günlük Özet</span>
-          </button>
-        </div>
+      <div className="ml-[240px] flex-1 flex flex-col h-full bg-[#0A0B0D]">
+        <Header />
 
-        {/* Warning Banner */}
+        {/* Alert Banner */}
         {remindersToday.length > 0 && (
-          <div className="bg-[#2A1A00] border-l-4 border-[#F5A623] py-2 px-6 flex-shrink-0">
-            <div className="flex items-center space-x-2 text-[#F5A623] text-xs font-medium">
-              <Clock size={14} />
-              <span>
-                Bugün {remindersToday.length} lead için takip zamanı geldi — {remindersToday.map(l => l.name).join(', ')}
-              </span>
-            </div>
+          <div className="w-full bg-[#2A1A00] border-b border-[#F5A623] px-container-padding py-stack-sm flex items-center gap-stack-sm shrink-0">
+            <span className="material-symbols-outlined text-primary-container" style={{fontVariationSettings: "'FILL' 1"}}>alarm</span>
+            <p className="font-body-md text-body-md text-on-surface">⏰ Bugün {remindersToday.length} lead için takip zamanı — {remindersToday.map(l => l.name).join(', ')}</p>
           </div>
         )}
 
-        {/* 3 Columns Layout */}
-        <div className="flex-1 flex overflow-hidden">
+        {/* Scrollable Canvas */}
+        <div className="flex-1 overflow-y-auto p-container-padding flex flex-col gap-container-padding">
           
-          {/* Column 1: New Lead Form (300px) */}
-          <div className="w-[300px] flex-shrink-0 border-r border-[#2A2D35] bg-[#0F1117] flex flex-col p-5 overflow-y-auto">
-            <h3 className="text-[13px] font-medium text-[#7C8090] mb-5">Yeni lead</h3>
-            {analyzeError && <div className="text-red-500 text-xs mb-4">{analyzeError}</div>}
-            
-            <form onSubmit={handleAnalyze} className="space-y-4 flex-1">
-              <div>
-                <input 
-                  required type="text" placeholder="İsim Soyisim"
-                  className="w-full text-[13px] bg-[#0F1117] border border-[#2A2D35] rounded-md px-3 py-2.5 text-[#F1F2F4] placeholder-[#7C8090]"
-                  value={name} onChange={e=>setName(e.target.value)} 
-                />
-              </div>
-              <div>
-                <input 
-                  required type="tel" placeholder="Telefon"
-                  className="w-full text-[13px] bg-[#0F1117] border border-[#2A2D35] rounded-md px-3 py-2.5 text-[#F1F2F4] placeholder-[#7C8090]"
-                  value={phone} onChange={e=>setPhone(e.target.value)} 
-                />
-              </div>
-              <div>
-                <textarea 
-                  required rows="5" placeholder="Müşteri mesajı..."
-                  className="w-full text-[13px] bg-[#0F1117] border border-[#2A2D35] rounded-md px-3 py-2.5 text-[#F1F2F4] placeholder-[#7C8090] resize-none"
-                  value={message} onChange={e=>setMessage(e.target.value)} 
-                />
-              </div>
-              
-              <button disabled={analyzing} type="submit" className="w-full bg-[#F5A623] text-[#0F1117] hover:bg-[#d9921e] transition-colors py-2.5 rounded-md text-[13px] font-medium flex items-center justify-center space-x-2 disabled:opacity-50">
-                {analyzing ? (
-                  <>
-                    <div className="w-3.5 h-3.5 border-2 border-[#0F1117]/30 border-t-[#0F1117] rounded-full animate-spin" />
-                    <span>Analiz Ediliyor...</span>
-                  </>
-                ) : (
-                  <span>Analiz Et</span>
-                )}
-              </button>
-            </form>
-
-            <div className="mt-4 pt-4 border-t border-[#2A2D35]">
-              <VoiceToText onLeadCreated={(newLead) => {
-                queryClient.invalidateQueries(['leads']);
-                setSelectedLeadId(newLead.id);
-              }} />
+          {/* Top Metric Bar */}
+          <div className="panel flex items-center justify-between p-stack-md shrink-0">
+            <div className="flex flex-col">
+              <span className="font-label-caps text-label-caps text-on-surface-variant mb-unit">BU AY LEAD</span>
+              <span className="font-data-tabular text-[24px] font-medium leading-none text-on-surface">{leads.length}</span>
+            </div>
+            <div className="h-8 w-px divider border-l"></div>
+            <div className="flex flex-col items-center">
+              <span className="font-label-caps text-label-caps text-on-surface-variant mb-unit">SICAK</span>
+              <span className="font-data-tabular text-[24px] font-medium leading-none text-error">{hotLeads}</span>
+            </div>
+            <div className="h-8 w-px divider border-l"></div>
+            <div className="flex flex-col items-center">
+              <span className="font-label-caps text-label-caps text-on-surface-variant mb-unit">ILIK</span>
+              <span className="font-data-tabular text-[24px] font-medium leading-none text-primary">{warmLeads}</span>
+            </div>
+            <div className="h-8 w-px divider border-l"></div>
+            <div className="flex flex-col items-end">
+              <span className="font-label-caps text-label-caps text-on-surface-variant mb-unit">SOĞUK</span>
+              <span className="font-data-tabular text-[24px] font-medium leading-none text-tertiary">{coldLeads}</span>
             </div>
           </div>
 
-          {/* Column 2: Lead List (flex-1) */}
-          <div className="flex-1 flex flex-col bg-[#0F1117] overflow-hidden border-r border-[#2A2D35]">
-            <div className="p-5 border-b border-[#2A2D35]">
-              <div className="flex space-x-2">
+          {/* 3-Column Layout */}
+          <div className="flex-1 flex gap-panel-gap min-h-0">
+            
+            {/* Left Column (New Lead Form) */}
+            <div className="w-[300px] panel flex flex-col shrink-0">
+              <div className="p-stack-md border-b divider shrink-0">
+                <h2 className="font-headline-md text-headline-md font-medium">Yeni lead</h2>
+              </div>
+              <div className="p-stack-md flex-1 overflow-y-auto flex flex-col gap-stack-md">
+                {analyzeError && <p className="text-error text-sm">{analyzeError}</p>}
+                <div className="flex flex-col gap-unit">
+                  <label className="font-body-sm text-body-sm text-on-surface-variant">Müşteri Adı</label>
+                  <input 
+                    className="input-dark p-2 text-sm w-full" 
+                    placeholder="Ad Soyad" 
+                    type="text"
+                    value={name} onChange={e=>setName(e.target.value)}
+                  />
+                </div>
+                <div className="flex flex-col gap-unit">
+                  <label className="font-body-sm text-body-sm text-on-surface-variant">Telefon</label>
+                  <input 
+                    className="input-dark p-2 text-sm w-full" 
+                    placeholder="+90 5XX XXX XX XX" 
+                    type="tel"
+                    value={phone} onChange={e=>setPhone(e.target.value)}
+                  />
+                </div>
+                <div className="flex flex-col gap-unit flex-1">
+                  <label className="font-body-sm text-body-sm text-on-surface-variant">Mesaj / Not</label>
+                  <textarea 
+                    className="input-dark p-2 text-sm w-full flex-1 resize-none min-h-[100px]" 
+                    placeholder="Lead detayları..."
+                    value={message} onChange={e=>setMessage(e.target.value)}
+                  ></textarea>
+                </div>
+              </div>
+              <div className="p-stack-md border-t divider flex flex-col gap-stack-sm shrink-0">
+                <button 
+                  onClick={handleAnalyze}
+                  disabled={analyzing}
+                  className="w-full bg-[#F5A623] hover:bg-[#d48c1a] text-black font-medium py-2 px-4 rounded transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {analyzing ? 'Analiz Ediliyor...' : 'Analiz Et'}
+                </button>
+                <button 
+                  onClick={() => setIsVoiceModalOpen(true)}
+                  className="w-full bg-transparent border border-[#2A2D35] hover:bg-[#1C1E24] text-[#F1F2F4] font-medium py-2 px-4 rounded transition-colors flex items-center justify-center gap-2"
+                >
+                  🎙️ Sesli not
+                </button>
+              </div>
+            </div>
+
+            {/* Middle Column (Lead List) */}
+            <div className="flex-1 panel flex flex-col min-w-[320px]">
+              <div className="p-stack-md border-b divider shrink-0 flex gap-stack-sm overflow-x-auto">
                 {['Tümü', 'Sıcak', 'Ilık', 'Soğuk'].map(f => (
                   <button 
-                    key={f} onClick={() => setFilter(f)}
+                    key={f}
+                    onClick={() => setFilter(f)}
                     className={clsx(
-                      "px-3 py-1 text-[11px] font-medium rounded-full uppercase tracking-wider transition-colors", 
-                      filter === f ? "bg-[#F5A623] text-[#0F1117]" : "border border-[#2A2D35] text-[#7C8090] hover:text-[#F1F2F4]"
+                      "px-3 py-1 rounded text-sm whitespace-nowrap transition-colors",
+                      filter === f 
+                        ? "bg-surface-container-high text-on-surface" 
+                        : "bg-transparent border border-outline-variant hover:bg-surface-container-high text-on-surface-variant"
                     )}
                   >
                     {f} {f === 'Tümü' ? leads.length : leads.filter(l=>l.label===f).length}
                   </button>
                 ))}
               </div>
-            </div>
-            
-            <div className="flex-1 overflow-y-auto">
-              {loading ? (
-                <div className="p-8 text-center text-[#7C8090] text-[13px]">Yükleniyor...</div>
-              ) : filteredLeads.length === 0 ? (
-                <div className="p-8 text-center text-[#7C8090] text-[13px]">Henüz kayıt yok.</div>
-              ) : (
-                <div className="flex flex-col">
-                  {filteredLeads.map(lead => {
-                    const isSelected = selectedLeadId === lead.id;
-                    const colorHex = getLabelColorHex(lead.label);
-                    return (
-                      <div 
-                        key={lead.id} 
-                        onClick={() => setSelectedLeadId(lead.id)}
-                        className={clsx(
-                          "px-5 py-3 border-b border-[#2A2D35] cursor-pointer transition-colors flex items-center group",
-                          isSelected ? "bg-[#1A1C23] border-l-2" : "hover:bg-[#1E2028] border-l-2 border-l-transparent"
-                        )}
-                        style={{ borderLeftColor: isSelected ? '#F5A623' : '' }}
-                      >
-                        <div className="w-1.5 h-1.5 rounded-full mr-4 flex-shrink-0" style={{backgroundColor: colorHex}} />
-                        <div className="w-[140px] truncate text-[13px] text-[#F1F2F4] font-medium">{lead.name}</div>
-                        <div className="w-[80px] text-[13px] text-[#7C8090]">{lead.label}</div>
-                        <div className="w-[40px] font-mono text-[13px] text-[#F1F2F4]">{lead.score}/10</div>
-                        <div className="flex-1 truncate text-[13px] text-[#7C8090]">
-                          {lead.properties?.bolge || 'Bölge yok'}
-                        </div>
-                        <div className="w-[80px] text-right text-[12px] text-[#7C8090]">
-                          {isToday(new Date(lead.created_at)) ? 'Bugün' : format(new Date(lead.created_at), 'd MMM')}
-                        </div>
-                        <ChevronRight size={14} className={clsx("ml-2 transition-colors", isSelected ? "text-[#F5A623]" : "text-transparent group-hover:text-[#7C8090]")} />
-                      </div>
-                    )
-                  })}
+              
+              <div className="flex-1 overflow-y-auto">
+                <div className="grid grid-cols-[1fr_auto] gap-4 p-stack-sm px-stack-md border-b divider bg-[#1C1E24] sticky top-0 font-label-caps text-label-caps text-on-surface-variant">
+                  <div>Müşteri / İletişim</div>
+                  <div className="text-right">Durum</div>
                 </div>
-              )}
-            </div>
-          </div>
-
-          {/* Column 3: Lead Detail (380px) */}
-          <div className="w-[380px] flex-shrink-0 bg-[#16181D] overflow-y-auto flex flex-col relative">
-            {!selectedLeadId ? (
-              <div className="flex-1 flex items-center justify-center text-[#7C8090] text-[13px]">
-                Detay için bir lead seçin
-              </div>
-            ) : detailsLoading || !leadDetails ? (
-              <div className="flex-1 flex items-center justify-center text-[#7C8090] text-[13px]">
-                Yükleniyor...
-              </div>
-            ) : (
-              <div className="p-6">
                 
-                {/* Header */}
-                <div className="flex justify-between items-start mb-6">
-                  <div>
-                    <h2 className="text-[18px] font-medium text-[#F1F2F4]">{leadDetails.name}</h2>
-                    <p className="text-[13px] text-[#7C8090] mt-0.5">{leadDetails.phone}</p>
-                    
-                    {/* Status Select */}
-                    <select 
-                      className="mt-3 text-[12px] bg-[#0F1117] border border-[#2A2D35] text-[#F1F2F4] rounded-md px-2 py-1 outline-none focus:border-[#F5A623]"
-                      value={leadDetails.status}
-                      onChange={(e) => handleStatusChange(e.target.value)}
-                    >
-                      <option value="Takipte">Takipte</option>
-                      <option value="Arandı">Arandı</option>
-                      <option value="Randevu Alındı">Randevu Alındı</option>
-                      <option value="Satış Tamamlandı">Satış Tamamlandı</option>
-                    </select>
-
-                  </div>
-                  
-                  {/* Score */}
-                  <div className="relative w-[72px] h-[72px] flex items-center justify-center flex-shrink-0">
-                    <svg className="absolute inset-0 w-full h-full transform -rotate-90">
-                      <circle cx="36" cy="36" r="32" fill="none" stroke="#2A2D35" strokeWidth="4" />
-                      <circle cx="36" cy="36" r="32" fill="none" 
-                        stroke={getLabelColorHex(leadDetails.label)} 
-                        strokeWidth="4" strokeLinecap="round"
-                        strokeDasharray={`${(leadDetails.score/10)*201} 201`}
-                        className="score-circle transition-all duration-1000" />
-                    </svg>
-                    <div className="flex items-baseline">
-                      <span className="font-mono text-[24px] font-semibold" style={{color: getLabelColorHex(leadDetails.label)}}>{leadDetails.score}</span>
+                {loading && <div className="p-8 text-center text-on-surface-variant text-sm">Yükleniyor...</div>}
+                {!loading && filteredLeads.length === 0 && <div className="p-8 text-center text-on-surface-variant text-sm">Lead bulunamadı.</div>}
+                
+                {filteredLeads.map(lead => (
+                  <div 
+                    key={lead.id}
+                    onClick={() => setSelectedLeadId(lead.id)}
+                    className={clsx(
+                      "grid grid-cols-[1fr_auto] gap-4 p-stack-sm px-stack-md border-b divider hover:bg-[#1a1c22] cursor-pointer",
+                      selectedLeadId === lead.id ? "bg-[#1e2025]" : ""
+                    )}
+                  >
+                    <div className="flex flex-col">
+                      <span className="font-medium text-on-surface">{lead.name}</span>
+                      <span className="font-body-sm text-body-sm text-on-surface-variant">{lead.phone || '-'}</span>
+                    </div>
+                    <div className="flex items-center gap-2 justify-end">
+                      <div className={clsx(
+                        "w-2 h-2 rounded-full",
+                        lead.label === 'Sıcak' ? "bg-error" : lead.label === 'Ilık' ? "bg-primary" : "bg-tertiary"
+                      )}></div>
+                      <span className={clsx(
+                        "font-body-sm text-body-sm",
+                        lead.label === 'Sıcak' ? "text-error" : lead.label === 'Ilık' ? "text-primary" : "text-tertiary"
+                      )}>{lead.label}</span>
                     </div>
                   </div>
-                </div>
-
-                <div className="mb-6">
-                  <p className="text-[13px] text-[#7C8090] italic">"{leadDetails.reasoning}"</p>
-                </div>
-
-                <hr className="border-[#2A2D35] mb-6" />
-
-                {/* Property Preferences */}
-                {leadDetails.properties && (
-                  <div className="mb-6">
-                    <h4 className="text-[11px] uppercase tracking-wider font-medium text-[#7C8090] mb-3">Mülk Tercihleri</h4>
-                    <div className="grid grid-cols-2 gap-2">
-                      {Object.entries({
-                        'Bölge': leadDetails.properties.bolge,
-                        'Tip': leadDetails.properties.tip,
-                        'Oda': leadDetails.properties.oda,
-                        'Bütçe': leadDetails.properties.butce,
-                      }).map(([k, v]) => v ? (
-                        <div key={k} className="bg-[#0F1117] border border-[#2A2D35] rounded-md px-3 py-2">
-                          <div className="text-[10px] text-[#7C8090] uppercase tracking-wider mb-0.5">{k}</div>
-                          <div className="text-[12px] font-medium text-[#F1F2F4] truncate">{v}</div>
-                        </div>
-                      ) : null)}
-                    </div>
-                  </div>
-                )}
-
-                {/* Voice Note */}
-                <div className="mb-6">
-                   <h4 className="text-[11px] uppercase tracking-wider font-medium text-[#7C8090] mb-3">Sesli Not</h4>
-                   <VoiceNote leadId={selectedLeadId} onSaved={() => queryClient.invalidateQueries(['lead', selectedLeadId])} />
-                </div>
-
-                {/* WhatsApp */}
-                <div className="mb-6">
-                  <h4 className="text-[11px] uppercase tracking-wider font-medium text-[#7C8090] mb-3">WhatsApp Yanıtı</h4>
-                  <div className="bg-[#0F1117] border border-[#2A2D35] rounded-lg p-3">
-                    <p className="text-[13px] text-[#F1F2F4] leading-relaxed mb-4">
-                      {leadDetails.whatsapp_draft || 'Taslak bulunamadı.'}
-                    </p>
-                    <div className="flex items-center space-x-3">
-                      <a 
-                        href={`https://wa.me/${leadDetails.phone?.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(leadDetails.whatsapp_draft || '')}`}
-                        target="_blank" rel="noreferrer"
-                        className="text-[#25D366] text-[12px] font-medium flex items-center space-x-1 hover:opacity-80"
-                      >
-                        <Send size={12} />
-                        <span>WhatsApp'ta Aç</span>
-                      </a>
-                      <button 
-                        onClick={() => copyToClipboard(leadDetails.whatsapp_draft || '')}
-                        className="text-[#7C8090] hover:text-[#F1F2F4] text-[12px] font-medium flex items-center space-x-1"
-                      >
-                        {copied ? <Check size={12} className="text-green-500" /> : <Copy size={12} />}
-                        <span>{copied ? 'Kopyalandı' : 'Kopyala'}</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
+                ))}
               </div>
-            )}
+            </div>
+
+            {/* Right Column (Lead Detail) */}
+            <div className="w-[380px] panel flex flex-col shrink-0">
+              {!selectedLeadId || detailsLoading ? (
+                <div className="flex-1 flex items-center justify-center text-on-surface-variant text-sm p-8 text-center">
+                  {detailsLoading ? 'Detaylar yükleniyor...' : 'Detayları görmek için bir lead seçin.'}
+                </div>
+              ) : leadDetails ? (
+                <>
+                  <div className="p-stack-md border-b divider shrink-0 flex items-center justify-between">
+                    <div className="flex items-center gap-stack-sm">
+                      <div className="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-lg font-medium text-on-surface">
+                        {leadDetails.name?.substring(0,2).toUpperCase()}
+                      </div>
+                      <div>
+                        <h3 className="font-headline-md text-headline-md font-medium leading-tight text-on-surface">{leadDetails.name}</h3>
+                        <span className="font-body-sm text-body-sm text-on-surface-variant">
+                          Oluşturulma: {format(new Date(leadDetails.created_at), 'dd MMM HH:mm', { locale: tr })}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex-1 overflow-y-auto p-stack-md flex flex-col gap-stack-lg">
+                    {/* Score Ring */}
+                    <div className="flex flex-col items-center justify-center gap-stack-sm">
+                      <div className="relative w-[88px] h-[88px] flex items-center justify-center">
+                        <svg className="absolute inset-0 w-full h-full transform -rotate-90" viewBox="0 0 88 88">
+                          <circle cx="44" cy="44" fill="none" r="40" stroke="#2A2D35" strokeWidth="8"></circle>
+                          <circle 
+                            className="score-circle transition-all duration-1000 ease-out" 
+                            cx="44" cy="44" fill="none" r="40" 
+                            stroke={leadDetails.label === 'Sıcak' ? '#EF4444' : leadDetails.label === 'Ilık' ? '#F5A623' : '#3B82F6'} 
+                            strokeDasharray="251.2" 
+                            strokeDashoffset={251.2 - (251.2 * (leadDetails.score || 5) / 10)} 
+                            strokeWidth="8"
+                          ></circle>
+                        </svg>
+                        <span className="font-data-tabular text-xl font-bold text-on-surface relative z-10">{leadDetails.score || 5}/10</span>
+                      </div>
+                      <span className="font-label-caps text-label-caps text-on-surface-variant">ALIM İHTİMALİ</span>
+                    </div>
+
+                    {/* WhatsApp Action */}
+                    <div className="flex flex-col gap-stack-sm">
+                      <span className="font-label-caps text-label-caps text-on-surface-variant">İLETİŞİM</span>
+                      <div className="bg-[#1C1E24] border border-[#2A2D35] rounded p-stack-sm flex items-center justify-between">
+                        <span className="font-body-md text-body-md text-on-surface">{leadDetails.phone || 'Telefon yok'}</span>
+                        {leadDetails.phone && (
+                          <a 
+                            href={`https://wa.me/${leadDetails.phone.replace(/[^0-9]/g, '')}`} 
+                            target="_blank" rel="noreferrer"
+                            className="bg-[#25D366] text-white px-3 py-1.5 rounded text-sm font-medium flex items-center gap-2 hover:bg-[#20b858] transition-colors"
+                          >
+                            WhatsApp'ta Aç
+                          </a>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Property Preferences */}
+                    {leadDetails.tags && leadDetails.tags.length > 0 && (
+                      <div className="flex flex-col gap-stack-sm">
+                        <span className="font-label-caps text-label-caps text-on-surface-variant">TERCİHLER</span>
+                        <div className="flex flex-wrap gap-2">
+                          {leadDetails.tags.map((tag, i) => (
+                            <span key={i} className="px-2 py-1 bg-surface-container-high border border-outline-variant rounded text-sm text-on-surface">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Voice Note / Message Preview */}
+                    <div className="flex flex-col gap-stack-sm mt-auto">
+                      <span className="font-label-caps text-label-caps text-on-surface-variant">MÜŞTERİ NOTU</span>
+                      <div className="bg-[#1C1E24] border border-[#2A2D35] rounded p-stack-sm">
+                        <p className="font-body-sm text-body-sm text-on-surface-variant italic">
+                          "{leadDetails.summary || leadDetails.original_message || 'Not eklenmemiş.'}"
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : null}
+            </div>
           </div>
-
         </div>
-
       </div>
+
+      <VoiceNoteModal 
+        isOpen={isVoiceModalOpen} 
+        onClose={() => setIsVoiceModalOpen(false)} 
+        onRecordingComplete={handleVoiceNoteComplete} 
+      />
     </div>
   );
 };

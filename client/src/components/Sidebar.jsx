@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
-import { Home, Users, Briefcase, BarChart2, Link as LinkIcon, LogOut } from 'lucide-react';
 
 const Sidebar = () => {
   const { user, logout } = useContext(AuthContext);
@@ -13,69 +12,81 @@ const Sidebar = () => {
   };
 
   const navItems = [
-    { to: '/dashboard', label: 'Dashboard', icon: <Home size={16} /> },
-    { to: '/leads', label: 'Leadler', icon: <Users size={16} /> },
-    { to: '/properties', label: 'Portföy', icon: <Briefcase size={16} /> },
-    { to: '/stats', label: 'İstatistikler', icon: <BarChart2 size={16} /> },
-    { to: '/integrations', label: 'Entegrasyonlar', icon: <LinkIcon size={16} /> },
+    { to: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
+    { to: '/leads', label: 'Leadler', icon: 'group' },
+    { to: '/properties', label: 'Portföy', icon: 'home_work' },
+    { to: '/stats', label: 'İstatistikler', icon: 'analytics' },
+    { to: '/integrations', label: 'Entegrasyonlar', icon: 'sync' },
   ];
 
   return (
-    <div className="w-[220px] bg-[#16181D] h-screen flex flex-col border-r border-[#2A2D35] flex-shrink-0">
-      
-      {/* Header / Logo */}
-      <div className="h-16 flex items-center px-4 mb-4">
-        <div className="w-7 h-7 bg-[#2A2D35] rounded-md flex items-center justify-center mr-3">
-          <span className="text-white font-bold text-[13px] tracking-wider">EA</span>
+    <nav className="bg-surface-container dark:bg-surface-container fixed left-0 top-0 h-full w-[240px] border-r border-outline-variant flex flex-col p-stack-md z-20">
+      {/* Header */}
+      <div className="flex items-center gap-stack-sm mb-stack-lg p-stack-sm">
+        <div className="w-10 h-10 rounded bg-primary-container flex items-center justify-center font-bold text-on-primary-container" title="EA Monogram">
+          EA
         </div>
-        <span className="text-[#F1F2F4] font-medium text-[13px]">Takip.ai</span>
+        <div>
+          <h1 className="font-headline-md text-headline-md font-bold text-primary dark:text-primary">Takip.ai</h1>
+          <p className="font-body-sm text-body-sm text-on-surface-variant">Emlak Yönetimi</p>
+        </div>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 px-3 space-y-1">
+      {/* Main Navigation Tabs */}
+      <ul className="flex-1 flex flex-col gap-unit">
         {navItems.map((item) => (
+          <li key={item.to} className="group">
+            <NavLink
+              to={item.to}
+              className={({ isActive }) =>
+                `flex items-center gap-stack-sm p-stack-sm cursor-pointer active:scale-95 rounded-lg transition-colors duration-200 ${
+                  isActive 
+                    ? 'text-primary bg-secondary-container font-bold' 
+                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <span className="material-symbols-outlined" style={isActive ? { fontVariationSettings: "'FILL' 1" } : {}}>
+                    {item.icon}
+                  </span>
+                  <span>{item.label}</span>
+                </>
+              )}
+            </NavLink>
+          </li>
+        ))}
+      </ul>
+
+      {/* Footer Navigation Tabs */}
+      <ul className="mt-auto border-t border-outline-variant pt-stack-sm flex flex-col gap-unit">
+        <li className="group">
           <NavLink
-            key={item.to}
-            to={item.to}
+            to="/profile"
             className={({ isActive }) =>
-              `flex items-center space-x-3 px-3 py-2 rounded-md text-[13px] font-medium transition-colors ${
+              `flex items-center gap-stack-sm p-stack-sm cursor-pointer active:scale-95 rounded-lg transition-colors duration-200 ${
                 isActive 
-                  ? 'bg-[#1E2028] text-[#F1F2F4] border-l-2 border-[#F5A623]' 
-                  : 'text-[#7C8090] hover:bg-[#1E2028] hover:text-[#F1F2F4] border-l-2 border-transparent'
+                  ? 'text-primary bg-secondary-container font-bold' 
+                  : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'
               }`
             }
           >
-            {item.icon}
-            <span>{item.label}</span>
+            <span className="material-symbols-outlined">account_circle</span>
+            <span>Profilim</span>
           </NavLink>
-        ))}
-      </nav>
-
-      {/* User Area */}
-      <div className="p-4 border-t border-[#2A2D35]">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3 overflow-hidden">
-            <div className="w-8 h-8 rounded-full bg-[#2A2D35] flex items-center justify-center flex-shrink-0 text-[#F1F2F4] font-medium text-xs uppercase">
-              {user?.name?.substring(0, 2) || 'EA'}
-            </div>
-            <div className="flex flex-col min-w-0">
-              <span className="text-[#F1F2F4] text-[13px] font-medium truncate">{user?.name || 'Kullanıcı'}</span>
-              <span className="text-[10px] font-medium text-white bg-[#F5A623] px-1.5 py-0.5 rounded-sm uppercase self-start mt-0.5" style={{ letterSpacing: '0.05em' }}>
-                {user?.plan === 'proplus' ? 'PRO+' : user?.plan?.toUpperCase() || 'FREE'}
-              </span>
-            </div>
-          </div>
-          <button 
+        </li>
+        <li className="group">
+          <button
             onClick={handleLogout}
-            className="text-[#7C8090] hover:text-[#F1F2F4] transition-colors p-1"
-            title="Çıkış Yap"
+            className="w-full flex items-center gap-stack-sm p-stack-sm cursor-pointer active:scale-95 text-on-surface-variant hover:text-error hover:bg-surface-container-high transition-colors duration-200 rounded-lg"
           >
-            <LogOut size={16} />
+            <span className="material-symbols-outlined">logout</span>
+            <span>Çıkış Yap</span>
           </button>
-        </div>
-      </div>
-
-    </div>
+        </li>
+      </ul>
+    </nav>
   );
 };
 

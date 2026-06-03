@@ -1,56 +1,50 @@
 import React, { useContext } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
-import { LogOut, Home, PieChart, Star } from 'lucide-react';
 
 const Header = () => {
-  const { user, logout } = useContext(AuthContext);
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
-
-  const isActive = (path) => location.pathname === path;
+  const { user } = useContext(AuthContext);
 
   return (
-    <header className="bg-primary-dark text-white sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-        <div className="flex items-center space-x-8">
-          <Link to="/dashboard" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center">
-              <span className="text-accent-gold font-bold">EA</span>
-            </div>
-            <span className="font-semibold text-lg tracking-tight">Takip.ai</span>
-          </Link>
-          
-          <nav className="hidden md:flex items-center space-x-1">
-            <Link to="/dashboard" className={`px-3 py-2 rounded-lg flex items-center space-x-2 text-sm font-medium transition ${isActive('/dashboard') ? 'bg-white/10 text-white' : 'text-gray-300 hover:bg-white/5 hover:text-white'}`}>
-              <Home size={16} />
-              <span>Dashboard</span>
-            </Link>
-            {user?.plan === 'proplus' && (
-              <Link to="/stats" className={`px-3 py-2 rounded-lg flex items-center space-x-2 text-sm font-medium transition ${isActive('/stats') ? 'bg-white/10 text-white' : 'text-gray-300 hover:bg-white/5 hover:text-white'}`}>
-                <PieChart size={16} />
-                <span>İstatistikler</span>
-              </Link>
-            )}
-            <Link to="/plans" className={`px-3 py-2 rounded-lg flex items-center space-x-2 text-sm font-medium transition ${isActive('/plans') ? 'bg-white/10 text-white' : 'text-gray-300 hover:bg-white/5 hover:text-white'}`}>
-              <Star size={16} className={user?.plan === 'proplus' ? 'text-accent-gold' : ''} />
-              <span>Planlar {user?.plan === 'proplus' ? '(Pro+)' : ''}</span>
-            </Link>
-          </nav>
+    <header className="bg-background dark:bg-background border-b border-outline-variant flex justify-between items-center h-16 px-container-padding sticky top-0 z-30">
+      {/* Left: Search/Title */}
+      <div className="flex items-center gap-stack-lg flex-1">
+        <div className="relative w-64 hidden sm:block">
+          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+          <input 
+            className="w-full bg-surface-container-lowest border border-outline-variant rounded-md pl-9 pr-3 py-1.5 font-body-sm text-on-surface focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all" 
+            placeholder="Ara..." 
+            type="text"
+          />
         </div>
-
-        <div className="flex items-center space-x-4">
-          <Link to="/profile" className="hidden md:block text-sm text-gray-300 hover:text-white transition">
-            Merhaba, <span className="text-white font-medium">{user?.name}</span>
+        {/* Nav Links (Desktop) */}
+        <nav className="hidden lg:flex items-center gap-stack-md">
+          <Link to="/leads" className="text-on-surface-variant hover:text-primary transition-all duration-200 ease-in-out font-label-caps text-label-caps uppercase tracking-wider">
+            Leadler
           </Link>
-          <button onClick={handleLogout} className="text-gray-300 hover:text-white p-2 rounded-lg hover:bg-white/10 transition" title="Çıkış Yap">
-            <LogOut size={18} />
-          </button>
+          <Link to="/properties" className="text-on-surface-variant hover:text-primary transition-all duration-200 ease-in-out font-label-caps text-label-caps uppercase tracking-wider">
+            Portföy
+          </Link>
+        </nav>
+      </div>
+
+      {/* Right: Actions */}
+      <div className="flex items-center gap-stack-md">
+        <button className="text-on-surface-variant hover:text-on-surface transition-colors">
+          <span className="material-symbols-outlined">notifications</span>
+        </button>
+        <button className="text-on-surface-variant hover:text-on-surface transition-colors">
+          <span className="material-symbols-outlined">help</span>
+        </button>
+        <button className="bg-primary-container text-[#000] font-label-caps text-label-caps px-4 py-2 rounded-md hover:brightness-110 transition-all font-bold">
+          Yeni Kayıt
+        </button>
+        <div className="w-8 h-8 rounded-full bg-surface-container border border-outline-variant overflow-hidden ml-2 flex items-center justify-center">
+          {user?.avatarUrl ? (
+            <img alt="Avatar" className="w-full h-full object-cover" src={user.avatarUrl} />
+          ) : (
+             <span className="text-on-surface-variant font-medium text-sm">{user?.name?.substring(0, 2).toUpperCase() || 'EA'}</span>
+          )}
         </div>
       </div>
     </header>
