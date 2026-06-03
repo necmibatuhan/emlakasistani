@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
 import Sidebar from '../components/Sidebar';
+import Header from '../components/Header';
 import { CheckCircle } from 'lucide-react';
 
 const fetchOfficeData = async (token, officeId) => {
@@ -56,12 +57,13 @@ const OfficeDashboard = () => {
   };
 
   return (
-    <div className="flex h-screen bg-[#0F1117] text-[#F1F2F4] overflow-hidden">
+    <div className="flex min-h-screen bg-[#0A0B0D]">
       <Sidebar />
-      <div className="flex-1 flex flex-col overflow-y-auto">
-        <div className="p-8 max-w-7xl mx-auto w-full">
+      <div className="lg:ml-[240px] flex-1 flex flex-col min-h-screen w-full">
+        <Header />
+        <div className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full flex flex-col">
           
-          <div className="flex justify-between items-center mb-8">
+          <div className="flex justify-between items-center mb-6 md:mb-8">
             <div>
               <h1 className="text-[20px] font-medium text-[#F1F2F4]">{office?.name || 'Ofis Yönetimi'}</h1>
               <p className="text-[13px] text-[#7C8090] mt-1">Gelen tüm talepleri ve danışman performansını yönetin.</p>
@@ -76,12 +78,12 @@ const OfficeDashboard = () => {
             <StatCard title="Bugün Eklenen" value={stats.today} color="text-[#3B82F6]" />
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-6 h-[calc(100vh-280px)] min-h-[500px]">
+          <div className="flex flex-col lg:flex-row gap-6 flex-1 min-h-0">
             {/* Left: Lead List (60%) */}
-            <div className="w-full lg:w-3/5 bg-[#16181D] rounded-[8px] border border-[#2A2D35] flex flex-col">
-              <div className="p-4 border-b border-[#2A2D35] flex gap-2 overflow-x-auto bg-[#0A0B0D]">
+            <div className="w-full lg:w-3/5 bg-[#16181D] rounded-[8px] border border-[#2A2D35] flex flex-col min-h-[400px]">
+              <div className="p-4 border-b border-[#2A2D35] flex gap-2 overflow-x-auto bg-[#0A0B0D] hide-scrollbar">
                 {['Tümü', 'Sıcak', 'Ilık', 'Soğuk'].map(f => (
-                  <button key={f} onClick={() => setFilter(f)} className={`px-4 py-1.5 rounded-[4px] text-[12px] font-medium transition-colors whitespace-nowrap border ${filter === f ? 'bg-[#1E2028] text-[#F1F2F4] border-[#4A4E5A]' : 'bg-[#0A0B0D] text-[#7C8090] border-[#2A2D35] hover:bg-[#1E2025]'}`}>
+                  <button key={f} onClick={() => setFilter(f)} className={`px-4 py-2 min-h-[44px] rounded-[4px] text-[12px] font-medium transition-colors whitespace-nowrap border ${filter === f ? 'bg-[#1E2028] text-[#F1F2F4] border-[#4A4E5A]' : 'bg-[#0A0B0D] text-[#7C8090] border-[#2A2D35] hover:bg-[#1E2025]'}`}>
                     {f}
                   </button>
                 ))}
@@ -135,7 +137,7 @@ const OfficeDashboard = () => {
                   <div className="mb-8 p-4 bg-[#0A0B0D] rounded-[6px] border border-[#2A2D35]">
                     <label className="block text-[11px] font-medium text-[#7C8090] mb-2 uppercase tracking-wider">Atanan Danışman</label>
                     <select 
-                      className="w-full p-2.5 rounded-[6px] bg-[#16181D] border border-[#2A2D35] text-[#F1F2F4] text-[13px] focus:border-[#F5A623] outline-none transition-colors"
+                      className="w-full p-2.5 min-h-[44px] rounded-[6px] bg-[#16181D] border border-[#2A2D35] text-[#F1F2F4] text-[13px] focus:border-[#F5A623] outline-none transition-colors"
                       value={selectedLead.assigned_to || ''}
                       onChange={(e) => assignMutation.mutate({ leadId: selectedLead.id, agentId: e.target.value })}
                     >

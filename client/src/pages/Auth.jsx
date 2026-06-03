@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
-import ReCAPTCHA from 'react-google-recaptcha';
+import { Turnstile } from '@marsidev/react-turnstile';
 import axios from 'axios';
 import { User, Building, Building2, ArrowLeft } from 'lucide-react';
 import clsx from 'clsx';
@@ -46,8 +46,8 @@ const Auth = () => {
     setError('');
     setMessage('');
     
-    // Yalnızca lokal test için devrede bırakılabilir, ama production'da zorunludur:
-    if (import.meta.env.VITE_RECAPTCHA_SITE_KEY && import.meta.env.VITE_RECAPTCHA_SITE_KEY !== 'GIRILECEK_RECAPTCHA_SITE_KEY') {
+    // Sadece lokal test için devrede bırakılabilir, ama production'da zorunludur:
+    if (import.meta.env.VITE_TURNSTILE_SITE_KEY && import.meta.env.VITE_TURNSTILE_SITE_KEY !== 'GIRILECEK_TURNSTILE_SITE_KEY') {
       if (!captchaToken) {
         setError('Lütfen robot olmadığınızı doğrulayın.');
         return;
@@ -56,7 +56,7 @@ const Auth = () => {
     
     if (isLogin) {
       try {
-        await login(email, password);
+        await login(email, password, captchaToken);
         navigate('/dashboard');
       } catch (err) {
         setError(err.response?.data?.message || 'Giriş başarısız.');
@@ -77,7 +77,10 @@ const Auth = () => {
     setIsSubmitting(true);
     
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/auth/forgot-password`, { email });
+      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/auth/forgot-password`, { 
+        email, 
+        turnstileToken: captchaToken 
+      });
       setMessage(res.data.message);
     } catch (err) {
       setError(err.response?.data?.message || 'Şifre sıfırlama isteği başarısız.');
@@ -91,7 +94,7 @@ const Auth = () => {
     setMessage('');
     setIsSubmitting(true);
     try {
-      const res = await register(name, email, password, selectedRole);
+      const res = await register(name, email, password, selectedRole, captchaToken);
       if (res.data.message) {
         setMessage(res.data.message);
         setIsLogin(true); 
@@ -143,7 +146,14 @@ const Auth = () => {
         {error && <div className="bg-[#EF4444]/10 text-[#EF4444] border border-[#EF4444]/20 p-3 rounded-md mb-6 text-[13px] text-center">{error}</div>}
 
         {isForgotPassword ? (
-          <form onSubmit={handleForgotPassword}>
+          <form onSubmit={async (e) => {
+            e.preventDefault();
+            if (import.meta.env.VITE_TURNSTILE_SITE_KEY && import.meta.env.VITE_TURNSTILE_SITE_KEY !== 'GIRILECEK_TURNSTILE_SITE_KEY' && !captchaToken) {
+              setError('Lütfen robot olmadığınızı doğrulayın.');
+              return;
+            }
+            handleForgotPassword(e);
+          }}>
             <div className="mb-4">
               <label className="block text-[#7C8090] text-[12px] font-medium mb-1.5 uppercase tracking-wider">E-posta</label>
               <input 
@@ -155,6 +165,15 @@ const Auth = () => {
                 placeholder="ornek@sirket.com" 
               />
             </div>
+            
+            {import.meta.env.VITE_TURNSTILE_SITE_KEY && import.meta.env.VITE_TURNSTILE_SITE_KEY !== 'GIRILECEK_TURNSTILE_SITE_KEY' && (
+              <div className="flex justify-center mt-4">
+                <Turnstile
+                  siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+                  onSuccess={(token) => setCaptchaToken(token)}
+                />
+              </div>
+            )}
             
             <button 
               type="submit" 
@@ -224,12 +243,11 @@ const Auth = () => {
                 </div>
               )}
 
-              {import.meta.env.VITE_RECAPTCHA_SITE_KEY && import.meta.env.VITE_RECAPTCHA_SITE_KEY !== 'GIRILECEK_RECAPTCHA_SITE_KEY' && (
-                <div className="flex justify-center my-4">
-                  <ReCAPTCHA
-                    sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
-                    onChange={(token) => setCaptchaToken(token)}
-                    theme="dark"
+              {import.meta.env.VITE_TURNSTILE_SITE_KEY && import.meta.env.VITE_TURNSTILE_SITE_KEY !== 'GIRILECEK_TURNSTILE_SITE_KEY' && (
+                <div className="flex justify-center mt-4">
+                  <Turnstile
+                    siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+                    onSuccess={(token) => setCaptchaToken(token)}
                   />
                 </div>
               )}

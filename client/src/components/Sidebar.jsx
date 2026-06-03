@@ -1,10 +1,12 @@
 import React, { useContext } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
+import { UIContext } from '../contexts/UIContext';
 import { Logo } from './Logo';
 
 const Sidebar = () => {
   const { user, logout } = useContext(AuthContext);
+  const { isSidebarOpen, closeSidebar } = useContext(UIContext);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -21,8 +23,18 @@ const Sidebar = () => {
   ];
 
   return (
-    <nav className="bg-surface-container dark:bg-surface-container fixed left-0 top-0 h-full w-[240px] border-r border-outline-variant flex flex-col p-stack-md z-20">
-      {/* Header */}
+    <>
+      {/* Mobile Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={closeSidebar}
+        />
+      )}
+      
+      {/* Sidebar */}
+      <nav className={`bg-surface-container dark:bg-surface-container fixed left-0 top-0 h-full w-[240px] border-r border-outline-variant flex flex-col p-stack-md z-50 transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+        {/* Header */}
       <div className="flex items-center mb-stack-lg p-stack-sm">
         <Logo iconSize="w-8 h-8" textSize="text-[22px]" />
       </div>
@@ -33,6 +45,7 @@ const Sidebar = () => {
           <li key={item.to} className="group">
             <NavLink
               to={item.to}
+              onClick={() => closeSidebar()}
               className={({ isActive }) =>
                 `flex items-center gap-stack-sm p-stack-sm cursor-pointer active:scale-95 rounded-lg transition-colors duration-200 ${
                   isActive 
@@ -59,6 +72,7 @@ const Sidebar = () => {
         <li className="group">
           <NavLink
             to="/profile"
+            onClick={() => closeSidebar()}
             className={({ isActive }) =>
               `flex items-center gap-stack-sm p-stack-sm cursor-pointer active:scale-95 rounded-lg transition-colors duration-200 ${
                 isActive 
@@ -82,6 +96,7 @@ const Sidebar = () => {
         </li>
       </ul>
     </nav>
+    </>
   );
 };
 

@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthContext, AuthProvider } from './contexts/AuthContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 import Landing from './pages/Landing';
 import Auth from './pages/Auth';
@@ -79,6 +80,7 @@ function App() {
       <AuthProvider>
         <Router>
           <AppRoutes />
+          <SpeedInsights />
         </Router>
       </AuthProvider>
     </GoogleOAuthProvider>

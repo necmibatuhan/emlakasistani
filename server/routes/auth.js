@@ -15,7 +15,7 @@ const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID || 'MOCK_CLIE
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || "smtp.hostinger.com",
   port: parseInt(process.env.SMTP_PORT || "465"),
-  secure: process.env.SMTP_PORT === "587" ? false : true, // true for 465, false for other ports
+  secure: parseInt(process.env.SMTP_PORT || "465", 10) === 465,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
@@ -38,7 +38,9 @@ const transporter = nodemailer.createTransport({
 const sendVerificationEmail = async (email, token) => {
   const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${token}`;
   
-  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS || 
+      process.env.SMTP_PASS === 'GIRILECEK_APP_PASSWORD' ||
+      process.env.SMTP_PASS === 'BURAYA_HOSTINGER_SIFRENIZI_YAZIN') {
     console.log(`\n\n=== E-POSTA SİMÜLASYONU (SMTP Kurulmamış) ===`);
     console.log(`Kime: ${email}`);
     console.log(`Link: ${verificationUrl}\n=============================\n\n`);
@@ -65,9 +67,39 @@ const sendVerificationEmail = async (email, token) => {
   }
 };
 
+// Cloudflare Turnstile Verification
+async function verifyTurnstile(token) {
+  if (!process.env.TURNSTILE_SECRET_KEY || process.env.TURNSTILE_SECRET_KEY === 'GIRILECEK_TURNSTILE_SECRET_KEY') {
+    return true; // Skip if not configured
+  }
+  if (!token) return false;
+  
+  try {
+    const formData = new URLSearchParams();
+    formData.append('secret', process.env.TURNSTILE_SECRET_KEY);
+    formData.append('response', token);
+    
+    const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      body: formData
+    });
+    
+    const data = await res.json();
+    return data.success;
+  } catch (err) {
+    console.error('Turnstile verification error:', err);
+    return false;
+  }
+}
+
 router.post('/register', async (req, res) => {
   try {
-    const { email, name, password, role = 'agent' } = req.body;
+    const { email, name, password, role = 'agent', turnstileToken } = req.body;
+    
+    const isHuman = await verifyTurnstile(turnstileToken);
+    if (!isHuman) {
+      return res.status(403).json({ message: 'Lütfen robot olmadığınızı doğrulayın.' });
+    }
     
     const userExists = await db.query('SELECT * FROM users WHERE email = $1', [email]);
     if (userExists.rows.length > 0) {
@@ -119,7 +151,12 @@ router.post('/register', async (req, res) => {
 
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, turnstileToken } = req.body;
+
+    const isHuman = await verifyTurnstile(turnstileToken);
+    if (!isHuman) {
+      return res.status(403).json({ message: 'Lütfen robot olmadığınızı doğrulayın.' });
+    }
 
     const userRes = await db.query('SELECT * FROM users WHERE email = $1', [email]);
     if (userRes.rows.length === 0) {
@@ -240,7 +277,27 @@ router.post('/google', async (req, res) => {
 // Şifremi Unuttum (Forgot Password)
 router.post('/forgot-password', async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, turnstileToken } = req.body;
+    
+    // Verify Turnstile Token (if configured)
+    if (process.env.TURNSTILE_SECRET_KEY && process.env.TURNSTILE_SECRET_KEY !== 'GIRILECEK_TURNSTILE_SECRET_KEY') {
+      if (!turnstileToken) {
+        return res.status(403).json({ message: 'Lütfen robot olmadığınızı doğrulayın.' });
+      }
+
+      const turnstileRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `secret=${process.env.TURNSTILE_SECRET_KEY}&response=${turnstileToken}`
+      });
+      
+      const turnstileData = await turnstileRes.json();
+      if (!turnstileData.success) {
+        return res.status(403).json({ message: 'Güvenlik doğrulaması başarısız oldu.' });
+      }
+    }
     
     const userResult = await db.query('SELECT * FROM users WHERE email = $1', [email]);
     if (userResult.rows.length === 0) {

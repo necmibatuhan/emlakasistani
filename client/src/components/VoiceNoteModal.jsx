@@ -21,7 +21,8 @@ const VoiceNoteModal = ({ isOpen, onClose, onRecordingComplete }) => {
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+      const mediaRecorder = new MediaRecorder(stream, { mimeType });
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
@@ -32,14 +33,10 @@ const VoiceNoteModal = ({ isOpen, onClose, onRecordingComplete }) => {
       };
 
       mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+        const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
         setState('processing');
-        
-        // Simulating API call for analysis
-        setTimeout(() => {
-          setState('result');
-          if (onRecordingComplete) onRecordingComplete(audioBlob);
-        }, 2000);
+        if (onRecordingComplete) onRecordingComplete(audioBlob);
       };
 
       mediaRecorder.start();

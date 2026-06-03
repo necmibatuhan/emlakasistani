@@ -199,11 +199,14 @@ Sadece aşağıdaki JSON formatında yanıt dön:
       parsedResult.gerekceler.aciklama = unmaskPII(parsedResult.gerekceler.aciklama, tokenMap);
     }
 
+    const finalName = name?.trim() ? name.trim() : '[İsim Belirtilmedi]';
+    const finalPhone = phone?.trim() ? phone.trim() : '[Telefon Belirtilmedi]';
+
     const leadInsert = await db.query(
       `INSERT INTO leads (company_id, office_id, assigned_to, source, name, phone, message, score, label, reasoning, recommended_action, whatsapp_draft, properties) 
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`,
       [
-        req.user.company_id, req.user.office_id, req.user.id, 'manual', name, phone, message, 
+        req.user.company_id, req.user.office_id, req.user.id, 'manual', finalName, finalPhone, message, 
         parsedResult.skor, parsedResult.etiket, parsedResult.gerekceler.aciklama, 
         parsedResult.onerilen_aksiyon, parsedResult.yanit_taslak, JSON.stringify(parsedResult.mulk_tercihleri)
       ]

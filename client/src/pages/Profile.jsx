@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { User, Mail, Building, Key, Shield, LogOut, Trash2, AlertTriangle, X } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
+import Header from '../components/Header';
 import axios from 'axios';
 
 const Profile = () => {
@@ -34,12 +35,13 @@ const Profile = () => {
   };
 
   return (
-    <div className="flex h-screen bg-[#0F1117] text-[#F1F2F4] overflow-hidden">
+    <div className="flex min-h-screen bg-[#0A0B0D]">
       <Sidebar />
-      <div className="flex-1 flex flex-col overflow-y-auto">
-        <div className="p-8 max-w-4xl mx-auto w-full">
+      <div className="lg:ml-[240px] flex-1 flex flex-col min-h-screen w-full">
+        <Header />
+        <div className="p-4 md:p-8 max-w-4xl mx-auto w-full flex-1">
           
-          <div className="flex justify-between items-center mb-8">
+          <div className="flex justify-between items-center mb-6 md:mb-8">
             <h1 className="text-[20px] font-medium text-[#F1F2F4]">Profilim</h1>
             <button onClick={logout} className="flex items-center space-x-2 text-[#EF4444] bg-[#EF4444]/10 hover:bg-[#EF4444]/20 px-4 py-2 rounded-[6px] text-[13px] font-medium transition-colors border border-[#EF4444]/20">
               <LogOut size={14} />
@@ -62,6 +64,14 @@ const Profile = () => {
                   <span>{getRoleLabel(user?.role)}</span>
                 </div>
               </div>
+              <div className="bg-[#16181D] rounded-[8px] border border-[#2A2D35] p-6 mt-6">
+                <h3 className="text-[14px] font-medium text-[#EF4444] mb-3">Hesap Yönetimi</h3>
+                <p className="text-[12px] text-[#7C8090] mb-4 leading-relaxed">Hesabınızı sildiğinizde size ait tüm veriler (müşteriler, istatistikler, portföyler) kalıcı olarak silinir. Bu işlem geri alınamaz.</p>
+                <button onClick={() => setIsDeleteModalOpen(true)} className="w-full flex justify-center items-center space-x-2 text-[#EF4444] bg-[#EF4444]/5 hover:bg-[#EF4444]/10 min-h-[44px] px-4 py-2.5 rounded-[6px] text-[13px] font-medium transition-colors border border-[#EF4444]/20">
+                  <Trash2 size={14} />
+                  <span>Hesabımı Kalıcı Olarak Sil</span>
+                </button>
+              </div>
             </div>
 
             {/* Right Column - Forms */}
@@ -71,36 +81,36 @@ const Profile = () => {
               <div className="bg-[#16181D] rounded-[8px] border border-[#2A2D35] p-6">
                 <h3 className="text-[14px] font-medium text-[#F1F2F4] mb-4 border-b border-[#2A2D35] pb-3">Hesap Bilgileri</h3>
                 <form className="space-y-5">
-                  <div className="grid grid-cols-2 gap-5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
                       <label className="block text-[11px] font-medium text-[#7C8090] mb-1.5 uppercase tracking-wider">Ad Soyad</label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#7C8090]"><User size={14}/></div>
-                        <input type="text" className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#7C8090] rounded-[6px] pl-9 p-2.5 text-[13px] outline-none cursor-not-allowed" value={user?.name || ''} readOnly />
+                        <input type="text" className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#7C8090] rounded-[6px] pl-9 p-2.5 min-h-[44px] text-[13px] outline-none cursor-not-allowed" value={user?.name || ''} readOnly />
                       </div>
                     </div>
                     <div>
                       <label className="block text-[11px] font-medium text-[#7C8090] mb-1.5 uppercase tracking-wider">E-posta</label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#7C8090]"><Mail size={14}/></div>
-                        <input type="email" className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#7C8090] rounded-[6px] pl-9 p-2.5 text-[13px] outline-none cursor-not-allowed" value={user?.email || ''} readOnly />
+                        <input type="email" className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#7C8090] rounded-[6px] pl-9 p-2.5 min-h-[44px] text-[13px] outline-none cursor-not-allowed" value={user?.email || ''} readOnly />
                       </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
                       <label className="block text-[11px] font-medium text-[#7C8090] mb-1.5 uppercase tracking-wider">Şirket ID</label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#7C8090]"><Building size={14}/></div>
-                        <input type="text" className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#7C8090] rounded-[6px] pl-9 p-2.5 text-[13px] outline-none cursor-not-allowed" value={user?.company_id || ''} readOnly />
+                        <input type="text" className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#7C8090] rounded-[6px] pl-9 p-2.5 min-h-[44px] text-[13px] outline-none cursor-not-allowed" value={user?.company_id || ''} readOnly />
                       </div>
                     </div>
                     <div>
                       <label className="block text-[11px] font-medium text-[#7C8090] mb-1.5 uppercase tracking-wider">Ofis ID</label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#7C8090]"><Building size={14}/></div>
-                        <input type="text" className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#7C8090] rounded-[6px] pl-9 p-2.5 text-[13px] outline-none cursor-not-allowed" value={user?.office_id || 'Merkez'} readOnly />
+                        <input type="text" className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#7C8090] rounded-[6px] pl-9 p-2.5 min-h-[44px] text-[13px] outline-none cursor-not-allowed" value={user?.office_id || ''} readOnly />
                       </div>
                     </div>
                   </div>
@@ -110,26 +120,15 @@ const Profile = () => {
               {/* Password Change */}
               <div className="bg-[#16181D] rounded-[8px] border border-[#2A2D35] p-6">
                 <h3 className="text-[14px] font-medium text-[#F1F2F4] mb-4 border-b border-[#2A2D35] pb-3">Şifre Değiştir</h3>
-                <form className="space-y-5">
-                  <div>
-                    <label className="block text-[11px] font-medium text-[#7C8090] mb-1.5 uppercase tracking-wider">Mevcut Şifre</label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#7C8090]"><Key size={14}/></div>
-                      <input type="password" placeholder="••••••••" className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#F1F2F4] rounded-[6px] pl-9 p-2.5 text-[13px] focus:border-[#F5A623] outline-none transition-colors placeholder-[#4A4E5A]" />
-                    </div>
-                  </div>
+                <form className="space-y-4">
                   <div>
                     <label className="block text-[11px] font-medium text-[#7C8090] mb-1.5 uppercase tracking-wider">Yeni Şifre</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#7C8090]"><Key size={14}/></div>
-                      <input type="password" placeholder="••••••••" className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#F1F2F4] rounded-[6px] pl-9 p-2.5 text-[13px] focus:border-[#F5A623] outline-none transition-colors placeholder-[#4A4E5A]" />
+                      <input type="password" placeholder="En az 6 karakter" className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#F1F2F4] rounded-[6px] pl-9 p-2.5 min-h-[44px] text-[13px] focus:border-[#F5A623] outline-none transition-colors" />
                     </div>
                   </div>
-                  <div className="flex justify-end pt-2">
-                    <button type="button" className="bg-[#1E2025] hover:bg-[#2A2D35] text-[#F1F2F4] font-medium py-2 px-6 rounded-[6px] text-[13px] transition-colors border border-[#2A2D35]">
-                      Güncelle
-                    </button>
-                  </div>
+                  <button type="button" className="w-full bg-[#F5A623] hover:bg-[#d9921e] text-[#0A0B0D] min-h-[44px] px-4 py-2.5 rounded-[6px] text-[13px] font-medium transition-colors">Şifreyi Güncelle</button>
                 </form>
               </div>
 

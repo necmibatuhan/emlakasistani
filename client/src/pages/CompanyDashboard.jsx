@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
 import Sidebar from '../components/Sidebar';
+import Header from '../components/Header';
 import { Building2, Users, Target, Activity, CheckCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -22,12 +23,13 @@ const CompanyDashboard = () => {
   });
 
   return (
-    <div className="flex h-screen bg-[#0F1117] text-[#F1F2F4] overflow-hidden">
+    <div className="flex min-h-screen bg-[#0A0B0D]">
       <Sidebar />
-      <div className="flex-1 flex flex-col overflow-y-auto">
-        <div className="p-8 max-w-7xl mx-auto w-full">
+      <div className="lg:ml-[240px] flex-1 flex flex-col min-h-screen w-full">
+        <Header />
+        <div className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full">
           
-          <div className="flex justify-between items-center mb-8">
+          <div className="flex justify-between items-center mb-6 md:mb-8">
             <h1 className="text-[20px] font-medium text-[#F1F2F4]">Şirket Özeti</h1>
             <div className="text-[13px] text-[#7C8090]">
               Son Güncelleme: <span className="text-[#F1F2F4] font-medium">{new Date().toLocaleTimeString('tr-TR', {hour: '2-digit', minute:'2-digit'})}</span>

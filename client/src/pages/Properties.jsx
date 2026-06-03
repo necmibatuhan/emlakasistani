@@ -5,6 +5,7 @@ import { AuthContext } from '../contexts/AuthContext';
 import { Home, Plus, MapPin, Tag, Check, Search, Building } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import Header from '../components/Header';
 
 const fetchProperties = async (token) => {
   const { data } = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/properties`, {
@@ -47,11 +48,14 @@ const Properties = () => {
   };
 
   return (
-    <div className="flex h-screen bg-[#0F1117] text-[#F1F2F4] overflow-hidden">
+    <div className="flex min-h-screen bg-[#0A0B0D]">
       <Sidebar />
       
-      <div className="flex-1 flex flex-col overflow-y-auto p-8">
-        <div className="max-w-6xl mx-auto w-full">
+      <div className="lg:ml-[240px] flex-1 flex flex-col min-h-screen w-full">
+        <Header />
+        
+        <div className="flex-1 p-4 md:p-8">
+          <div className="max-w-6xl mx-auto w-full">
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-[20px] font-medium text-[#F1F2F4]">Portföy Yönetimi</h1>
             <button onClick={() => setShowModal(true)} className="bg-[#F5A623] hover:bg-[#d9921e] text-[#0A0B0D] px-4 py-2 rounded-[6px] text-[13px] font-medium flex items-center space-x-2 transition-colors">
@@ -119,32 +123,32 @@ const Properties = () => {
               <form id="prop-form" onSubmit={handleSubmit} className="space-y-5">
                 <div>
                   <label className="block text-[11px] font-medium text-[#7C8090] mb-1.5 uppercase tracking-wider">İlan Başlığı</label>
-                  <input required className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#F1F2F4] rounded-[6px] p-2.5 text-[13px] focus:border-[#F5A623] outline-none transition-colors" value={formData.title} onChange={e=>setFormData({...formData, title: e.target.value})} />
+                  <input required className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#F1F2F4] rounded-[6px] p-2.5 text-[13px] focus:border-[#F5A623] outline-none transition-colors min-h-[44px]" value={formData.title} onChange={e=>setFormData({...formData, title: e.target.value})} />
                 </div>
-                <div className="grid grid-cols-2 gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div>
                     <label className="block text-[11px] font-medium text-[#7C8090] mb-1.5 uppercase tracking-wider">Türü</label>
-                    <select className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#F1F2F4] rounded-[6px] p-2.5 text-[13px] focus:border-[#F5A623] outline-none transition-colors" value={formData.type} onChange={e=>setFormData({...formData, type: e.target.value})}>
+                    <select className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#F1F2F4] rounded-[6px] p-2.5 text-[13px] focus:border-[#F5A623] outline-none transition-colors min-h-[44px]" value={formData.type} onChange={e=>setFormData({...formData, type: e.target.value})}>
                       <option>Satılık</option><option>Kiralık</option>
                     </select>
                   </div>
                   <div>
                     <label className="block text-[11px] font-medium text-[#7C8090] mb-1.5 uppercase tracking-wider">Kategori</label>
-                    <select className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#F1F2F4] rounded-[6px] p-2.5 text-[13px] focus:border-[#F5A623] outline-none transition-colors" value={formData.category} onChange={e=>setFormData({...formData, category: e.target.value})}>
+                    <select className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#F1F2F4] rounded-[6px] p-2.5 text-[13px] focus:border-[#F5A623] outline-none transition-colors min-h-[44px]" value={formData.category} onChange={e=>setFormData({...formData, category: e.target.value})}>
                       <option>Konut</option><option>İşyeri</option><option>Arsa</option>
                     </select>
                   </div>
                   <div>
                     <label className="block text-[11px] font-medium text-[#7C8090] mb-1.5 uppercase tracking-wider">Şehir</label>
-                    <input required className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#F1F2F4] rounded-[6px] p-2.5 text-[13px] focus:border-[#F5A623] outline-none transition-colors" value={formData.city} onChange={e=>setFormData({...formData, city: e.target.value})} />
+                    <input required className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#F1F2F4] rounded-[6px] p-2.5 text-[13px] focus:border-[#F5A623] outline-none transition-colors min-h-[44px]" value={formData.city} onChange={e=>setFormData({...formData, city: e.target.value})} />
                   </div>
                   <div>
                     <label className="block text-[11px] font-medium text-[#7C8090] mb-1.5 uppercase tracking-wider">İlçe</label>
-                    <input required className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#F1F2F4] rounded-[6px] p-2.5 text-[13px] focus:border-[#F5A623] outline-none transition-colors" value={formData.district} onChange={e=>setFormData({...formData, district: e.target.value})} />
+                    <input required className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#F1F2F4] rounded-[6px] p-2.5 text-[13px] focus:border-[#F5A623] outline-none transition-colors min-h-[44px]" value={formData.district} onChange={e=>setFormData({...formData, district: e.target.value})} />
                   </div>
                   <div>
                     <label className="block text-[11px] font-medium text-[#7C8090] mb-1.5 uppercase tracking-wider">Fiyat (TL)</label>
-                    <input required type="number" className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#F1F2F4] rounded-[6px] p-2.5 text-[13px] focus:border-[#F5A623] outline-none transition-colors" value={formData.price} onChange={e=>setFormData({...formData, price: e.target.value})} />
+                    <input required type="number" className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#F1F2F4] rounded-[6px] p-2.5 text-[13px] focus:border-[#F5A623] outline-none transition-colors min-h-[44px]" value={formData.price} onChange={e=>setFormData({...formData, price: e.target.value})} />
                   </div>
                   <div>
                     <label className="block text-[11px] font-medium text-[#7C8090] mb-1.5 uppercase tracking-wider">Oda Sayısı</label>
@@ -166,6 +170,7 @@ const Properties = () => {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };

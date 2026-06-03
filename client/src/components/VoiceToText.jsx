@@ -66,7 +66,7 @@ const VoiceToText = ({ onLeadCreated }) => {
         }
         
         const blob = new Blob(chunksRef.current, { type: mimeType });
-        await processAudio(blob);
+        await processAudio(blob, mimeType);
       };
 
       mediaRecorderRef.current.cancelRecordingFlag = false;
@@ -98,11 +98,12 @@ const VoiceToText = ({ onLeadCreated }) => {
     }
   };
 
-  const processAudio = async (blob) => {
+  const processAudio = async (blob, mimeType) => {
     setStatus('processing');
     try {
+      const extension = mimeType?.includes('mp4') ? 'm4a' : 'webm';
       const formData = new FormData();
-      formData.append('audio', blob, 'voicenote.webm');
+      formData.append('audio', blob, `voicenote.${extension}`);
       
       const token = localStorage.getItem('token');
       const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/voice/create-lead`, formData, {
@@ -186,7 +187,7 @@ const VoiceToText = ({ onLeadCreated }) => {
                       <span>Durdur ve Çevir</span>
                     </button>
                     <button 
-                      onClick={cancelRecording}
+                      onClick={() => stopRecording(true)}
                       className="text-[#7C8090] hover:text-[#EF4444] transition-colors p-3"
                       title="İptal Et"
                     >

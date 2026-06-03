@@ -4,6 +4,7 @@ import { AuthContext } from '../contexts/AuthContext';
 import { Link } from 'react-router-dom';
 import { Search, Mail, Target } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
+import Header from '../components/Header';
 
 const Agents = () => {
   const { token, user } = useContext(AuthContext);
@@ -43,20 +44,21 @@ const Agents = () => {
   }, [user, token]);
 
   return (
-    <div className="flex h-screen bg-[#0F1117] text-[#F1F2F4] overflow-hidden">
+    <div className="flex min-h-screen bg-[#0A0B0D]">
       <Sidebar />
-      <div className="flex-1 flex flex-col overflow-y-auto">
-        <div className="p-8 max-w-6xl mx-auto w-full">
+      <div className="lg:ml-[240px] flex-1 flex flex-col min-h-screen w-full">
+        <Header />
+        <div className="flex-1 p-4 md:p-8 max-w-6xl mx-auto w-full">
           
-          <div className="flex justify-between items-center mb-8">
+          <div className="flex justify-between items-center mb-6 md:mb-8">
             <h1 className="text-[20px] font-medium text-[#F1F2F4]">Tüm Danışmanlar</h1>
           </div>
 
           <div className="bg-[#16181D] rounded-[8px] border border-[#2A2D35] overflow-hidden">
-            <div className="p-4 border-b border-[#2A2D35] flex justify-between items-center bg-[#0A0B0D]">
-              <div className="relative w-64">
+            <div className="p-4 border-b border-[#2A2D35] flex flex-col md:flex-row gap-4 md:justify-between md:items-center bg-[#0A0B0D]">
+              <div className="relative w-full md:w-64">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#7C8090]"><Search size={14}/></div>
-                <input type="text" placeholder="Danışman Ara..." className="w-full text-[13px] bg-[#16181D] border border-[#2A2D35] rounded-[6px] pl-9 p-2 outline-none focus:border-[#F5A623] text-[#F1F2F4] placeholder-[#4A4E5A] transition-colors" />
+                <input type="text" placeholder="Danışman Ara..." className="w-full text-[13px] bg-[#16181D] border border-[#2A2D35] rounded-[6px] pl-9 p-2 min-h-[44px] outline-none focus:border-[#F5A623] text-[#F1F2F4] placeholder-[#4A4E5A] transition-colors" />
               </div>
               <span className="text-[11px] font-medium text-[#7C8090] border border-[#2A2D35] px-3 py-1 rounded-[4px] bg-[#16181D]">Toplam {agents.length} Danışman</span>
             </div>
@@ -65,8 +67,8 @@ const Agents = () => {
               {loading ? (
                 <div className="p-8 flex justify-center"><div className="w-8 h-8 border-4 border-[#2A2D35] border-t-[#F5A623] rounded-full animate-spin" /></div>
               ) : (
-                <table className="w-full text-left border-collapse">
-                  <thead>
+                <table className="w-full text-left border-collapse block md:table">
+                  <thead className="hidden md:table-header-group">
                     <tr className="bg-[#0A0B0D] text-[11px] uppercase tracking-wider text-[#7C8090] border-b border-[#2A2D35]">
                       <th className="p-4 font-medium">Danışman</th>
                       {user?.role === 'company_admin' && <th className="p-4 font-medium">Ofis</th>}
@@ -75,12 +77,12 @@ const Agents = () => {
                       <th className="p-4 font-medium">Dönüşüm</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#2A2D35] text-[13px]">
+                  <tbody className="block md:table-row-group divide-y divide-[#2A2D35] text-[13px]">
                     {agents.map(agent => (
-                      <tr key={agent.id} className="hover:bg-[#1E2028] transition-colors group">
-                        <td className="p-4">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-8 h-8 bg-[#2A2D35] rounded-[6px] flex items-center justify-center font-medium text-[#F1F2F4]">
+                      <tr key={agent.id} className="block md:table-row hover:bg-[#1E2028] transition-colors p-4 md:p-0">
+                        <td className="block md:table-cell p-2 md:p-4">
+                          <div className="flex items-center space-x-3 mb-2 md:mb-0">
+                            <div className="w-8 h-8 bg-[#2A2D35] rounded-[6px] flex items-center justify-center font-medium text-[#F1F2F4] shrink-0">
                               {agent.name.charAt(0)}
                             </div>
                             <div>
@@ -90,23 +92,27 @@ const Agents = () => {
                           </div>
                         </td>
                         {user?.role === 'company_admin' && (
-                          <td className="p-4 text-[#7C8090] font-medium">
+                          <td className="block md:table-cell p-2 md:p-4 text-[#7C8090] font-medium flex justify-between md:table-cell">
+                            <span className="md:hidden font-medium text-[#7C8090]">Ofis:</span>
                             {agent.office_name}
                           </td>
                         )}
-                        <td className="p-4">
+                        <td className="block md:table-cell p-2 md:p-4 flex justify-between md:table-cell">
+                          <span className="md:hidden font-medium text-[#7C8090]">Toplam Lead:</span>
                           <div className="flex items-center space-x-1.5 text-[#F1F2F4]">
                             <Target size={12} className="text-[#7C8090]" />
                             <span className="font-mono">{agent.lead_count}</span>
                           </div>
                         </td>
-                        <td className="p-4">
+                        <td className="block md:table-cell p-2 md:p-4 flex justify-between md:table-cell">
+                          <span className="md:hidden font-medium text-[#7C8090]">Sıcak Lead:</span>
                           <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-[4px] text-[11px] font-medium bg-[#EF4444]/10 text-[#EF4444] border border-[#EF4444]/20">
                             <span className="w-1.5 h-1.5 rounded-full bg-[#EF4444]"></span>
                             <span>{agent.hot_leads}</span>
                           </span>
                         </td>
-                        <td className="p-4">
+                        <td className="block md:table-cell p-2 md:p-4 flex justify-between md:table-cell border-b border-[#2A2D35] md:border-none pb-4 md:pb-4 mb-2 md:mb-0">
+                          <span className="md:hidden font-medium text-[#7C8090]">Dönüşüm:</span>
                           <span className={`px-2 py-1 rounded-[4px] text-[11px] font-medium border ${Number(agent.conversionRate) > 10 ? 'bg-[#10B981]/10 text-[#10B981] border-[#10B981]/20' : 'bg-[#2A2D35] text-[#7C8090] border-[#4A4E5A]'}`}>
                             % {agent.conversionRate}
                           </span>

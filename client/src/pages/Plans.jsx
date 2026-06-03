@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
 import Sidebar from '../components/Sidebar';
+import Header from '../components/Header';
 
 const Plans = () => {
   const { user, token, setUser } = useContext(AuthContext);
@@ -84,10 +85,11 @@ const Plans = () => {
   };
 
   return (
-    <div className="flex h-screen bg-[#0F1117] text-[#F1F2F4] overflow-hidden">
+    <div className="flex min-h-screen bg-[#0A0B0D]">
       <Sidebar />
-      <div className="flex-1 flex flex-col overflow-y-auto">
-        <div className="p-8 max-w-[1000px] mx-auto w-full">
+      <div className="lg:ml-[240px] flex-1 flex flex-col min-h-screen w-full">
+        <Header />
+        <div className="flex-1 p-4 md:p-8 max-w-[1000px] mx-auto w-full">
           <h1 className="text-[20px] font-medium text-[#F1F2F4] mb-2">Abonelik Planları</h1>
           <p className="text-[13px] text-[#7C8090] mb-12">İhtiyaçlarınıza en uygun planı seçin ve işinizi büyütün.</p>
 

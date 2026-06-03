@@ -50,6 +50,9 @@ const AgentDashboard = () => {
 
   const handleAnalyze = async (e) => {
     if (e) e.preventDefault();
+    
+    // YENİ LEAD: Eğer isim/telefon eksikse arka plan otomatik olarak placeholder ekler.
+    
     setAnalyzing(true);
     setAnalyzeError('');
     try {
@@ -70,18 +73,17 @@ const AgentDashboard = () => {
   const handleVoiceNoteComplete = async (audioBlob) => {
     try {
       const formData = new FormData();
-      formData.append('audio', audioBlob);
-      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/voice`, formData, {
+      formData.append('audio', audioBlob, 'voicenote.webm');
+      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/voice/transcribe`, formData, {
         headers: { 
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
+          Authorization: `Bearer ${token}`
         }
       });
-      await queryClient.invalidateQueries(['leads']);
-      setSelectedLeadId(res.data.id);
+      setMessage(prev => prev ? prev + '\n' + res.data.transcript : res.data.transcript);
+      setIsVoiceModalOpen(false);
     } catch (err) {
       console.error(err);
-      alert('Sesli not analiz hatası.');
+      alert('Ses metne çevrilemedi.');
     }
   };
 
@@ -94,10 +96,10 @@ const AgentDashboard = () => {
   const remindersToday = leads.filter(l => l.reminder_date && isToday(new Date(l.reminder_date)));
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex min-h-screen bg-[#0A0B0D]">
       <Sidebar />
 
-      <div className="ml-[240px] flex-1 flex flex-col h-full bg-[#0A0B0D]">
+      <div className="lg:ml-[240px] flex-1 flex flex-col min-h-screen w-full">
         <Header />
 
         {/* Alert Banner */}
@@ -109,25 +111,22 @@ const AgentDashboard = () => {
         )}
 
         {/* Scrollable Canvas */}
-        <div className="flex-1 overflow-y-auto p-container-padding flex flex-col gap-container-padding">
+        <div className="flex-1 p-container-padding flex flex-col gap-container-padding">
           
           {/* Top Metric Bar */}
-          <div className="panel flex items-center justify-between p-stack-md shrink-0">
+          <div className="panel grid grid-cols-2 md:grid-cols-4 items-center justify-between p-stack-md shrink-0 gap-4">
             <div className="flex flex-col">
               <span className="font-label-caps text-label-caps text-on-surface-variant mb-unit">BU AY LEAD</span>
               <span className="font-data-tabular text-[24px] font-medium leading-none text-on-surface">{leads.length}</span>
             </div>
-            <div className="h-8 w-px divider border-l"></div>
             <div className="flex flex-col items-center">
               <span className="font-label-caps text-label-caps text-on-surface-variant mb-unit">SICAK</span>
               <span className="font-data-tabular text-[24px] font-medium leading-none text-error">{hotLeads}</span>
             </div>
-            <div className="h-8 w-px divider border-l"></div>
             <div className="flex flex-col items-center">
               <span className="font-label-caps text-label-caps text-on-surface-variant mb-unit">ILIK</span>
               <span className="font-data-tabular text-[24px] font-medium leading-none text-primary">{warmLeads}</span>
             </div>
-            <div className="h-8 w-px divider border-l"></div>
             <div className="flex flex-col items-end">
               <span className="font-label-caps text-label-caps text-on-surface-variant mb-unit">SOĞUK</span>
               <span className="font-data-tabular text-[24px] font-medium leading-none text-tertiary">{coldLeads}</span>
@@ -135,10 +134,10 @@ const AgentDashboard = () => {
           </div>
 
           {/* 3-Column Layout */}
-          <div className="flex-1 flex gap-panel-gap min-h-0">
+          <div className="flex-1 grid lg:grid-cols-[300px_1fr_380px] gap-panel-gap">
             
             {/* Left Column (New Lead Form) */}
-            <div className="w-[300px] panel flex flex-col shrink-0">
+            <div className="panel flex flex-col shrink-0">
               <div className="p-stack-md border-b divider shrink-0">
                 <h2 className="font-headline-md text-headline-md font-medium">Yeni lead</h2>
               </div>
@@ -190,7 +189,7 @@ const AgentDashboard = () => {
             </div>
 
             {/* Middle Column (Lead List) */}
-            <div className="flex-1 panel flex flex-col min-w-[320px]">
+            <div className="panel flex flex-col min-w-[320px]">
               <div className="p-stack-md border-b divider shrink-0 flex gap-stack-sm overflow-x-auto">
                 {['Tümü', 'Sıcak', 'Ilık', 'Soğuk'].map(f => (
                   <button 
@@ -227,8 +226,18 @@ const AgentDashboard = () => {
                     )}
                   >
                     <div className="flex flex-col">
-                      <span className="font-medium text-on-surface">{lead.name}</span>
-                      <span className="font-body-sm text-body-sm text-on-surface-variant">{lead.phone || '-'}</span>
+                      <span className={clsx(
+                        "font-medium", 
+                        lead.name === '[İsim Belirtilmedi]' ? "text-[#EF4444]" : "text-on-surface"
+                      )}>
+                        {lead.name === '[İsim Belirtilmedi]' ? 'İsim Eksik (Düzenle)' : lead.name}
+                      </span>
+                      <span className={clsx(
+                        "font-body-sm text-body-sm", 
+                        lead.phone === '[Telefon Belirtilmedi]' ? "text-[#EF4444]" : "text-on-surface-variant"
+                      )}>
+                        {lead.phone === '[Telefon Belirtilmedi]' ? 'Telefon Eksik' : (lead.phone || '-')}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2 justify-end">
                       <div className={clsx(
@@ -246,7 +255,7 @@ const AgentDashboard = () => {
             </div>
 
             {/* Right Column (Lead Detail) */}
-            <div className="w-[380px] panel flex flex-col shrink-0">
+            <div className="panel flex flex-col shrink-0">
               {!selectedLeadId || detailsLoading ? (
                 <div className="flex-1 flex items-center justify-center text-on-surface-variant text-sm p-8 text-center">
                   {detailsLoading ? 'Detaylar yükleniyor...' : 'Detayları görmek için bir lead seçin.'}
@@ -255,11 +264,16 @@ const AgentDashboard = () => {
                 <>
                   <div className="p-stack-md border-b divider shrink-0 flex items-center justify-between">
                     <div className="flex items-center gap-stack-sm">
-                      <div className="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-lg font-medium text-on-surface">
-                        {leadDetails.name?.substring(0,2).toUpperCase()}
+                      <div className="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-lg font-medium text-on-surface shrink-0">
+                        {leadDetails.name === '[İsim Belirtilmedi]' ? '?' : leadDetails.name?.substring(0,2).toUpperCase()}
                       </div>
-                      <div>
-                        <h3 className="font-headline-md text-headline-md font-medium leading-tight text-on-surface">{leadDetails.name}</h3>
+                      <div className="flex flex-col">
+                        <h3 className={clsx(
+                          "font-headline-md text-headline-md font-medium leading-tight",
+                          leadDetails.name === '[İsim Belirtilmedi]' ? "text-[#EF4444]" : "text-on-surface"
+                        )}>
+                          {leadDetails.name === '[İsim Belirtilmedi]' ? 'Lütfen Müşteri Adı Ekleyin' : leadDetails.name}
+                        </h3>
                         <span className="font-body-sm text-body-sm text-on-surface-variant">
                           Oluşturulma: {format(new Date(leadDetails.created_at), 'dd MMM HH:mm', { locale: tr })}
                         </span>
@@ -291,8 +305,13 @@ const AgentDashboard = () => {
                     <div className="flex flex-col gap-stack-sm">
                       <span className="font-label-caps text-label-caps text-on-surface-variant">İLETİŞİM</span>
                       <div className="bg-[#1C1E24] border border-[#2A2D35] rounded p-stack-sm flex items-center justify-between">
-                        <span className="font-body-md text-body-md text-on-surface">{leadDetails.phone || 'Telefon yok'}</span>
-                        {leadDetails.phone && (
+                        <span className={clsx(
+                          "font-body-md text-body-md",
+                          leadDetails.phone === '[Telefon Belirtilmedi]' ? "text-[#EF4444]" : "text-on-surface"
+                        )}>
+                          {leadDetails.phone === '[Telefon Belirtilmedi]' ? 'Lütfen Telefon Ekleyin' : (leadDetails.phone || 'Telefon yok')}
+                        </span>
+                        {leadDetails.phone && leadDetails.phone !== '[Telefon Belirtilmedi]' && (
                           <a 
                             href={`https://wa.me/${leadDetails.phone.replace(/[^0-9]/g, '')}`} 
                             target="_blank" rel="noreferrer"

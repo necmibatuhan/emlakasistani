@@ -8,6 +8,7 @@ import '@fontsource/geist-mono/500.css';
 import '@fontsource/geist-mono/600.css';
 import './index.css';
 import App from './App.jsx'
+import { UIProvider } from './contexts/UIContext.jsx';
 
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
@@ -17,7 +18,9 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || 'MOCK_CLIENT_ID'}>
       <QueryClientProvider client={queryClient}>
-        <App />
+        <UIProvider>
+          <App />
+        </UIProvider>
       </QueryClientProvider>
     </GoogleOAuthProvider>
   </StrictMode>,

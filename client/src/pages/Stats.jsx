@@ -27,11 +27,11 @@ const Stats = () => {
 
   if (loading) {
     return (
-      <div className="flex h-screen overflow-hidden">
+      <div className="flex min-h-screen bg-[#0A0B0D]">
         <Sidebar />
-        <div className="flex-1 flex flex-col h-full bg-[#0A0B0D] ml-[240px]">
+        <div className="lg:ml-[240px] flex-1 flex flex-col min-h-screen w-full">
           <Header />
-          <div className="flex-1 flex items-center justify-center text-on-surface-variant text-sm">
+          <div className="flex-1 flex items-center justify-center text-on-surface-variant text-sm p-4">
             Yükleniyor...
           </div>
         </div>
@@ -41,11 +41,11 @@ const Stats = () => {
 
   if (user?.plan !== 'proplus') {
     return (
-      <div className="flex h-screen overflow-hidden">
+      <div className="flex min-h-screen bg-[#0A0B0D]">
         <Sidebar />
-        <div className="flex-1 flex flex-col h-full bg-[#0A0B0D] ml-[240px]">
+        <div className="lg:ml-[240px] flex-1 flex flex-col min-h-screen w-full">
           <Header />
-          <div className="flex-1 flex items-center justify-center p-8">
+          <div className="flex-1 flex items-center justify-center p-4 md:p-8">
             <div className="w-full max-w-md panel p-8 text-center">
               <div className="w-16 h-16 bg-primary-container/10 text-primary-container rounded-full flex items-center justify-center mx-auto mb-4 border custom-border">
                  <span className="material-symbols-outlined text-[32px]">star</span>
@@ -71,13 +71,13 @@ const Stats = () => {
   const coldPct = totalLeads ? Math.round((coldCount / totalLeads) * 100) : 0;
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex min-h-screen bg-[#0A0B0D]">
       <Sidebar />
-      <div className="flex-1 flex flex-col min-h-screen ml-[240px] bg-[#0A0B0D]">
+      <div className="lg:ml-[240px] flex-1 flex flex-col min-h-screen w-full">
         <Header />
         
         {/* Canvas */}
-        <main className="flex-1 p-container-padding flex flex-col gap-stack-lg overflow-x-hidden overflow-y-auto">
+        <main className="flex-1 p-4 md:p-container-padding flex flex-col gap-6 md:gap-stack-lg">
           {/* Header */}
           <div>
             <h1 className="font-display text-display text-on-surface">İstatistikler</h1>

@@ -26,15 +26,15 @@ export const AuthProvider = ({ children }) => {
     }
   }, [token]);
 
-  const login = async (email, password) => {
-    const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/auth/login`, { email, password });
+  const login = async (email, password, turnstileToken) => {
+    const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/auth/login`, { email, password, turnstileToken });
     setToken(res.data.token);
     localStorage.setItem('token', res.data.token);
     setUser(res.data.user);
   };
 
-  const register = async (name, email, password, role = 'agent') => {
-    const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/auth/register`, { name, email, password, role });
+  const register = async (name, email, password, role = 'agent', turnstileToken) => {
+    const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/auth/register`, { name, email, password, role, turnstileToken });
     if (res.data.token) {
       setToken(res.data.token);
       localStorage.setItem('token', res.data.token);

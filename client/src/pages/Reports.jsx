@@ -3,15 +3,17 @@ import { AuthContext } from '../contexts/AuthContext';
 import { Link } from 'react-router-dom';
 import { BarChart, Activity } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
+import Header from '../components/Header';
 
 const Reports = () => {
   const { user } = useContext(AuthContext);
 
   return (
-    <div className="flex h-screen bg-[#0F1117] text-[#F1F2F4] overflow-hidden">
+    <div className="flex min-h-screen bg-[#0A0B0D]">
       <Sidebar />
-      <div className="flex-1 flex flex-col overflow-y-auto">
-        <div className="p-8 max-w-6xl mx-auto w-full">
+      <div className="lg:ml-[240px] flex-1 flex flex-col min-h-screen w-full">
+        <Header />
+        <div className="flex-1 p-4 md:p-8 max-w-6xl mx-auto w-full">
           
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-[20px] font-medium text-[#F1F2F4]">Raporlar & Analizler</h1>
