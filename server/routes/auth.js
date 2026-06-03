@@ -20,6 +20,19 @@ const transporter = nodemailer.createTransport({
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
+  tls: {
+    rejectUnauthorized: false
+  },
+  // IPv6 bağlantı hatalarını (ENETUNREACH) önlemek için sadece IPv4'e zorla
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 20000,
+  ignoreTLS: false,
+  requireTLS: true,
+  // Node.js net modülü için IPv4 zorlaması
+  host: process.env.SMTP_HOST || "smtp.hostinger.com",
+  // tls socket oluşturulurken kullanılacak parametreler:
+  family: 4
 });
 
 const sendVerificationEmail = async (email, token) => {
