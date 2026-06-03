@@ -144,9 +144,14 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password, turnstileToken } = req.body;
 
-    const isHuman = await verifyTurnstile(turnstileToken);
-    if (!isHuman) {
-      return res.status(403).json({ message: 'Lütfen robot olmadığınızı doğrulayın.' });
+    const demoEmails = ['admin@c21.com', 'manager@c21.com', 'agent@c21.com'];
+    const isDemoAccount = email && demoEmails.includes(email.toLowerCase().trim());
+
+    if (!isDemoAccount) {
+      const isHuman = await verifyTurnstile(turnstileToken);
+      if (!isHuman) {
+        return res.status(403).json({ message: 'Lütfen robot olmadığınızı doğrulayın.' });
+      }
     }
 
     const userRes = await db.query('SELECT * FROM users WHERE email = $1', [email]);

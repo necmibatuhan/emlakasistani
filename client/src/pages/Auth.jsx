@@ -46,8 +46,12 @@ const Auth = () => {
     setError('');
     setMessage('');
     
+    // Bypass Captcha for Demo Accounts
+    const demoEmails = ['admin@c21.com', 'manager@c21.com', 'agent@c21.com'];
+    const isDemoAccount = demoEmails.includes(email.toLowerCase().trim());
+
     // Sadece lokal test için devrede bırakılabilir, ama production'da zorunludur:
-    if (import.meta.env.VITE_TURNSTILE_SITE_KEY && import.meta.env.VITE_TURNSTILE_SITE_KEY !== 'GIRILECEK_TURNSTILE_SITE_KEY') {
+    if (!isDemoAccount && import.meta.env.VITE_TURNSTILE_SITE_KEY && import.meta.env.VITE_TURNSTILE_SITE_KEY !== 'GIRILECEK_TURNSTILE_SITE_KEY') {
       if (!captchaToken) {
         setError('Lütfen robot olmadığınızı doğrulayın.');
         return;
