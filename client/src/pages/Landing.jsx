@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Play, X } from 'lucide-react';
+import { Logo } from '../components/Logo';
 
 const MOCK_LEADS = [
   {
@@ -52,12 +53,7 @@ const Landing = () => {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-outline-variant">
         <div className="max-w-[1200px] mx-auto px-6 h-16 flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-surface-container-high flex items-center justify-center rounded-[6px]">
-              <span className="text-on-surface font-headline-md font-bold tracking-tight">EA</span>
-            </div>
-            <span className="font-headline-sm font-medium tracking-wide">Kapora</span>
-          </div>
+          <Logo />
           
           {/* Right Nav */}
           <div className="flex items-center gap-stack-lg">
@@ -387,12 +383,7 @@ const Landing = () => {
       <footer className="border-t border-outline-variant bg-surface-container-lowest py-12 px-6 sm:px-12 lg:px-24">
         <div className="max-w-[1200px] mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
           <div className="max-w-2xl">
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-surface-container-high rounded-[6px] flex items-center justify-center">
-                <span className="text-on-surface font-headline-sm font-bold tracking-tight">EA</span>
-              </div>
-              <span className="text-on-surface font-headline-md font-semibold tracking-tight">Kapora</span>
-            </div>
+            <Logo className="mb-4" />
             <p className="font-body-sm text-on-surface-variant leading-relaxed mb-4">
               <strong className="text-on-surface font-medium block mb-1">Veri Gizliliği Bildirimi ("Privacy by Design"):</strong>
               Kapora, KVKK uyumlu altyapısı ile tasarlanmıştır. Verileriniz, anonimleştirme teknolojileri ile korunur. Yapay zeka süreçlerimizde, müşteri bilgileriniz (ad, telefon, e-posta) analiz edilmeden önce maskelenir ve dış sistemlerde veya modellerin eğitiminde asla depolanmaz/kullanılmaz.

@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
+import { Logo } from './Logo';
 
 const Sidebar = () => {
   const { user, logout } = useContext(AuthContext);
@@ -22,14 +23,8 @@ const Sidebar = () => {
   return (
     <nav className="bg-surface-container dark:bg-surface-container fixed left-0 top-0 h-full w-[240px] border-r border-outline-variant flex flex-col p-stack-md z-20">
       {/* Header */}
-      <div className="flex items-center gap-stack-sm mb-stack-lg p-stack-sm">
-        <div className="w-10 h-10 rounded bg-primary-container flex items-center justify-center font-bold text-on-primary-container" title="EA Monogram">
-          EA
-        </div>
-        <div>
-          <h1 className="font-headline-md text-headline-md font-bold text-primary dark:text-primary">Kapora</h1>
-          <p className="font-body-sm text-body-sm text-on-surface-variant">Emlak Yönetimi</p>
-        </div>
+      <div className="flex items-center mb-stack-lg p-stack-sm">
+        <Logo iconSize="w-8 h-8" textSize="text-[22px]" />
       </div>
 
       {/* Main Navigation Tabs */}
