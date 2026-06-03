@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AuthContext } from '../contexts/AuthContext';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import VoiceNoteModal from '../components/VoiceNoteModal';
@@ -220,80 +221,125 @@ const AgentDashboard = () => {
             ))}
           </div>
 
-          {/* Kanban Board Container */}
-          <div className="flex-1 overflow-x-auto overflow-y-hidden flex gap-6 pb-4">
-             {['Sıcak', 'Ilık', 'Soğuk'].map(status => (
-                <div 
-                  key={status} 
-                  className={clsx(
-                    "w-full md:w-[340px] shrink-0 flex flex-col bg-[#0F1115] rounded-xl border border-[#23262F] h-full shadow-xl",
-                    "md:flex",
-                    activeTab === status ? "flex" : "hidden"
-                  )} 
-                  onDrop={(e) => handleDrop(e, status)} 
-                  onDragOver={handleDragOver}
-                >
-                  {/* Column Header */}
-                  <div className="p-4 border-b border-[#23262F] flex items-center justify-between shrink-0 bg-[#13151A]/50 rounded-t-xl">
-                     <h3 className="font-semibold text-[#F1F2F4] flex items-center gap-2">
-                        <span className="w-2.5 h-2.5 rounded-full" style={{backgroundColor: getStatusColor(status)}}></span>
-                        {status}
-                     </h3>
-                     <span className="text-xs font-bold text-[#8E929C] bg-[#1C1E24] px-2.5 py-1 rounded-full border border-[#2A2D35]">
-                       {leads.filter(l => l.label === status).length}
-                     </span>
-                  </div>
-                  
-                  {/* Column Body (Cards) */}
-                  <div className="p-3 flex-1 overflow-y-auto flex flex-col gap-3 custom-scrollbar">
-                     {loading && <p className="text-[#8E929C] text-sm text-center mt-4">Yükleniyor...</p>}
-                     {!loading && leads.filter(l => l.label === status).length === 0 && (
-                       <div className="flex flex-col items-center justify-center h-32 opacity-50 border border-dashed border-[#2A2D35] rounded-lg mt-2">
-                         <span className="material-symbols-outlined text-[#8E929C] text-2xl mb-1">inbox</span>
-                         <p className="text-[#8E929C] text-sm text-center">Lead yok</p>
-                       </div>
-                     )}
-                     
-                     {leads.filter(l => l.label === status).map(lead => (
+          {/* Kanban Board Container (Drag and Drop) */}
+          <DragDropContext onDragEnd={(result) => {
+            const { destination, source, draggableId } = result;
+            if (!destination) return;
+            if (destination.droppableId === source.droppableId && destination.index === source.index) return;
+            
+            const newStatus = destination.droppableId;
+            const leadId = draggableId;
+            
+            const previousLeads = queryClient.getQueryData(['leads']);
+            const targetLead = previousLeads.find(l => l.id === leadId);
+            if (!targetLead || targetLead.label === newStatus) return;
+
+            // Optimistic Update
+            queryClient.setQueryData(['leads'], old => {
+               const newLeads = Array.from(old);
+               const idx = newLeads.findIndex(l => l.id === leadId);
+               newLeads[idx] = { ...newLeads[idx], label: newStatus };
+               return newLeads;
+            });
+            
+            setShowSuccessTick(true);
+            setTimeout(() => setShowSuccessTick(false), 1500);
+
+            axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/${leadId}`, { label: newStatus }, {
+              headers: { Authorization: `Bearer ${token}` }
+            }).catch(() => {
+              queryClient.setQueryData(['leads'], previousLeads);
+            });
+          }}>
+            <div className="flex-1 overflow-x-auto overflow-y-hidden flex gap-6 pb-4">
+               {['Sıcak', 'Ilık', 'Soğuk'].map(status => (
+                  <div 
+                    key={status} 
+                    className={clsx(
+                      "w-full md:w-[340px] shrink-0 flex flex-col bg-[#0F1115] rounded-xl border border-[#23262F] h-full shadow-xl",
+                      "md:flex",
+                      activeTab === status ? "flex" : "hidden"
+                    )} 
+                  >
+                    {/* Column Header */}
+                    <div className="p-4 border-b border-[#23262F] flex items-center justify-between shrink-0 bg-[#13151A]/50 rounded-t-xl">
+                       <h3 className="font-semibold text-[#F1F2F4] flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 rounded-full" style={{backgroundColor: getStatusColor(status)}}></span>
+                          {status}
+                       </h3>
+                       <span className="text-xs font-bold text-[#8E929C] bg-[#1C1E24] px-2.5 py-1 rounded-full border border-[#2A2D35]">
+                         {leads.filter(l => l.label === status).length}
+                       </span>
+                    </div>
+                    
+                    {/* Column Body (Cards) */}
+                    <Droppable droppableId={status}>
+                      {(provided, snapshot) => (
                         <div 
-                          key={lead.id} 
-                          draggable 
-                          onDragStart={(e) => handleDragStart(e, lead.id)} 
-                          onClick={() => setSelectedLeadId(lead.id)} 
+                          ref={provided.innerRef}
+                          {...provided.droppableProps}
                           className={clsx(
-                            "bg-[#1A1D24] p-4 rounded-lg border cursor-grab active:cursor-grabbing transition-all relative overflow-hidden group shadow-sm hover:shadow-md",
-                            selectedLeadId === lead.id ? "border-[#F5A623] ring-1 ring-[#F5A623]/30" : "border-[#2A2D35] hover:border-[#424652]"
+                            "p-3 flex-1 overflow-y-auto flex flex-col gap-3 custom-scrollbar transition-colors",
+                            snapshot.isDraggingOver ? "bg-[#1C1E24]/30" : ""
                           )}
                         >
-                           <div className="flex justify-between items-start mb-2">
-                             <div className="text-[15px] font-semibold text-[#F1F2F4] leading-tight">
-                               {lead.name === '[İsim Belirtilmedi]' ? 'İsimsiz Lead' : lead.name}
-                             </div>
-                             <div className="text-[11px] font-bold text-[#8E929C] bg-[#23262F] px-1.5 py-0.5 rounded ml-2 shrink-0">
-                               {lead.score || 5}/10
-                             </div>
-                           </div>
-                           <div className="text-[13px] text-[#A1A5B0] flex items-center gap-1.5 mb-3">
-                             <span className="material-symbols-outlined text-[14px]">call</span>
-                             {lead.phone === '[Telefon Belirtilmedi]' ? 'Telefon Yok' : lead.phone}
-                           </div>
-                           {lead.tags && lead.tags.length > 0 && (
-                             <div className="flex flex-wrap gap-1.5">
-                               {lead.tags.slice(0, 3).map((tag, i) => (
-                                 <span key={i} className="text-[10px] px-1.5 py-0.5 bg-[#23262F] text-[#D1D5DB] rounded border border-[#2A2D35]">{tag}</span>
-                               ))}
-                               {lead.tags.length > 3 && <span className="text-[10px] px-1.5 py-0.5 text-[#8E929C]">+{lead.tags.length - 3}</span>}
+                           {loading && <p className="text-[#8E929C] text-sm text-center mt-4">Yükleniyor...</p>}
+                           {!loading && leads.filter(l => l.label === status).length === 0 && (
+                             <div className="flex flex-col items-center justify-center h-32 opacity-50 border border-dashed border-[#2A2D35] rounded-lg mt-2">
+                               <span className="material-symbols-outlined text-[#8E929C] text-2xl mb-1">inbox</span>
+                               <p className="text-[#8E929C] text-sm text-center">Lead yok</p>
                              </div>
                            )}
                            
-                           {/* Hover indicator for drag */}
-                           <div className="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-[#F5A623]/30 transition-colors"></div>
+                           {leads.filter(l => l.label === status).map((lead, index) => (
+                              <Draggable key={lead.id} draggableId={lead.id} index={index}>
+                                {(provided, snapshot) => (
+                                  <div 
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    onClick={() => setSelectedLeadId(lead.id)} 
+                                    className={clsx(
+                                      "bg-[#1A1D24] p-4 rounded-lg border transition-all relative overflow-hidden group",
+                                      snapshot.isDragging ? "shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-[#F5A623] scale-105 z-50 ring-2 ring-[#F5A623]/50" : "shadow-sm border-[#2A2D35] hover:border-[#424652]",
+                                      selectedLeadId === lead.id && !snapshot.isDragging ? "border-[#F5A623] ring-1 ring-[#F5A623]/30" : ""
+                                    )}
+                                  >
+                                     <div className="flex justify-between items-start mb-2">
+                                       <div className="text-[15px] font-semibold text-[#F1F2F4] leading-tight">
+                                         {lead.name === '[İsim Belirtilmedi]' ? 'İsimsiz Lead' : lead.name}
+                                       </div>
+                                       <div className="text-[11px] font-bold text-[#8E929C] bg-[#23262F] px-1.5 py-0.5 rounded ml-2 shrink-0">
+                                         {lead.score || 5}/10
+                                       </div>
+                                     </div>
+                                     <div className="text-[13px] text-[#A1A5B0] flex items-center gap-1.5 mb-3">
+                                       <span className="material-symbols-outlined text-[14px]">call</span>
+                                       {lead.phone === '[Telefon Belirtilmedi]' ? 'Telefon Yok' : lead.phone}
+                                     </div>
+                                     {lead.tags && lead.tags.length > 0 && (
+                                       <div className="flex flex-wrap gap-1.5">
+                                         {lead.tags.slice(0, 3).map((tag, i) => (
+                                           <span key={i} className="text-[10px] px-1.5 py-0.5 bg-[#23262F] text-[#D1D5DB] rounded border border-[#2A2D35]">{tag}</span>
+                                         ))}
+                                         {lead.tags.length > 3 && <span className="text-[10px] px-1.5 py-0.5 text-[#8E929C]">+{lead.tags.length - 3}</span>}
+                                       </div>
+                                     )}
+                                     
+                                     {/* Hover indicator for drag */}
+                                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-[#F5A623]/30 transition-colors"></div>
+                                  </div>
+                                )}
+                              </Draggable>
+                           ))}
+                           {provided.placeholder}
                         </div>
-                     ))}
+                      )}
+                    </Droppable>
                   </div>
-                </div>
-             ))}
-          </div>
+               ))}
+            </div>
+          </DragDropContext>
 
         </div>
       </div>

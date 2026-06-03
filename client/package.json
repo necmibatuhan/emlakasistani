@@ -12,6 +12,7 @@
   "dependencies": {
     "@fontsource/geist-mono": "^5.2.8",
     "@fontsource/geist-sans": "^5.2.5",
+    "@hello-pangea/dnd": "^18.0.1",
     "@marsidev/react-turnstile": "^1.5.2",
     "@react-oauth/google": "^0.13.5",
     "@tailwindcss/vite": "^4.3.0",
