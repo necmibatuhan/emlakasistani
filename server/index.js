@@ -10,6 +10,7 @@ const integrationsRoutes = require('./routes/integrations');
 const companiesRoutes = require('./routes/companies');
 const officesRoutes = require('./routes/offices');
 const voiceRoutes = require('./routes/voice');
+const paymentRoutes = require('./routes/payment');
 require('./services/queue'); // Start background worker
 
 const app = express();
@@ -26,6 +27,7 @@ app.use('/api/integrations', integrationsRoutes);
 app.use('/api/companies', companiesRoutes);
 app.use('/api/offices', officesRoutes);
 app.use('/api/voice', voiceRoutes);
+app.use('/api/payment', paymentRoutes);
 
 app.get('/', (req, res) => {
   res.send('Kapora API');

@@ -10,6 +10,56 @@ const Plans = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  const handlePayment = async (plan) => {
+    setLoading(true);
+    setError('');
+    
+    try {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/payment/shopier-checkout`, { plan }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      const { data } = res.data;
+      
+      // Shopier'e yönlendirmek için dinamik form oluştur
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = 'https://shopier.com/ShowProduct/api_pay4.php';
+      
+      const fields = {
+        API_KEY: data.API_KEY,
+        signature: data.signature,
+        buyer_idnr: data.buyerId,
+        product_name: plan === 'pro' ? 'Pro Plan Aylık' : 'Pro+ Plan Aylık',
+        product_price: data.totalAmount,
+        currency: data.currency,
+        buyer_name: data.buyerName,
+        buyer_surname: data.buyerSurname,
+        buyer_email: data.buyerEmail,
+        buyer_phone: data.buyerPhone,
+        buyer_account_age: data.buyerAccountAge,
+        buyer_id: data.buyerId,
+        custom_data: data.customData,
+        callback: data.callbackUrl
+      };
+      
+      Object.keys(fields).forEach(key => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = fields[key];
+        form.appendChild(input);
+      });
+      
+      document.body.appendChild(form);
+      form.submit();
+      
+    } catch (err) {
+      setError('Ödeme başlatılamadı. Lütfen sistem yöneticinizle iletişime geçin.');
+      setLoading(false);
+    }
+  };
+
   const handleUpgrade = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -76,8 +126,12 @@ const Plans = () => {
                 <li>Hatırlatıcı</li>
                 <li>Günlük özet</li>
               </ul>
-              <button className="w-full py-2.5 text-center text-[13px] font-medium bg-[#F5A623] text-[#0A0B0D] hover:bg-[#d9921e] rounded-[6px] transition-colors">
-                Pro'ya Geç
+              <button 
+                disabled={loading || ['pro', 'proplus'].includes(user?.plan)} 
+                onClick={() => handlePayment('pro')}
+                className={`w-full py-2.5 text-center text-[13px] font-medium rounded-[6px] transition-colors ${['pro', 'proplus'].includes(user?.plan) ? 'bg-[#2A2D35] text-[#7C8090] cursor-not-allowed' : 'bg-[#F5A623] text-[#0A0B0D] hover:bg-[#d9921e]'}`}
+              >
+                {['pro', 'proplus'].includes(user?.plan) ? 'Mevcut Plan' : (loading ? 'Yönlendiriliyor...' : "Pro'ya Geç")}
               </button>
             </div>
 
@@ -94,8 +148,12 @@ const Plans = () => {
                 <li>Timeline takibi</li>
                 <li>Öncelikli destek</li>
               </ul>
-              <button disabled={user?.plan === 'proplus'} className={`w-full py-2.5 text-center text-[13px] font-medium rounded-[6px] transition-colors ${user?.plan === 'proplus' ? 'bg-[#2A2D35] text-[#7C8090] cursor-not-allowed' : 'text-[#F1F2F4] border border-[#2A2D35] hover:bg-[#1E2025]'}`}>
-                {user?.plan === 'proplus' ? 'Mevcut Plan' : "Pro+'ya Geç"}
+              <button 
+                disabled={loading || user?.plan === 'proplus'} 
+                onClick={() => handlePayment('proplus')}
+                className={`w-full py-2.5 text-center text-[13px] font-medium rounded-[6px] transition-colors ${user?.plan === 'proplus' ? 'bg-[#2A2D35] text-[#7C8090] cursor-not-allowed' : 'text-[#F1F2F4] border border-[#2A2D35] hover:bg-[#1E2025]'}`}
+              >
+                {user?.plan === 'proplus' ? 'Mevcut Plan' : (loading ? 'Yönlendiriliyor...' : "Pro+'ya Geç")}
               </button>
             </div>
 

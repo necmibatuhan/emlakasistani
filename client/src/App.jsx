@@ -12,6 +12,7 @@ import AgentDashboard from './pages/AgentDashboard';
 import WhatsApp from './pages/WhatsApp';
 import Stats from './pages/Stats';
 import Plans from './pages/Plans';
+import PaymentResult from './pages/PaymentResult';
 import Properties from './pages/Properties';
 import Profile from './pages/Profile';
 import Offices from './pages/Offices';
@@ -67,6 +68,7 @@ const AppRoutes = () => {
       <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
       <Route path="/stats" element={<ProtectedRoute><Stats /></ProtectedRoute>} />
       <Route path="/plans" element={<ProtectedRoute><Plans /></ProtectedRoute>} />
+      <Route path="/payment-result" element={<ProtectedRoute><PaymentResult /></ProtectedRoute>} />
     </Routes>
   );
 };
