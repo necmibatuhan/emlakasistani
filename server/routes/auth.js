@@ -12,56 +12,47 @@ const { OAuth2Client } = require('google-auth-library');
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID || 'MOCK_CLIENT_ID');
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || "smtp.hostinger.com",
-  port: parseInt(process.env.SMTP_PORT || "465"),
-  secure: parseInt(process.env.SMTP_PORT || "465", 10) === 465,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false
-  },
-  // IPv6 bağlantı hatalarını (ENETUNREACH) önlemek için sadece IPv4'e zorla
-  connectionTimeout: 10000,
-  greetingTimeout: 10000,
-  socketTimeout: 20000,
-  ignoreTLS: false,
-  requireTLS: true,
-  // Node.js net modülü için IPv4 zorlaması
-  host: process.env.SMTP_HOST || "smtp.hostinger.com",
-  // tls socket oluşturulurken kullanılacak parametreler:
-  family: 4
-});
+const sendResendEmail = async (to, subject, html) => {
+  const RESEND_API_KEY = process.env.RESEND_API_KEY || 're_ZMoRLSj3_67kzciBd73eaHcCiNGAtsPUk';
+  const fromEmail = process.env.SMTP_FROM || 'info@kapora.online';
+  
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${RESEND_API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      from: `Kapora <${fromEmail}>`,
+      to: [to],
+      subject: subject,
+      html: html
+    })
+  });
+  
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || 'Resend API Hatası');
+  }
+  return data;
+};
 
 const sendVerificationEmail = async (email, token) => {
   const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${token}`;
   
-  if (!process.env.SMTP_USER || !process.env.SMTP_PASS || 
-      process.env.SMTP_PASS === 'GIRILECEK_APP_PASSWORD' ||
-      process.env.SMTP_PASS === 'BURAYA_HOSTINGER_SIFRENIZI_YAZIN') {
-    console.log(`\n\n=== E-POSTA SİMÜLASYONU (SMTP Kurulmamış) ===`);
-    console.log(`Kime: ${email}`);
-    console.log(`Link: ${verificationUrl}\n=============================\n\n`);
-    return;
-  }
-
   try {
-    const fromEmail = process.env.SMTP_FROM || process.env.SMTP_USER;
-    const info = await transporter.sendMail({
-      from: `"Kapora" <${fromEmail}>`,
-      to: email,
-      subject: "Kapora Hesabınızı Doğrulayın",
-      html: `
+    const data = await sendResendEmail(
+      email,
+      "Kapora Hesabınızı Doğrulayın",
+      `
         <h2>Kapora'a Hoş Geldiniz!</h2>
         <p>Hesabınızı aktifleştirmek için lütfen aşağıdaki bağlantıya tıklayın:</p>
         <a href="${verificationUrl}" style="display:inline-block;padding:10px 20px;color:#fff;background-color:#F5A623;text-decoration:none;border-radius:5px;">Hesabımı Doğrula</a>
         <p>Eğer butona tıklayamazsanız, bu linki kopyalayıp tarayıcınıza yapıştırın:</p>
         <p>${verificationUrl}</p>
-      `,
-    });
-    console.log(`Doğrulama maili gönderildi: ${email} (${info.messageId})`);
+      `
+    );
+    console.log(`Doğrulama maili gönderildi: ${email} (${data.id})`);
   } catch (error) {
     console.error("Mail gönderme hatası:", error);
   }
@@ -309,21 +300,19 @@ router.post('/forgot-password', async (req, res) => {
     const resetToken = jwt.sign({ userId: user.id, email: user.email }, resetSecret, { expiresIn: '1h' });
     const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${resetToken}&id=${user.id}`;
     
-    if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+    if (process.env.RESEND_API_KEY || (process.env.SMTP_USER && process.env.SMTP_PASS)) {
       try {
-        const fromEmail = process.env.SMTP_FROM || process.env.SMTP_USER;
-        await transporter.sendMail({
-          from: `"Kapora" <${fromEmail}>`,
-          to: email,
-          subject: "Kapora Şifre Sıfırlama İsteği",
-          html: `
+        await sendResendEmail(
+          email,
+          "Kapora Şifre Sıfırlama İsteği",
+          `
             <h2>Şifrenizi Sıfırlayın</h2>
             <p>Şifrenizi sıfırlamak için aşağıdaki bağlantıya tıklayın. Bu bağlantı 1 saat boyunca geçerlidir.</p>
             <a href="${resetUrl}" style="display:inline-block;padding:10px 20px;color:#fff;background-color:#F5A623;text-decoration:none;border-radius:5px;">Şifremi Sıfırla</a>
             <p>Eğer butona tıklayamazsanız, bu linki kopyalayıp tarayıcınıza yapıştırın:</p>
             <p>${resetUrl}</p>
-          `,
-        });
+          `
+        );
       } catch (mailErr) {
         console.error('SMTP Mail Gönderme Hatası:', mailErr);
         return res.status(500).json({ message: `Mail gönderilemedi. Lütfen sistem yöneticisiyle iletişime geçin. (Hata: ${mailErr.message})` });
