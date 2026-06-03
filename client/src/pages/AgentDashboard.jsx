@@ -60,6 +60,12 @@ const AgentDashboard = () => {
     refetchInterval: 30000
   });
 
+  React.useEffect(() => {
+    const handleOpenDrawer = () => setIsNewLeadDrawerOpen(true);
+    window.addEventListener('open-new-lead-drawer', handleOpenDrawer);
+    return () => window.removeEventListener('open-new-lead-drawer', handleOpenDrawer);
+  }, []);
+
   const { data: leadDetails, isLoading: detailsLoading } = useQuery({
     queryKey: ['lead', selectedLeadId],
     queryFn: async () => {
