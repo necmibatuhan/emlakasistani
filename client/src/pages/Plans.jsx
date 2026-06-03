@@ -11,54 +11,20 @@ const Plans = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const handlePayment = async (plan) => {
-    setLoading(true);
-    setError('');
+  const handlePayment = (plan) => {
+    // Statik Link Yönlendirmesi
+    let shopierLink = '';
     
-    try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/payment/shopier-checkout`, { plan }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      const { data } = res.data;
-      
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = 'https://shopier.com/ShowProduct/api_pay4.php';
-      
-      const fields = {
-        API_KEY: data.API_KEY,
-        signature: data.signature,
-        platform_order_id: data.platform_order_id,
-        random_nr: data.random_nr,
-        product_name: data.product_name,
-        product_type: data.product_type,
-        product_price: data.product_price,
-        currency: data.currency,
-        buyer_name: data.buyer_name,
-        buyer_surname: data.buyer_surname,
-        buyer_email: data.buyer_email,
-        buyer_phone: data.buyer_phone,
-        buyer_idnr: data.buyer_idnr,
-        buyer_account_age: data.buyer_account_age,
-        custom_data: data.custom_data,
-        callback: data.callback
-      };
-      
-      Object.keys(fields).forEach(key => {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = key;
-        input.value = fields[key];
-        form.appendChild(input);
-      });
-      
-      document.body.appendChild(form);
-      form.submit();
-      
-    } catch (err) {
-      setError('Ödeme başlatılamadı. Lütfen sistem yöneticinizle iletişime geçin.');
-      setLoading(false);
+    // TODO: Kullanıcı bu linkleri Shopier panelinden alıp buraya yapıştıracak
+    if (plan === 'pro') {
+      shopierLink = 'https://www.shopier.com/ShowProductNew/products.php?id=PRO_URUN_ID'; // Buraya kendi linkinizi girin
+    } else if (plan === 'proplus') {
+      shopierLink = 'https://www.shopier.com/ShowProductNew/products.php?id=PROPLUS_URUN_ID'; // Buraya kendi linkinizi girin
+    }
+
+    if (shopierLink) {
+      window.open(shopierLink, '_blank');
+      setSuccess('Shopier ödeme sayfasına yönlendirildiniz. Ödemenizi tamamladıktan sonra sistem yöneticisi hesabınızı aktif edecektir.');
     }
   };
 
