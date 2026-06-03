@@ -13,11 +13,48 @@ const voiceRoutes = require('./routes/voice');
 const paymentRoutes = require('./routes/payment');
 require('./services/queue'); // Start background worker
 
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-app.use(cors());
-app.use(express.json());
+// 1. Security Headers (Helmet)
+app.use(helmet());
+app.use(helmet.hidePoweredBy()); // Remove X-Powered-By
+app.use(helmet.noSniff()); // Prevent MIME sniffing
+app.use(helmet.xssFilter()); // Add XSS protection header
+app.use(helmet.frameguard({ action: 'deny' })); // Prevent Clickjacking (no iframes allowed)
+
+// 2. Strict CORS
+const allowedOrigins = [
+  'https://www.kapora.online',
+  'https://kapora.online',
+  'http://localhost:5173'
+];
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  optionsSuccessStatus: 200
+}));
+
+// 3. Rate Limiting (Anti-DDoS & Anti-Scraping)
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 300, // Limit each IP to 300 requests per windowMs
+  message: { message: "Çok fazla istek gönderildi. Lütfen daha sonra tekrar deneyin." },
+  standardHeaders: true, 
+  legacyHeaders: false,
+});
+app.use('/api', limiter);
+
+app.use(express.json({ limit: '1mb' })); // Limit body payload to prevent huge payload attacks
 
 app.use('/api/auth', authRoutes);
 app.use('/api/leads', leadsRoutes);
