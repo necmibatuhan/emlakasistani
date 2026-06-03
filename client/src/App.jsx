@@ -5,6 +5,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 
 import Landing from './pages/Landing';
 import Auth from './pages/Auth';
+import ResetPassword from './pages/ResetPassword';
 import CompanyDashboard from './pages/CompanyDashboard';
 import OfficeDashboard from './pages/OfficeDashboard';
 import AgentDashboard from './pages/AgentDashboard';
@@ -51,6 +52,7 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Landing />} />
       <Route path="/auth" element={user ? <Navigate to="/dashboard" /> : <Auth />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/aydinlatma-metni" element={<AydinlatmaMetni />} />
       <Route path="/gizlilik-politikasi" element={<GizlilikPolitikasi />} />

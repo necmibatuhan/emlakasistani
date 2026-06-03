@@ -9,6 +9,7 @@ import clsx from 'clsx';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [registerStep, setRegisterStep] = useState(1);
   const [kvkkAccepted, setKvkkAccepted] = useState(false);
   const [name, setName] = useState('');
@@ -57,7 +58,7 @@ const Auth = () => {
         await login(email, password);
         navigate('/dashboard');
       } catch (err) {
-        setError(err.response?.data?.message || 'Bir hata oluştu');
+        setError(err.response?.data?.message || 'Giriş başarısız.');
       }
     } else {
       if (!kvkkAccepted) {
@@ -65,6 +66,22 @@ const Auth = () => {
         return;
       }
       setRegisterStep(2);
+    }
+  };
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setError('');
+    setMessage('');
+    setIsSubmitting(true);
+    
+    try {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/auth/forgot-password`, { email });
+      setMessage(res.data.message);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Şifre sıfırlama isteği başarısız.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -92,30 +109,61 @@ const Auth = () => {
   return (
     <div className="min-h-screen bg-[#0A0B0D] flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-[420px] bg-[#16181D] rounded-[10px] border border-[#2A2D35] p-8 relative">
-        {!isLogin && registerStep === 2 && (
+        {(isForgotPassword || (!isLogin && registerStep === 2)) && (
           <button 
-            onClick={() => setRegisterStep(1)}
+            onClick={() => { isForgotPassword ? setIsForgotPassword(false) : setRegisterStep(1); }}
             className="absolute top-6 left-6 text-[#7C8090] hover:text-[#F1F2F4] transition-colors"
           >
             <ArrowLeft size={18} />
           </button>
         )}
 
-        {/* Logo */}
         <div className="flex justify-center mb-8">
           <div className="w-10 h-10 bg-[#1E2025] rounded-[6px] flex items-center justify-center">
             <span className="text-[#F1F2F4] font-bold text-[16px] tracking-tight">EA</span>
           </div>
         </div>
         
-        <h2 className="text-[20px] font-medium text-center text-[#F1F2F4] mb-8">
-          {isLogin ? 'Tekrar Hoşgeldiniz' : (registerStep === 1 ? 'Hesap Oluşturun' : 'Profilinizi Seçin')}
+        <h2 className="text-[20px] font-medium text-center text-[#F1F2F4] mb-2">
+          {isForgotPassword ? 'Şifremi Unuttum' : (isLogin ? 'Tekrar Hoşgeldiniz' : (registerStep === 1 ? 'Hesap Oluşturun' : 'Profilinizi Seçin'))}
         </h2>
+        
+        <div className="text-center mb-8">
+          <p className="text-[14px] text-[#7C8090]">
+            {isForgotPassword 
+              ? 'Hesabınıza kayıtlı e-posta adresini girin, size şifre sıfırlama bağlantısı gönderelim.'
+              : isLogin 
+                ? 'Emlak asistanınıza tekrar hoş geldiniz.' 
+                : 'Dakikalar içinde yeni nesil emlak CRM\'ini kullanmaya başlayın.'}
+          </p>
+        </div>
 
         {message && <div className="bg-[#10B981]/10 text-[#10B981] border border-[#10B981]/20 p-3 rounded-md mb-6 text-[13px] font-medium text-center">{message}</div>}
         {error && <div className="bg-[#EF4444]/10 text-[#EF4444] border border-[#EF4444]/20 p-3 rounded-md mb-6 text-[13px] text-center">{error}</div>}
 
-        {isLogin || registerStep === 1 ? (
+        {isForgotPassword ? (
+          <form onSubmit={handleForgotPassword}>
+            <div className="mb-4">
+              <label className="block text-[#7C8090] text-[12px] font-medium mb-1.5 uppercase tracking-wider">E-posta</label>
+              <input 
+                type="email" 
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full bg-[#0A0B0D] border border-[#2A2D35] rounded-[6px] px-3 py-2.5 text-[#F1F2F4] text-[13px] focus:outline-none focus:border-[#F5A623] focus:ring-1 focus:ring-[#F5A623] transition-colors" 
+                placeholder="ornek@sirket.com" 
+              />
+            </div>
+            
+            <button 
+              type="submit" 
+              disabled={isSubmitting}
+              className="w-full bg-[#F5A623] text-[#0A0B0D] font-medium text-[13px] py-2.5 rounded-[6px] hover:bg-[#d9921e] transition-colors mt-2 disabled:opacity-50"
+            >
+              Şifre Sıfırlama Bağlantısı Gönder
+            </button>
+          </form>
+        ) : isLogin || registerStep === 1 ? (
           <>
             <form onSubmit={handleSubmit} className="space-y-4">
               {!isLogin && (
@@ -163,6 +211,18 @@ const Auth = () => {
                 </div>
               )}
 
+              {isLogin && (
+                <div className="mb-6 flex justify-end">
+                  <button 
+                    type="button"
+                    onClick={() => { setIsForgotPassword(true); setError(''); setMessage(''); }}
+                    className="text-[12px] text-[#F5A623] hover:underline"
+                  >
+                    Şifremi unuttum
+                  </button>
+                </div>
+              )}
+
               {import.meta.env.VITE_RECAPTCHA_SITE_KEY && import.meta.env.VITE_RECAPTCHA_SITE_KEY !== 'GIRILECEK_RECAPTCHA_SITE_KEY' && (
                 <div className="flex justify-center my-4">
                   <ReCAPTCHA
@@ -175,7 +235,8 @@ const Auth = () => {
 
               <button 
                 type="submit" 
-                className="w-full bg-[#F5A623] text-[#0A0B0D] font-medium text-[13px] py-2.5 rounded-[6px] hover:bg-[#d9921e] transition-colors mt-2"
+                disabled={isSubmitting}
+                className="w-full bg-[#F5A623] text-[#0A0B0D] font-medium text-[13px] py-2.5 rounded-[6px] hover:bg-[#d9921e] transition-colors mt-2 disabled:opacity-50"
               >
                 {isLogin ? 'Giriş Yap' : 'Devam Et'}
               </button>
