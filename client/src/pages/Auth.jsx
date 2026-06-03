@@ -6,6 +6,7 @@ import ReCAPTCHA from 'react-google-recaptcha';
 import axios from 'axios';
 import { User, Building, Building2, ArrowLeft } from 'lucide-react';
 import clsx from 'clsx';
+import { Logo } from '../components/Logo';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -119,9 +120,7 @@ const Auth = () => {
         )}
 
         <div className="flex justify-center mb-8">
-          <div className="w-10 h-10 bg-[#1E2025] rounded-[6px] flex items-center justify-center">
-            <span className="text-[#F1F2F4] font-bold text-[16px] tracking-tight">EA</span>
-          </div>
+          <Logo iconSize="w-10 h-10" textSize="text-[24px]" />
         </div>
         
         <h2 className="text-[20px] font-medium text-center text-[#F1F2F4] mb-2">
@@ -134,7 +133,9 @@ const Auth = () => {
               ? 'Hesabınıza kayıtlı e-posta adresini girin, size şifre sıfırlama bağlantısı gönderelim.'
               : isLogin 
                 ? 'Emlak asistanınıza tekrar hoş geldiniz.' 
-                : 'Dakikalar içinde yeni nesil emlak CRM\'ini kullanmaya başlayın.'}
+                : (registerStep === 1 
+                  ? 'Dakikalar içinde yeni nesil emlak CRM\'ini kullanmaya başlayın.'
+                  : 'Platformu kullanım amacınıza en uygun rolü belirleyin.')}
           </p>
         </div>
 
@@ -274,8 +275,6 @@ const Auth = () => {
           </>
         ) : (
           <div className="space-y-4">
-            <p className="text-center text-[13px] text-[#7C8090] mb-8">Size en uygun deneyimi sunabilmemiz için rolünüzü seçin.</p>
-            
             <button 
               disabled={isSubmitting}
               onClick={() => handleRoleSelection('agent')}
