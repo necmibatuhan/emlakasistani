@@ -7,25 +7,34 @@ const { authMiddleware } = require('../middleware/auth');
 const router = express.Router();
 
 const crypto = require('crypto');
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 const { OAuth2Client } = require('google-auth-library');
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID || 'MOCK_CLIENT_ID');
-const resend = new Resend(process.env.RESEND_API_KEY);
+
+const transporter = nodemailer.createTransport({
+  host: "smtp.hostinger.com",
+  port: 465,
+  secure: true, // true for 465, false for other ports
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
 
 const sendVerificationEmail = async (email, token) => {
   const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${token}`;
   
-  if (!process.env.RESEND_API_KEY) {
-    console.log(`\n\n=== E-POSTA SİMÜLASYONU (Resend Kurulmamış) ===`);
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.log(`\n\n=== E-POSTA SİMÜLASYONU (SMTP Kurulmamış) ===`);
     console.log(`Kime: ${email}`);
     console.log(`Link: ${verificationUrl}\n=============================\n\n`);
     return;
   }
 
   try {
-    await resend.emails.send({
-      from: 'Takip.ai <onboarding@resend.dev>', // Resend test sender
+    const info = await transporter.sendMail({
+      from: `"Takip.ai" <${process.env.SMTP_USER}>`,
       to: email,
       subject: "Takip.ai Hesabınızı Doğrulayın",
       html: `
@@ -36,7 +45,7 @@ const sendVerificationEmail = async (email, token) => {
         <p>${verificationUrl}</p>
       `,
     });
-    console.log(`Doğrulama maili gönderildi: ${email}`);
+    console.log(`Doğrulama maili gönderildi: ${email} (${info.messageId})`);
   } catch (error) {
     console.error("Mail gönderme hatası:", error);
   }
