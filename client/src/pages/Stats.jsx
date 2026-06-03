@@ -62,9 +62,9 @@ const Stats = () => {
 
   // Calculate dynamic stats
   const totalLeads = stats?.totalLeads || 0;
-  const hotCount = stats?.leadsByLabel?.find(l => l.label === 'Sıcak')?.count || 0;
-  const warmCount = stats?.leadsByLabel?.find(l => l.label === 'Ilık')?.count || 0;
-  const coldCount = stats?.leadsByLabel?.find(l => l.label === 'Soğuk')?.count || 0;
+  const hotCount = stats?.labelDist?.find(l => l.name === 'Sıcak')?.value || 0;
+  const warmCount = stats?.labelDist?.find(l => l.name === 'Ilık')?.value || 0;
+  const coldCount = stats?.labelDist?.find(l => l.name === 'Soğuk')?.value || 0;
   
   const hotPct = totalLeads ? Math.round((hotCount / totalLeads) * 100) : 0;
   const warmPct = totalLeads ? Math.round((warmCount / totalLeads) * 100) : 0;
@@ -91,7 +91,7 @@ const Stats = () => {
               <span className="font-body-sm text-body-sm text-on-surface-variant">Toplam Lead</span>
               <div className="flex items-baseline gap-2">
                 <span className="font-headline-lg text-headline-lg font-data-tabular">{totalLeads}</span>
-                <span className="font-body-sm text-body-sm text-tertiary font-medium flex items-center"><span className="material-symbols-outlined text-[14px]">trending_up</span> +%12</span>
+                {totalLeads > 0 && <span className="font-body-sm text-body-sm text-tertiary font-medium flex items-center"><span className="material-symbols-outlined text-[14px]">trending_up</span> Aktif</span>}
               </div>
             </div>
             
@@ -100,7 +100,6 @@ const Stats = () => {
               <span className="font-body-sm text-body-sm text-on-surface-variant">Sıcak Müşteri</span>
               <div className="flex items-baseline gap-2">
                 <span className="font-headline-lg text-headline-lg font-data-tabular">{hotCount}</span>
-                <span className="font-body-sm text-body-sm text-tertiary font-medium flex items-center"><span className="material-symbols-outlined text-[14px]">trending_up</span> +2</span>
               </div>
             </div>
             
@@ -108,8 +107,7 @@ const Stats = () => {
               <div className="absolute inset-0 bg-gradient-to-br from-primary-container/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
               <span className="font-body-sm text-body-sm text-on-surface-variant">Dönüşüm</span>
               <div className="flex items-baseline gap-2">
-                <span className="font-headline-lg text-headline-lg font-data-tabular">%17.6</span>
-                <span className="font-body-sm text-body-sm text-tertiary font-medium flex items-center"><span className="material-symbols-outlined text-[14px]">trending_up</span> +3.1%</span>
+                <span className="font-headline-lg text-headline-lg font-data-tabular">%{stats?.conversionRate || 0}</span>
               </div>
             </div>
             
@@ -117,16 +115,16 @@ const Stats = () => {
               <div className="absolute inset-0 bg-gradient-to-br from-primary-container/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
               <span className="font-body-sm text-body-sm text-on-surface-variant">Ort. Skor</span>
               <div className="flex items-baseline gap-2">
-                <span className="font-headline-lg text-headline-lg font-data-tabular">6.4</span>
+                <span className="font-headline-lg text-headline-lg font-data-tabular">{stats?.averageScore || '0.0'}</span>
                 <span className="font-body-sm text-body-sm text-on-surface-variant font-medium">/ 10</span>
               </div>
             </div>
           </section>
 
           {/* Charts Section */}
-          <section className="flex flex-col lg:flex-row gap-panel-gap h-[360px]">
+          <section className="flex flex-col lg:flex-row gap-panel-gap h-auto lg:h-[360px]">
             {/* Left: Line Chart (65%) */}
-            <div className="flex-[6.5] bg-surface-container border border-outline-variant rounded-xl p-stack-md flex flex-col">
+            <div className="flex-[6.5] bg-surface-container border border-outline-variant rounded-xl p-stack-md flex flex-col h-[300px] lg:h-full">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="font-headline-md text-headline-md text-on-surface">Son 30 gün</h2>
                 <button className="text-on-surface-variant hover:text-on-surface">
@@ -136,7 +134,6 @@ const Stats = () => {
               
               <div className="flex-1 relative w-full h-full">
                 <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
-                  <div className="border-t border-outline-variant/30 w-full h-0"></div>
                   <div className="border-t border-outline-variant/30 w-full h-0"></div>
                   <div className="border-t border-outline-variant/30 w-full h-0"></div>
                   <div className="border-t border-outline-variant/30 w-full h-0"></div>
@@ -163,29 +160,29 @@ const Stats = () => {
             </div>
 
             {/* Right: Bar Chart (35%) */}
-            <div className="flex-[3.5] bg-surface-container border border-outline-variant rounded-xl p-stack-md flex flex-col">
+            <div className="flex-[3.5] bg-surface-container border border-outline-variant rounded-xl p-stack-md flex flex-col h-[300px] lg:h-full">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="font-headline-md text-headline-md text-on-surface">Dağılım</h2>
                 <span className="font-label-caps text-label-caps text-on-surface-variant bg-surface-container-highest px-2 py-1 rounded">Lead Tipi</span>
               </div>
               
-              <div className="flex-1 flex items-end justify-around gap-2 px-4 pt-8">
-                <div className="flex flex-col items-center gap-2 w-full group">
-                  <div className="w-full bg-error rounded-t-sm group-hover:brightness-110 transition-all relative" style={{ height: `${hotPct || 10}%` }}>
+              <div className="flex-1 flex items-end justify-around gap-4 px-4 pt-8 h-full">
+                <div className="flex flex-col items-center gap-2 w-full h-full justify-end group">
+                  <div className="w-full bg-error rounded-t-sm group-hover:brightness-110 transition-all relative" style={{ height: `${Math.max(hotPct, 5)}%` }}>
                     <span className="absolute -top-6 left-1/2 -translate-x-1/2 font-data-tabular text-body-sm text-on-surface opacity-0 group-hover:opacity-100 transition-opacity">{hotCount}</span>
                   </div>
                   <span className="font-body-sm text-body-sm text-on-surface-variant">Sıcak</span>
                 </div>
                 
-                <div className="flex flex-col items-center gap-2 w-full group">
-                  <div className="w-full bg-primary-container rounded-t-sm group-hover:brightness-110 transition-all relative" style={{ height: `${warmPct || 10}%` }}>
+                <div className="flex flex-col items-center gap-2 w-full h-full justify-end group">
+                  <div className="w-full bg-primary-container rounded-t-sm group-hover:brightness-110 transition-all relative" style={{ height: `${Math.max(warmPct, 5)}%` }}>
                     <span className="absolute -top-6 left-1/2 -translate-x-1/2 font-data-tabular text-body-sm text-on-surface opacity-0 group-hover:opacity-100 transition-opacity">{warmCount}</span>
                   </div>
                   <span className="font-body-sm text-body-sm text-on-surface-variant">Ilık</span>
                 </div>
                 
-                <div className="flex flex-col items-center gap-2 w-full group">
-                  <div className="w-full bg-tertiary rounded-t-sm group-hover:brightness-110 transition-all relative" style={{ height: `${coldPct || 10}%` }}>
+                <div className="flex flex-col items-center gap-2 w-full h-full justify-end group">
+                  <div className="w-full bg-tertiary rounded-t-sm group-hover:brightness-110 transition-all relative" style={{ height: `${Math.max(coldPct, 5)}%` }}>
                     <span className="absolute -top-6 left-1/2 -translate-x-1/2 font-data-tabular text-body-sm text-on-surface opacity-0 group-hover:opacity-100 transition-opacity">{coldCount}</span>
                   </div>
                   <span className="font-body-sm text-body-sm text-on-surface-variant">Soğuk</span>

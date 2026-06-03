@@ -45,6 +45,9 @@ router.get('/', authMiddleware, async (req, res) => {
     const totalEver = parseInt(totalEverRes.rows[0].count);
     const conversionRate = totalEver > 0 ? ((sales / totalEver) * 100).toFixed(1) : 0;
 
+    const scoreRes = await db.query(`SELECT AVG(score) as avg_score FROM leads WHERE ${scopeClause}`, values);
+    const averageScore = scoreRes.rows[0].avg_score ? parseFloat(scoreRes.rows[0].avg_score).toFixed(1) : '0.0';
+
     const trendRes = await db.query(`
       SELECT DATE(created_at) as date, COUNT(*) as count 
       FROM leads 
@@ -63,6 +66,7 @@ router.get('/', authMiddleware, async (req, res) => {
       labelDist,
       statusDist,
       conversionRate,
+      averageScore,
       trend
     });
 
