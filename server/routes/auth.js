@@ -322,6 +322,10 @@ router.post('/forgot-password', async (req, res) => {
         console.error('SMTP Mail Gönderme Hatası:', mailErr);
         return res.status(500).json({ message: `Mail gönderilemedi. Lütfen sistem yöneticisiyle iletişime geçin. (Hata: ${mailErr.message})` });
       }
+    } else {
+      console.log('\n\n🔔 DİKKAT: SMTP Ayarları (Mail) girilmediği için şifre sıfırlama maili gönderilemedi.');
+      console.log('Kullanıcının şifresini sıfırlaması için gereken gizli link (Manuel olarak iletebilirsiniz):');
+      console.log('👉', resetUrl, '\n\n');
     }
     
     res.json({ message: 'Eğer bu e-posta adresi sistemimizde kayıtlıysa, şifre sıfırlama bağlantısı gönderildi.' });
