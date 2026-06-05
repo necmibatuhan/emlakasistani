@@ -361,19 +361,14 @@ const Landing = () => {
               <X size={20} />
             </button>
             <div className="aspect-video w-full bg-background flex items-center justify-center relative border-b border-outline-variant">
-              <div className="text-center p-8">
-                <div className="w-16 h-16 border-4 border-outline-variant border-t-primary rounded-full animate-spin mx-auto mb-6"></div>
-                <h3 className="font-headline-lg text-on-surface mb-2">Demo Videosu</h3>
-                <p className="font-body-md text-on-surface-variant max-w-md mx-auto leading-relaxed">
-                  Bu alana YouTube, Vimeo veya Loom üzerinden kaydettiğiniz kendi ürün demonuzu yerleştirebilirsiniz.
-                </p>
-                <div className="mt-8 bg-surface-container border border-outline-variant p-4 rounded-md text-left">
-                  <p className="font-label-sm text-on-surface-variant uppercase tracking-wider mb-2">Nasıl Eklenir?</p>
-                  <code className="text-[#10B981] font-mono text-[13px]">
-                    &lt;iframe src="https://www.youtube.com/embed/YOUR_ID" ...&gt;&lt;/iframe&gt;
-                  </code>
-                </div>
-              </div>
+              <video 
+                src="/videos/demo.mp4" 
+                controls 
+                autoPlay 
+                className="w-full h-full object-contain"
+              >
+                Tarayıcınız video etiketini desteklemiyor.
+              </video>
             </div>
           </div>
         </div>
