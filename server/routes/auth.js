@@ -12,7 +12,7 @@ const { OAuth2Client } = require('google-auth-library');
 const { Resend } = require('resend');
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID || 'MOCK_CLIENT_ID');
-const resend = new Resend(process.env.RESEND_API_KEY || 're_ZMoRLSj3_67kzciBd73eaHcCiNGAtsPUk');
+const resend = new Resend(process.env.RESEND_API_KEY || 're_5qWF7SiQ_2w4j9e68BraaBTZrBu7uSr1L');
 
 const sendVerificationEmail = async (email, token, name) => {
   const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${token}`;
@@ -284,31 +284,25 @@ router.post('/forgot-password', async (req, res) => {
     const resetToken = jwt.sign({ userId: user.id, email: user.email }, resetSecret, { expiresIn: '1h' });
     const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${resetToken}&id=${user.id}`;
     
-    if (process.env.RESEND_API_KEY || (process.env.SMTP_USER && process.env.SMTP_PASS)) {
-      try {
-        const { data, error } = await resend.events.send({
-          event: 'password-reset',
-          email: user.email,
-          data: {
-            resetUrl: resetUrl,
-            name: user.name
-          }
-        });
-        
-        if (error) {
-          console.error("Resend Event Error (Password Reset):", error);
-          return res.status(500).json({ message: "Mail gönderilemedi. Hata: " + error.message });
-        } else {
-          console.log(`Şifre sıfırlama otomasyon eventi tetiklendi: ${user.email} (ID: ${data?.id})`);
+    try {
+      const { data, error } = await resend.events.send({
+        event: 'password-reset',
+        email: user.email,
+        data: {
+          resetUrl: resetUrl,
+          name: user.name
         }
-      } catch (mailErr) {
-        console.error('SMTP/Resend Gönderme Hatası:', mailErr);
-        return res.status(500).json({ message: `Mail gönderilemedi. Lütfen sistem yöneticisiyle iletişime geçin. (Hata: ${mailErr.message})` });
+      });
+      
+      if (error) {
+        console.error("Resend Event Error (Password Reset):", error);
+        return res.status(500).json({ message: "Mail gönderilemedi. Hata: " + error.message });
+      } else {
+        console.log(`Şifre sıfırlama otomasyon eventi tetiklendi: ${user.email} (ID: ${data?.id})`);
       }
-    } else {
-      console.log('\n\n🔔 DİKKAT: SMTP Ayarları (Mail) girilmediği için şifre sıfırlama maili gönderilemedi.');
-      console.log('Kullanıcının şifresini sıfırlaması için gereken gizli link (Manuel olarak iletebilirsiniz):');
-      console.log('👉', resetUrl, '\n\n');
+    } catch (mailErr) {
+      console.error('SMTP/Resend Gönderme Hatası:', mailErr);
+      return res.status(500).json({ message: `Mail gönderilemedi. Lütfen sistem yöneticisiyle iletişime geçin. (Hata: ${mailErr.message})` });
     }
     
     res.json({ message: 'Eğer bu e-posta adresi sistemimizde kayıtlıysa, şifre sıfırlama bağlantısı gönderildi.' });
