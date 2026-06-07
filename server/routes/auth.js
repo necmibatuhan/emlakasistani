@@ -9,52 +9,31 @@ const router = express.Router();
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const { OAuth2Client } = require('google-auth-library');
+const { Resend } = require('resend');
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID || 'MOCK_CLIENT_ID');
+const resend = new Resend(process.env.RESEND_API_KEY || 're_ZMoRLSj3_67kzciBd73eaHcCiNGAtsPUk');
 
-const sendResendEmail = async (to, subject, html) => {
-  const RESEND_API_KEY = process.env.RESEND_API_KEY || 're_ZMoRLSj3_67kzciBd73eaHcCiNGAtsPUk';
-  const fromEmail = process.env.SMTP_FROM || 'info@kapora.online';
-  
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${RESEND_API_KEY}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      from: `Kapora <${fromEmail}>`,
-      to: [to],
-      subject: subject,
-      html: html
-    })
-  });
-  
-  const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data.message || 'Resend API Hatası');
-  }
-  return data;
-};
-
-const sendVerificationEmail = async (email, token) => {
+const sendVerificationEmail = async (email, token, name) => {
   const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${token}`;
   
   try {
-    const data = await sendResendEmail(
-      email,
-      "Kapora Hesabınızı Doğrulayın",
-      `
-        <h2>Kapora'a Hoş Geldiniz!</h2>
-        <p>Hesabınızı aktifleştirmek için lütfen aşağıdaki bağlantıya tıklayın:</p>
-        <a href="${verificationUrl}" style="display:inline-block;padding:10px 20px;color:#fff;background-color:#F5A623;text-decoration:none;border-radius:5px;">Hesabımı Doğrula</a>
-        <p>Eğer butona tıklayamazsanız, bu linki kopyalayıp tarayıcınıza yapıştırın:</p>
-        <p>${verificationUrl}</p>
-      `
-    );
-    console.log(`Doğrulama maili gönderildi: ${email} (${data.id})`);
+    const { data, error } = await resend.events.send({
+      event: 'email-verification',
+      email: email,
+      data: {
+        verificationUrl: verificationUrl,
+        name: name
+      }
+    });
+
+    if (error) {
+      console.error("Resend Event Error (Verification):", error);
+    } else {
+      console.log(`Doğrulama otomasyon eventi tetiklendi: ${email} (ID: ${data?.id})`);
+    }
   } catch (error) {
-    console.error("Mail gönderme hatası:", error);
+    console.error("Otomasyon tetikleme hatası:", error);
   }
 };
 
@@ -127,8 +106,8 @@ router.post('/register', async (req, res) => {
 
     const user = newUser.rows[0];
     
-    // Send verification email mock
-    await sendVerificationEmail(user.email, verificationToken);
+    // Send verification email automation event
+    await sendVerificationEmail(user.email, verificationToken, user.name);
 
     // DİKKAT: Henüz onaylanmadığı için token dönmüyoruz (veya is_verified kontrolü ekliyoruz)
     // Front-end tarafı bu mesajı görünce "lütfen mailinizi onaylayın" desin.
@@ -307,19 +286,23 @@ router.post('/forgot-password', async (req, res) => {
     
     if (process.env.RESEND_API_KEY || (process.env.SMTP_USER && process.env.SMTP_PASS)) {
       try {
-        await sendResendEmail(
-          email,
-          "Kapora Şifre Sıfırlama İsteği",
-          `
-            <h2>Şifrenizi Sıfırlayın</h2>
-            <p>Şifrenizi sıfırlamak için aşağıdaki bağlantıya tıklayın. Bu bağlantı 1 saat boyunca geçerlidir.</p>
-            <a href="${resetUrl}" style="display:inline-block;padding:10px 20px;color:#fff;background-color:#F5A623;text-decoration:none;border-radius:5px;">Şifremi Sıfırla</a>
-            <p>Eğer butona tıklayamazsanız, bu linki kopyalayıp tarayıcınıza yapıştırın:</p>
-            <p>${resetUrl}</p>
-          `
-        );
+        const { data, error } = await resend.events.send({
+          event: 'password-reset',
+          email: user.email,
+          data: {
+            resetUrl: resetUrl,
+            name: user.name
+          }
+        });
+        
+        if (error) {
+          console.error("Resend Event Error (Password Reset):", error);
+          return res.status(500).json({ message: "Mail gönderilemedi. Hata: " + error.message });
+        } else {
+          console.log(`Şifre sıfırlama otomasyon eventi tetiklendi: ${user.email} (ID: ${data?.id})`);
+        }
       } catch (mailErr) {
-        console.error('SMTP Mail Gönderme Hatası:', mailErr);
+        console.error('SMTP/Resend Gönderme Hatası:', mailErr);
         return res.status(500).json({ message: `Mail gönderilemedi. Lütfen sistem yöneticisiyle iletişime geçin. (Hata: ${mailErr.message})` });
       }
     } else {
