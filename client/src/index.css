@@ -1,29 +1,29 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #09090b; /* zinc-950 */
-  --color-surface: #09090b;
-  --color-surface-dim: #09090b;
-  --color-surface-bright: #18181b;
-  --color-surface-container-lowest: #09090b;
-  --color-surface-container-low: #0f0f11;
-  --color-surface-container: #18181b; /* zinc-900 */
-  --color-surface-container-high: #27272a; /* zinc-800 */
-  --color-surface-container-highest: #3f3f46; /* zinc-700 */
+  --color-background: #000814; /* Deep Navy Black */
+  --color-surface: #000814;
+  --color-surface-dim: #000814;
+  --color-surface-bright: #001D3D;
+  --color-surface-container-lowest: #000814;
+  --color-surface-container-low: #001021;
+  --color-surface-container: #001D3D; /* Deep Blue */
+  --color-surface-container-high: #002952;
+  --color-surface-container-highest: #003566; /* Royal Navy */
   
-  --color-on-surface: #fafafa; /* zinc-50 */
-  --color-on-surface-variant: #a1a1aa; /* zinc-400 */
-  --color-on-background: #fafafa;
+  --color-on-surface: #FDFEFE;
+  --color-on-surface-variant: #A2C2DF; /* Ice Blue / Gray */
+  --color-on-background: #FDFEFE;
   
-  --color-outline: #3f3f46;
-  --color-outline-variant: #27272a;
+  --color-outline: #003566;
+  --color-outline-variant: #001D3D;
   
-  --color-primary: #6366f1; /* indigo-500 */
-  --color-on-primary: #ffffff;
-  --color-primary-container: #4f46e5; /* indigo-600 */
-  --color-on-primary-container: #e0e7ff; /* indigo-100 */
-  --color-primary-fixed: #818cf8;
-  --color-on-primary-fixed: #1e1b4b;
+  --color-primary: #FFC300; /* Vibrant Gold */
+  --color-on-primary: #000000;
+  --color-primary-container: #FFD60A; /* Lighter Gold */
+  --color-on-primary-container: #000814;
+  --color-primary-fixed: #FFD60A;
+  --color-on-primary-fixed: #000000;
   
   --color-secondary: #a1a1aa;
   --color-on-secondary: #18181b;
