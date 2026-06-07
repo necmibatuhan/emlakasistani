@@ -5,31 +5,40 @@ import { Logo } from '../components/Logo';
 
 const MOCK_LEADS = [
   {
-    name: "Ayşe Kaya",
-    score: "8/10",
-    req: "Kadıköy 3+1",
-    action: "BUGÜN ARA",
-    bg: "bg-error",
-    text: "text-error",
-    msg: "\"Merhaba Ayşe Hanım, Kadıköy'deki 3+1 deniz manzaralı dairemiz tam aradığınız özelliklerde. Yarın 14:00'te görmek ister misiniz?\""
+    name: "Zeynep D.",
+    time: "Bugün, 14:30",
+    matchScore: "%92 Eşleşme",
+    incomingMsg: "Merhaba, Şişli'deki ofis ilanınız için yazıyorum. 100m2 civarı, bütçemiz 40.000 TL.",
+    tags: [
+      { text: "Şişli", style: "bg-surface-container-high text-on-surface-variant border-outline-variant" },
+      { text: "Ofis", style: "bg-surface-container-high text-on-surface-variant border-outline-variant" },
+      { text: "Bütçe: 40k", style: "bg-status-warm/10 text-status-warm border-status-warm/30" }
+    ],
+    aiReply: "Zeynep Hanım merhaba, Şişli bölgesinde tam aradığınız özelliklere uygun 110m2'lik yeni bir portföyümüz mevcut. Size detaylı sunum dosyasını iletiyorum."
   },
   {
-    name: "Mehmet Yılmaz",
-    score: "6/10",
-    req: "Beşiktaş 2+1",
-    action: "TAKİBE AL",
-    bg: "bg-primary",
-    text: "text-primary",
-    msg: "\"Merhaba Mehmet Bey, Beşiktaş'ta aradığınız bütçeye uygun yeni bir 2+1 portföyümüz oldu. Detayları iletmemi ister misiniz?\""
+    name: "Mehmet Y.",
+    time: "Bugün, 15:45",
+    matchScore: "%98 Eşleşme",
+    incomingMsg: "Kadıköy veya Ataşehir'de satılık 3+1 arıyorum. Bütçem 4.5M TL, krediye uygun olmalı.",
+    tags: [
+      { text: "Satılık 3+1", style: "bg-surface-container-high text-on-surface-variant border-outline-variant" },
+      { text: "Kadıköy", style: "bg-surface-container-high text-on-surface-variant border-outline-variant" },
+      { text: "Bütçe: 4.5M", style: "bg-primary/10 text-primary border-primary/30" }
+    ],
+    aiReply: "Mehmet Bey merhaba, Kadıköy'de krediye uygun, yeni binada 3+1 portföyümüz az önce eklendi. Hafta sonu görmek ister misiniz?"
   },
   {
-    name: "Zeynep Demir",
-    score: "9/10",
-    req: "Şişli Ofis",
-    action: "HEMEN ARA",
-    bg: "bg-error",
-    text: "text-error",
-    msg: "\"Zeynep Hanım merhaba, Şişli'de tam aradığınız m2'de plaza katı kiralık portföyümüze eklendi. Öğleden sonra müsaitseniz sunum yapabilirim.\""
+    name: "Ayşe K.",
+    time: "Dün, 18:20",
+    matchScore: "%85 Eşleşme",
+    incomingMsg: "İzmir Bornova'da eşyalı kiralık 1+1 bakıyoruz. Acil taşınmamız lazım, bütçe 15.000 TL.",
+    tags: [
+      { text: "Kiralık 1+1", style: "bg-surface-container-high text-on-surface-variant border-outline-variant" },
+      { text: "Bornova", style: "bg-surface-container-high text-on-surface-variant border-outline-variant" },
+      { text: "Çok Acil", style: "bg-status-hot/10 text-status-hot border-status-hot/30" }
+    ],
+    aiReply: "Ayşe Hanım merhaba, Bornova'da hemen taşınmaya hazır eşyalı 1+1 portföyümüz var. Müsaitseniz yarın sabah gösterebilirim."
   }
 ];
 
@@ -40,7 +49,7 @@ const Landing = () => {
   React.useEffect(() => {
     const interval = setInterval(() => {
       setActiveMockIndex((prev) => (prev + 1) % MOCK_LEADS.length);
-    }, 2000);
+    }, 4000);
     return () => clearInterval(interval);
   }, []);
 
@@ -125,33 +134,33 @@ const Landing = () => {
             
             <div className="p-6 space-y-6">
               {/* WhatsApp Message Incoming */}
-              <div className="flex gap-4 items-start animate-fade-in-up">
+              <div key={`hero-msg-${mockLead.name}`} className="flex gap-4 items-start animate-fade-in-up">
                 <div className="w-10 h-10 rounded-full bg-surface-container-high border border-outline flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-on-surface-variant text-[20px]">person</span>
                 </div>
                 <div className="bg-surface-container-highest/40 border border-outline/50 rounded-2xl rounded-tl-sm p-4 text-on-surface-variant font-body-sm shadow-sm relative">
-                  "Merhaba, Şişli'deki ofis ilanınız için yazıyorum. 100m2 civarı, bütçemiz 40.000 TL."
+                  "{mockLead.incomingMsg}"
                 </div>
               </div>
 
               {/* AI Processing Step */}
-              <div className="flex gap-4 items-start animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-                <div className="w-10 h-10 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
+              <div key={`hero-ai-${mockLead.name}`} className="flex gap-4 items-start animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+                <div className="w-10 h-10 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(255,195,0,0.2)]">
                   <span className="material-symbols-outlined text-primary text-[20px]">auto_awesome</span>
                 </div>
                 <div className="flex-1 space-y-3">
                   <div className="text-primary font-label-sm tracking-wider uppercase">AI Analizi Tamamlandı</div>
                   <div className="flex gap-2">
-                    <span className="px-2.5 py-1 rounded bg-surface-container-high text-on-surface-variant text-[12px] border border-outline-variant">Şişli</span>
-                    <span className="px-2.5 py-1 rounded bg-surface-container-high text-on-surface-variant text-[12px] border border-outline-variant">Ofis</span>
-                    <span className="px-2.5 py-1 rounded bg-status-warm/10 text-status-warm border border-status-warm/30 text-[12px]">Bütçe: 40k</span>
+                    {mockLead.tags.map((tag, i) => (
+                      <span key={i} className={`px-2.5 py-1 rounded text-[12px] border ${tag.style}`}>{tag.text}</span>
+                    ))}
                   </div>
                   
                   {/* Automated Reply */}
                   <div className="bg-primary/5 border border-primary/20 rounded-2xl rounded-tr-sm p-4 relative mt-2">
                     <div className="absolute top-2 right-2 text-[10px] text-primary/60 font-mono">0.4sn</div>
                     <p className="text-on-surface font-body-sm leading-relaxed">
-                      "Merhaba, Şişli bölgesinde tam aradığınız özelliklere uygun 110m2'lik yeni bir portföyümüz mevcut. Size detaylı sunum dosyasını iletiyorum."
+                      "{mockLead.aiReply}"
                     </p>
                   </div>
                 </div>
@@ -242,25 +251,25 @@ const Landing = () => {
                   <span className="material-symbols-outlined text-[#25D366]">chat</span>
                 </div>
                 <div>
-                  <div className="font-headline-sm text-on-surface">Yeni Talep: Zeynep D.</div>
-                  <div className="font-label-sm text-on-surface-variant">Bugün, 14:30</div>
+                  <div className="font-headline-sm text-on-surface">Yeni Talep: {mockLead.name}</div>
+                  <div className="font-label-sm text-on-surface-variant">{mockLead.time}</div>
                 </div>
-                <div className="ml-auto px-3 py-1 rounded-full bg-primary/20 text-primary font-label-sm border border-primary/30">
-                  %92 Eşleşme
+                <div className="ml-auto px-3 py-1 rounded-full bg-primary/20 text-primary font-label-sm border border-primary/30 transition-all duration-500">
+                  {mockLead.matchScore}
                 </div>
               </div>
               
-              <div className="space-y-4">
+              <div key={`flow-${mockLead.name}`} className="space-y-4 animate-fade-in-up">
                 <div className="bg-surface-container-highest/50 p-4 rounded-lg rounded-tl-none border border-outline-variant/30 max-w-[85%]">
                   <p className="font-body-sm text-on-surface-variant">
-                    "Merhaba, Kadıköy veya Ataşehir'de 3+1, bütçem 4.5M TL. Mümkünse bu hafta sonu görmek istiyorum."
+                    "{mockLead.incomingMsg}"
                   </p>
                 </div>
                 
                 <div className="flex flex-wrap gap-2 mt-4">
-                  <span className="px-2 py-1 rounded bg-surface-container-highest text-on-surface-variant font-mono text-[12px] border border-outline-variant/50">Bütçe: 4.5M</span>
-                  <span className="px-2 py-1 rounded bg-surface-container-highest text-on-surface-variant font-mono text-[12px] border border-outline-variant/50">Ataşehir</span>
-                  <span className="px-2 py-1 rounded bg-error/20 text-error font-mono text-[12px] border border-error/30">Çok Acil</span>
+                  {mockLead.tags.map((tag, i) => (
+                    <span key={i} className={`px-2 py-1 rounded font-mono text-[12px] border ${tag.style}`}>{tag.text}</span>
+                  ))}
                 </div>
 
                 <div className="mt-6 pt-4 border-t border-outline-variant/50">
@@ -268,10 +277,10 @@ const Landing = () => {
                   <div className="bg-surface-container-highest/30 p-4 rounded-lg border border-outline-variant/30 border-l-4 border-l-primary relative overflow-hidden">
                     <div className="absolute top-0 right-0 p-2 opacity-30"><span className="material-symbols-outlined text-primary">auto_awesome</span></div>
                     <p className="font-body-sm text-on-surface">
-                      "Zeynep Hanım merhaba, Ataşehir'de tam kriterlerinize uygun yeni bir 3+1 portföyümüz eklendi. Hafta sonu 14:00'te sunum yapabilirim."
+                      "{mockLead.aiReply}"
                     </p>
                   </div>
-                  <button className="w-full mt-4 bg-primary hover:bg-primary/90 text-on-primary font-label-md py-2.5 rounded transition-colors flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(99,102,241,0.3)]">
+                  <button className="w-full mt-4 bg-primary hover:bg-primary/90 text-on-primary font-label-md py-2.5 rounded transition-colors flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(255,195,0,0.3)]">
                     <span className="material-symbols-outlined text-[18px]">send</span> Yanıtı Gönder
                   </button>
                 </div>
