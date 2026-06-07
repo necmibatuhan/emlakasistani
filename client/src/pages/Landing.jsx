@@ -76,13 +76,14 @@ const Landing = () => {
             <span className="text-on-surface font-label-md font-medium">Türkiye'de 180.000 emlak danışmanı</span>
           </div>
 
-          <h1 className="font-display-lg text-[48px] lg:text-[60px] font-semibold leading-[1.1] tracking-tight text-on-surface mb-6">
-            Emlak Satışlarınızı <br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-[#818cf8]">Otopilota Bağlayın.</span>
+          <h1 className="font-display-lg text-[48px] lg:text-[56px] font-semibold leading-[1.1] tracking-tight text-on-surface mb-6">
+            Daha Fazla Portföy.<br/>
+            Daha Fazla Satış.<br/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-[#818cf8]">Daha Fazla Komisyon.</span>
           </h1>
 
           <p className="font-body-lg text-on-surface-variant mt-4 mb-10 max-w-[480px] leading-relaxed">
-            Yapay zeka asistanınız WhatsApp'tan gelen her talebi anlar, portföyünüzle eşleştirir ve saniyeler içinde mükemmel taslağı hazırlar. Siz sadece satışı kapatırsınız.
+            WhatsApp, yapay zekâ ve otomatik takip sistemi ile hiçbir fırsatı kaçırmayın.
           </p>
 
           <div className="flex flex-wrap items-center gap-4 mb-8">
