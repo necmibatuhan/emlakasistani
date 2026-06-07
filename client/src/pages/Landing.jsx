@@ -290,11 +290,11 @@ const Landing = () => {
           <p className="text-on-surface-variant max-w-2xl mx-auto font-body-lg">Hiçbir gizli ücret yok. İhtiyacınıza göre ölçeklendirin.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10 group/pricing">
           
           {/* Ücretsiz */}
-          <div className="bg-surface-container-low/50 backdrop-blur-lg border border-outline-variant/50 rounded-2xl p-8 flex flex-col shadow-lg">
-            <h3 className="font-headline-md text-on-surface mb-2">Ücretsiz</h3>
+          <div className="bg-surface-container-low/50 backdrop-blur-lg border border-outline-variant/50 rounded-2xl p-8 flex flex-col shadow-lg transition-all duration-300 ease-out hover:-translate-y-3 hover:scale-105 hover:shadow-2xl hover:border-primary/40 hover:z-20">
+            <h3 className="font-headline-md text-on-surface mb-2 transition-colors duration-300">Ücretsiz</h3>
             <p className="text-on-surface-variant text-sm mb-6 h-10">Sistemi test etmek için ideal.</p>
             <div className="flex items-baseline mb-8">
               <span className="font-display-md font-bold text-on-surface">0 ₺</span>
@@ -305,14 +305,14 @@ const Landing = () => {
               <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check</span> Temel AI Skorlama</li>
               <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check</span> Manuel WhatsApp Taslakları</li>
             </ul>
-            <Link to="/auth" className="w-full py-3 text-center font-label-md text-on-surface border border-outline hover:border-primary/50 hover:bg-surface-container rounded-xl transition-all">
+            <Link to="/auth" className="w-full py-3 text-center font-label-md text-on-surface border border-outline hover:border-primary hover:text-primary hover:bg-surface-container rounded-xl transition-all">
               Hemen Başla
             </Link>
           </div>
 
           {/* Pro */}
-          <div className="bg-surface-container border border-primary rounded-2xl p-8 flex flex-col relative transform md:-translate-y-4 shadow-[0_0_40px_rgba(99,102,241,0.15)] ring-1 ring-primary/20 backdrop-blur-xl">
-            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-primary text-on-primary font-label-sm uppercase font-bold tracking-widest px-4 py-1.5 rounded-full shadow-[0_0_15px_rgba(99,102,241,0.5)]">
+          <div className="bg-surface-container border border-primary rounded-2xl p-8 flex flex-col relative transform md:-translate-y-4 shadow-[0_0_40px_rgba(255,195,0,0.15)] ring-1 ring-primary/20 backdrop-blur-xl transition-all duration-300 ease-out hover:md:-translate-y-6 hover:-translate-y-2 hover:scale-105 hover:shadow-[0_0_50px_rgba(255,195,0,0.3)] hover:z-20">
+            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-primary text-on-primary font-label-sm uppercase font-bold tracking-widest px-4 py-1.5 rounded-full shadow-[0_0_15px_rgba(255,195,0,0.5)]">
               En Popüler
             </div>
             <h3 className="font-headline-md text-primary mb-2 mt-2">Pro</h3>
@@ -327,14 +327,14 @@ const Landing = () => {
               <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check_circle</span> Akıllı Hatırlatıcılar & Bildirimler</li>
               <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check_circle</span> Portföy Eşleştirme Motoru</li>
             </ul>
-            <Link to="/auth" className="w-full py-3 text-center font-label-md bg-primary text-on-primary hover:bg-primary/90 rounded-xl transition-all shadow-[0_0_20px_rgba(99,102,241,0.3)]">
+            <Link to="/auth" className="w-full py-3 text-center font-label-md bg-primary text-on-primary hover:bg-primary/90 hover:scale-[1.02] rounded-xl transition-all shadow-[0_0_20px_rgba(255,195,0,0.3)]">
               Pro'ya Geç
             </Link>
           </div>
 
           {/* Pro+ */}
-          <div className="bg-surface-container-low/50 backdrop-blur-lg border border-outline-variant/50 rounded-2xl p-8 flex flex-col shadow-lg">
-            <h3 className="font-headline-md text-on-surface mb-2">Pro+</h3>
+          <div className="bg-surface-container-low/50 backdrop-blur-lg border border-outline-variant/50 rounded-2xl p-8 flex flex-col shadow-lg transition-all duration-300 ease-out hover:-translate-y-3 hover:scale-105 hover:shadow-2xl hover:border-primary/40 hover:z-20">
+            <h3 className="font-headline-md text-on-surface mb-2 transition-colors duration-300">Pro+</h3>
             <p className="text-on-surface-variant text-sm mb-6 h-10">Yoğun ekipler ve ofis yöneticileri için.</p>
             <div className="flex items-baseline mb-8">
               <span className="font-display-md font-bold text-on-surface">599 ₺</span>
@@ -346,14 +346,14 @@ const Landing = () => {
               <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check</span> Müşteri Timeline Takibi</li>
               <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check</span> 7/24 Öncelikli Destek</li>
             </ul>
-            <Link to="/auth" className="w-full py-3 text-center font-label-md text-on-surface border border-outline hover:border-primary/50 hover:bg-surface-container rounded-xl transition-all">
+            <Link to="/auth" className="w-full py-3 text-center font-label-md text-on-surface border border-outline hover:border-primary hover:text-primary hover:bg-surface-container rounded-xl transition-all">
               Pro+'ya Geç
             </Link>
           </div>
 
           {/* Kurumsal */}
-          <div className="bg-surface-container-low/50 backdrop-blur-lg border border-outline-variant/50 rounded-2xl p-8 flex flex-col shadow-lg">
-            <h3 className="font-headline-md text-on-surface mb-2">Kurumsal</h3>
+          <div className="bg-surface-container-low/50 backdrop-blur-lg border border-outline-variant/50 rounded-2xl p-8 flex flex-col shadow-lg transition-all duration-300 ease-out hover:-translate-y-3 hover:scale-105 hover:shadow-2xl hover:border-primary/40 hover:z-20">
+            <h3 className="font-headline-md text-on-surface mb-2 transition-colors duration-300">Kurumsal</h3>
             <p className="text-on-surface-variant text-sm mb-6 h-10">Kendi sistemine entegre etmek isteyen brokerlar için.</p>
             <div className="flex items-baseline mb-8">
               <span className="font-display-md font-bold text-on-surface">Özel</span>
@@ -364,7 +364,7 @@ const Landing = () => {
               <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">chat</span> WhatsApp Business API Bağlantısı</li>
               <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">smart_toy</span> Özel Eğitilmiş Yapay Zeka Modeliniz</li>
             </ul>
-            <a href="https://wa.me/905555555555?text=Merhaba,%20Emlak%20Asistanı%20Kurumsal%20plan%20hakkında%20bilgi%20almak%20istiyorum." target="_blank" rel="noopener noreferrer" className="w-full py-3 text-center font-label-md text-on-surface border border-outline hover:border-primary/50 hover:bg-surface-container rounded-xl transition-all">
+            <a href="https://wa.me/905555555555?text=Merhaba,%20Emlak%20Asistanı%20Kurumsal%20plan%20hakkında%20bilgi%20almak%20istiyorum." target="_blank" rel="noopener noreferrer" className="w-full py-3 text-center font-label-md text-on-surface border border-outline hover:border-primary hover:text-primary hover:bg-surface-container rounded-xl transition-all">
               Satışla İletişime Geç
             </a>
           </div>
