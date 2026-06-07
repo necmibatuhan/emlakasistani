@@ -21,7 +21,8 @@
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.1.1",
     "nodemailer": "^8.0.10",
-    "pg": "^8.21.0"
+    "pg": "^8.21.0",
+    "shopier-api": "^1.1.4"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

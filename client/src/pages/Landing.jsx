@@ -76,14 +76,13 @@ const Landing = () => {
             <span className="text-on-surface font-label-md font-medium">Türkiye'de 180.000 emlak danışmanı</span>
           </div>
 
-          <h1 className="font-display-lg text-[48px] lg:text-[56px] font-semibold leading-[1.1] tracking-tight text-on-surface mb-4">
-            Daha Fazla Portföy.<br/>
-            Daha Fazla Satış.<br/>
-            <span className="text-on-surface-variant">Daha Fazla Komisyon.</span>
+          <h1 className="font-display-lg text-[48px] lg:text-[60px] font-semibold leading-[1.1] tracking-tight text-on-surface mb-6">
+            Emlak Satışlarınızı <br/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-[#818cf8]">Otopilota Bağlayın.</span>
           </h1>
 
-          <p className="font-body-lg text-on-surface-variant mt-4 mb-10 max-w-[440px] leading-relaxed">
-            WhatsApp, yapay zekâ ve otomatik takip sistemi ile hiçbir fırsatı kaçırmayın.
+          <p className="font-body-lg text-on-surface-variant mt-4 mb-10 max-w-[480px] leading-relaxed">
+            Yapay zeka asistanınız WhatsApp'tan gelen her talebi anlar, portföyünüzle eşleştirir ve saniyeler içinde mükemmel taslağı hazırlar. Siz sadece satışı kapatırsınız.
           </p>
 
           <div className="flex flex-wrap items-center gap-4 mb-8">
@@ -105,43 +104,64 @@ const Landing = () => {
 
         {/* Sağ Görsel (UI Snippet) */}
         <div className="w-full lg:w-1/2 mt-16 lg:mt-0 relative perspective-[1000px] hidden md:block">
+          <div className="absolute inset-0 bg-primary/20 blur-[120px] rounded-full"></div>
           <div 
-            className="w-full max-w-[500px] ml-auto bg-surface-container-low border border-outline-variant rounded-xl shadow-2xl relative overflow-hidden"
-            style={{ transform: 'perspective(1000px) rotateY(-8deg) rotateX(2deg)' }}
+            className="w-full max-w-[520px] ml-auto bg-surface-container/60 backdrop-blur-2xl border border-outline/50 rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] relative overflow-hidden"
+            style={{ transform: 'perspective(1200px) rotateY(-5deg) rotateX(2deg)' }}
           >
             {/* Header Mock */}
-            <div className="h-12 border-b border-outline-variant flex items-center px-5 space-x-2 bg-surface-container-lowest">
-              <div className="w-3 h-3 rounded-full bg-outline-variant" />
-              <div className="w-3 h-3 rounded-full bg-outline-variant" />
-              <div className="w-3 h-3 rounded-full bg-outline-variant" />
+            <div className="h-14 border-b border-outline/30 flex items-center justify-between px-6 bg-surface-container-low/40">
+              <div className="flex space-x-2">
+                <div className="w-3 h-3 rounded-full bg-outline-variant/60" />
+                <div className="w-3 h-3 rounded-full bg-outline-variant/60" />
+                <div className="w-3 h-3 rounded-full bg-outline-variant/60" />
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse shadow-[0_0_8px_#10B981]" />
+                <span className="font-label-sm text-[#10B981] tracking-widest">OTOPİLOT AKTİF</span>
+              </div>
             </div>
             
-            <div className="p-6 space-y-4">
-              {/* Lead Card Mock */}
-              <div key={mockLead.name} className="bg-surface-container border border-outline-variant rounded-md p-4 flex items-center justify-between animate-fade-in-up">
-                <div className="flex items-center space-x-3">
-                  <div className={`w-2 h-2 rounded-full ${mockLead.bg}`} />
-                  <span className="font-body-sm font-medium text-on-surface">{mockLead.name}</span>
+            <div className="p-6 space-y-6">
+              {/* WhatsApp Message Incoming */}
+              <div className="flex gap-4 items-start animate-fade-in-up">
+                <div className="w-10 h-10 rounded-full bg-surface-container-high border border-outline flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-on-surface-variant text-[20px]">person</span>
                 </div>
-                <div className="flex items-center space-x-4">
-                  <span className={`font-mono text-[13px] font-medium ${mockLead.text}`}>{mockLead.score}</span>
-                  <span className="font-body-sm text-on-surface-variant">{mockLead.req}</span>
-                  <span className={`${mockLead.text} bg-surface-container-highest border border-outline-variant font-label-sm px-2 py-1 rounded uppercase tracking-wider`}>{mockLead.action}</span>
+                <div className="bg-surface-container-highest/40 border border-outline/50 rounded-2xl rounded-tl-sm p-4 text-on-surface-variant font-body-sm shadow-sm relative">
+                  "Merhaba, Şişli'deki ofis ilanınız için yazıyorum. 100m2 civarı, bütçemiz 40.000 TL."
                 </div>
               </div>
-              
-              {/* WhatsApp Draft Mock */}
-              <div key={mockLead.msg} className="bg-surface-container border border-outline-variant border-l-2 border-l-[#25D366] rounded-md p-4 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-                <p className="font-mono text-[13px] text-on-surface-variant leading-relaxed">
-                  {mockLead.msg}
-                </p>
+
+              {/* AI Processing Step */}
+              <div className="flex gap-4 items-start animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+                <div className="w-10 h-10 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
+                  <span className="material-symbols-outlined text-primary text-[20px]">auto_awesome</span>
+                </div>
+                <div className="flex-1 space-y-3">
+                  <div className="text-primary font-label-sm tracking-wider uppercase">AI Analizi Tamamlandı</div>
+                  <div className="flex gap-2">
+                    <span className="px-2.5 py-1 rounded bg-surface-container-high text-on-surface-variant text-[12px] border border-outline-variant">Şişli</span>
+                    <span className="px-2.5 py-1 rounded bg-surface-container-high text-on-surface-variant text-[12px] border border-outline-variant">Ofis</span>
+                    <span className="px-2.5 py-1 rounded bg-status-warm/10 text-status-warm border border-status-warm/30 text-[12px]">Bütçe: 40k</span>
+                  </div>
+                  
+                  {/* Automated Reply */}
+                  <div className="bg-primary/5 border border-primary/20 rounded-2xl rounded-tr-sm p-4 relative mt-2">
+                    <div className="absolute top-2 right-2 text-[10px] text-primary/60 font-mono">0.4sn</div>
+                    <p className="text-on-surface font-body-sm leading-relaxed">
+                      "Merhaba, Şişli bölgesinde tam aradığınız özelliklere uygun 110m2'lik yeni bir portföyümüz mevcut. Size detaylı sunum dosyasını iletiyorum."
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
-
-            {/* Live Indicator */}
-            <div className="absolute top-3.5 right-5 flex items-center space-x-1.5">
-              <div className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
-              <span className="font-label-sm text-[#10B981] uppercase tracking-wider">Canlı</span>
+            
+            {/* Action Bar */}
+            <div className="border-t border-outline/30 p-4 bg-surface-container-low/60 flex justify-end">
+              <button className="bg-primary text-on-primary font-label-sm px-6 py-2.5 rounded-lg flex items-center gap-2 shadow-[0_0_15px_rgba(99,102,241,0.4)] hover:bg-primary/90 transition-colors">
+                <span className="material-symbols-outlined text-[16px]">send</span> Otomatik Yanıtlandı
+              </button>
             </div>
           </div>
         </div>
@@ -184,168 +204,166 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* BÖLÜM 4 — NASIL ÇALIŞIR */}
-      <section className="py-24 px-6 max-w-[800px] mx-auto">
-        <h2 className="font-label-lg uppercase tracking-widest text-on-surface-variant mb-12">Nasıl çalışır</h2>
-        
-        <div className="flex flex-col space-y-6">
-          <div className="flex items-start pb-6 border-b border-outline-variant">
-            <div className="w-16 font-mono text-[16px] text-primary font-bold">01</div>
-            <div className="w-48 font-headline-sm text-on-surface">WhatsApp'ı bağla</div>
-            <div className="flex-1 font-body-md text-on-surface-variant">Gelen mesajlar anında sisteme düşer, bütçe ve aciliyet AI tarafından analiz edilir.</div>
-          </div>
-          
-          <div className="flex items-start pb-6 border-b border-outline-variant">
-            <div className="w-16 font-mono text-[16px] text-primary font-bold">02</div>
-            <div className="w-48 font-headline-sm text-on-surface">Asistanla konuş</div>
-            <div className="flex-1 font-body-md text-on-surface-variant">Arama sonrası telefona 30 saniye konuş. Yapay zeka senin yerine CRM'e verileri işlesin.</div>
-          </div>
-          
-          <div className="flex items-start pb-6 border-b border-outline-variant">
-            <div className="w-16 font-mono text-[16px] text-primary font-bold">03</div>
-            <div className="w-48 font-headline-sm text-on-surface">Portföy eşleşsin</div>
-            <div className="flex-1 font-body-md text-on-surface-variant">Müşterinin istekleri (bütçe, konum, m2) havuzunuzdaki portföylerle saniyeler içinde eşleştirilir.</div>
-          </div>
-
-          <div className="flex items-start pb-6 border-b border-outline-variant">
-            <div className="w-16 font-mono text-[16px] text-primary font-bold">04</div>
-            <div className="w-48 font-headline-sm text-on-surface">Takip et & Kapat</div>
-            <div className="flex-1 font-body-md text-on-surface-variant">Hazır taslaklarla müşteriye ulaş, otomatik hatırlatıcılarla hiçbir takibi kaçırma.</div>
-          </div>
-        </div>
-      </section>
-
-      {/* BÖLÜM 5 — ÖZELLİKLER */}
-      <section className="py-12 px-6 max-w-[1000px] mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-[400px]">
-          
-          {/* Sol Büyük Kart */}
-          <div className="panel p-8 flex flex-col relative overflow-hidden h-full">
-            <div className="absolute top-0 left-0 right-0 h-[3px] bg-primary" />
-            <h3 className="font-headline-sm text-on-surface mb-2 mt-2">Lead skorlama</h3>
-            <p className="font-body-sm text-on-surface-variant mb-8">Her mesaj 3 kritere göre puanlanır: bütçe, aciliyet, ciddiyet.</p>
+      {/* BÖLÜM 4 — LIVE UI FLOW */}
+      <section className="py-24 px-6 max-w-[1200px] mx-auto">
+        <div className="flex flex-col md:flex-row items-center gap-12 md:gap-20">
+          {/* Sol: Adımlar */}
+          <div className="w-full md:w-1/2 space-y-8">
+            <h2 className="font-headline-lg text-[32px] text-on-surface mb-8">Nasıl Çalışır?</h2>
             
-            <div className="space-y-4 mt-auto mb-4">
-              <div className="flex items-center font-body-sm">
-                <span className="w-20 text-on-surface-variant font-medium">Bütçe</span>
-                <div className="flex-1 font-mono tracking-widest text-primary">████████░░</div>
-                <span className="w-12 text-right font-mono text-on-surface">8/10</span>
+            <div className="relative pl-8 border-l-2 border-surface-container-high space-y-12">
+              <div className="relative">
+                <div className="absolute -left-[41px] top-1 w-5 h-5 rounded-full bg-primary ring-4 ring-background shadow-[0_0_15px_rgba(99,102,241,0.5)]"></div>
+                <h3 className="font-headline-sm text-on-surface mb-2">1. WhatsApp'tan Mesaj Gelir</h3>
+                <p className="font-body-md text-on-surface-variant">Müşteri kriterlerini yazar. Yapay zeka bütçe, bölge ve aciliyeti saniyeler içinde analiz eder.</p>
               </div>
-              <div className="flex items-center font-body-sm">
-                <span className="w-20 text-on-surface-variant font-medium">Aciliyet</span>
-                <div className="flex-1 font-mono tracking-widest text-primary">██████████</div>
-                <span className="w-12 text-right font-mono text-on-surface">10/10</span>
+
+              <div className="relative">
+                <div className="absolute -left-[41px] top-1 w-5 h-5 rounded-full bg-surface-container-highest ring-4 ring-background"></div>
+                <h3 className="font-headline-sm text-on-surface mb-2">2. Akıllı Portföy Eşleşmesi</h3>
+                <p className="font-body-md text-on-surface-variant">Sistem, müşteri kriterlerine uyan en iyi portföyleri veri tabanınızdan otomatik bulur ve listeler.</p>
               </div>
-              <div className="flex items-center font-body-sm">
-                <span className="w-20 text-on-surface-variant font-medium">Ciddiyet</span>
-                <div className="flex-1 font-mono tracking-widest text-primary">███████░░░</div>
-                <span className="w-12 text-right font-mono text-on-surface">7/10</span>
+
+              <div className="relative">
+                <div className="absolute -left-[41px] top-1 w-5 h-5 rounded-full bg-surface-container-highest ring-4 ring-background"></div>
+                <h3 className="font-headline-sm text-on-surface mb-2">3. Otopilot Yanıt</h3>
+                <p className="font-body-md text-on-surface-variant">Yapay zeka, portföy detaylarını içeren profesyonel bir WhatsApp taslağı hazırlar. Tek tıkla gönderin.</p>
               </div>
             </div>
           </div>
 
-          {/* Sağ Kolon (Büyük üst, İki Küçük alt) */}
-          <div className="flex flex-col gap-4 h-full">
-            
-            {/* Sağ Üst */}
-            <div className="flex-1 panel p-6 flex flex-col justify-center relative overflow-hidden">
-              <div className="absolute left-0 top-6 bottom-6 w-[2px] bg-[#25D366]" />
-              <h3 className="font-headline-sm text-on-surface mb-3 ml-4">Tam Entegre CRM & Portföy</h3>
-              <p className="font-mono text-[13px] text-on-surface-variant ml-4 leading-relaxed">
-                Tüm mülklerinizi, takımınızı ve performans raporlarınızı tek panelden yönetin. Müşteriniz "Deniz manzaralı daire" yazdığında, AI doğrudan uygun portföyünüzü eşleştirip WhatsApp taslağını oluşturur.
-              </p>
-            </div>
-
-            {/* Sağ Alt (Yan Yana) */}
-            <div className="grid grid-cols-2 gap-4 h-[140px]">
-              <div className="panel p-5 flex flex-col justify-between hover:border-outline transition-colors cursor-pointer">
-                <h3 className="font-headline-sm text-on-surface">Yapay Zeka Sesli Not</h3>
-                <p className="font-body-sm text-on-surface-variant">Görüşmeden çık, 30sn konuş. Klavye kullanmana gerek yok.</p>
+          {/* Sağ: Interactive / Glass Mockup */}
+          <div className="w-full md:w-1/2 relative mt-12 md:mt-0">
+            <div className="absolute inset-0 bg-primary/10 blur-[100px] rounded-full"></div>
+            <div className="panel p-6 relative z-10 border border-outline-variant/50 shadow-2xl backdrop-blur-sm bg-surface-container/90">
+              <div className="flex items-center gap-3 mb-6 pb-4 border-b border-outline-variant/50">
+                <div className="w-10 h-10 rounded-full bg-[#25D366]/20 flex items-center justify-center">
+                  <span className="material-symbols-outlined text-[#25D366]">chat</span>
+                </div>
+                <div>
+                  <div className="font-headline-sm text-on-surface">Yeni Talep: Zeynep D.</div>
+                  <div className="font-label-sm text-on-surface-variant">Bugün, 14:30</div>
+                </div>
+                <div className="ml-auto px-3 py-1 rounded-full bg-primary/20 text-primary font-label-sm border border-primary/30">
+                  %92 Eşleşme
+                </div>
               </div>
-              <div className="panel p-5 flex flex-col justify-between hover:border-outline transition-colors cursor-pointer">
-                <h3 className="font-headline-sm text-on-surface">Otomasyon & Takip</h3>
-                <p className="font-body-sm text-on-surface-variant">"Haftaya arayacağım" diyen müşteriyi sistem senin yerine hatırlatır.</p>
+              
+              <div className="space-y-4">
+                <div className="bg-surface-container-highest/50 p-4 rounded-lg rounded-tl-none border border-outline-variant/30 max-w-[85%]">
+                  <p className="font-body-sm text-on-surface-variant">
+                    "Merhaba, Kadıköy veya Ataşehir'de 3+1, bütçem 4.5M TL. Mümkünse bu hafta sonu görmek istiyorum."
+                  </p>
+                </div>
+                
+                <div className="flex flex-wrap gap-2 mt-4">
+                  <span className="px-2 py-1 rounded bg-surface-container-highest text-on-surface-variant font-mono text-[12px] border border-outline-variant/50">Bütçe: 4.5M</span>
+                  <span className="px-2 py-1 rounded bg-surface-container-highest text-on-surface-variant font-mono text-[12px] border border-outline-variant/50">Ataşehir</span>
+                  <span className="px-2 py-1 rounded bg-error/20 text-error font-mono text-[12px] border border-error/30">Çok Acil</span>
+                </div>
+
+                <div className="mt-6 pt-4 border-t border-outline-variant/50">
+                  <div className="font-label-sm text-on-surface-variant mb-3 uppercase tracking-wider">AI Önerilen Yanıt</div>
+                  <div className="bg-surface-container-highest/30 p-4 rounded-lg border border-outline-variant/30 border-l-4 border-l-primary relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-2 opacity-30"><span className="material-symbols-outlined text-primary">auto_awesome</span></div>
+                    <p className="font-body-sm text-on-surface">
+                      "Zeynep Hanım merhaba, Ataşehir'de tam kriterlerinize uygun yeni bir 3+1 portföyümüz eklendi. Hafta sonu 14:00'te sunum yapabilirim."
+                    </p>
+                  </div>
+                  <button className="w-full mt-4 bg-primary hover:bg-primary/90 text-on-primary font-label-md py-2.5 rounded transition-colors flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(99,102,241,0.3)]">
+                    <span className="material-symbols-outlined text-[18px]">send</span> Yanıtı Gönder
+                  </button>
+                </div>
               </div>
             </div>
-
           </div>
-
         </div>
       </section>
 
       {/* BÖLÜM 6 — FİYATLANDIRMA */}
-      <section id="fiyatlar" className="py-24 px-6 max-w-[1200px] mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <section id="fiyatlar" className="py-24 px-6 max-w-[1200px] mx-auto relative">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-primary/5 blur-[120px] rounded-full pointer-events-none"></div>
+        
+        <div className="text-center mb-16 relative z-10">
+          <h2 className="font-display-lg text-[36px] text-on-surface font-semibold mb-4">Size Uygun Planı Seçin</h2>
+          <p className="text-on-surface-variant max-w-2xl mx-auto font-body-lg">Hiçbir gizli ücret yok. İhtiyacınıza göre ölçeklendirin.</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
           
           {/* Ücretsiz */}
-          <div className="panel p-8 flex flex-col">
-            <h3 className="font-headline-md text-on-surface mb-4">Ücretsiz</h3>
-            <div className="flex items-baseline mb-6">
-              <span className="font-display-md font-semibold text-on-surface">0 ₺</span>
-              <span className="font-body-md text-on-surface-variant ml-1">/ay</span>
+          <div className="bg-surface-container-low/50 backdrop-blur-lg border border-outline-variant/50 rounded-2xl p-8 flex flex-col shadow-lg">
+            <h3 className="font-headline-md text-on-surface mb-2">Ücretsiz</h3>
+            <p className="text-on-surface-variant text-sm mb-6 h-10">Sistemi test etmek için ideal.</p>
+            <div className="flex items-baseline mb-8">
+              <span className="font-display-md font-bold text-on-surface">0 ₺</span>
+              <span className="font-body-sm text-on-surface-variant ml-1">/ay</span>
             </div>
-            <ul className="font-body-md text-on-surface-variant space-y-3 mb-8 flex-1">
-              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-primary">check</span> 5 lead / ay</li>
-              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-primary">check</span> AI skorlama</li>
-              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-primary">check</span> WhatsApp taslağı</li>
+            <ul className="font-body-sm text-on-surface-variant space-y-4 mb-8 flex-1">
+              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check</span> Ayda 5 Lead Analizi</li>
+              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check</span> Temel AI Skorlama</li>
+              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check</span> Manuel WhatsApp Taslakları</li>
             </ul>
-            <Link to="/auth" className="w-full py-2.5 text-center font-label-md text-on-surface border border-outline-variant hover:bg-surface-container rounded-md transition-colors">
-              Başla
+            <Link to="/auth" className="w-full py-3 text-center font-label-md text-on-surface border border-outline hover:border-primary/50 hover:bg-surface-container rounded-xl transition-all">
+              Hemen Başla
             </Link>
           </div>
 
           {/* Pro */}
-          <div className="bg-surface-container border border-primary rounded-xl p-8 flex flex-col relative transform md:-translate-y-4 shadow-lg shadow-primary/10">
-            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-primary text-on-primary font-label-sm uppercase font-bold tracking-wider px-3 py-1 rounded-full">
-              En popüler
+          <div className="bg-surface-container border border-primary rounded-2xl p-8 flex flex-col relative transform md:-translate-y-4 shadow-[0_0_40px_rgba(99,102,241,0.15)] ring-1 ring-primary/20 backdrop-blur-xl">
+            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-primary text-on-primary font-label-sm uppercase font-bold tracking-widest px-4 py-1.5 rounded-full shadow-[0_0_15px_rgba(99,102,241,0.5)]">
+              En Popüler
             </div>
-            <h3 className="font-headline-md text-on-surface mb-4">Pro</h3>
-            <div className="flex items-baseline mb-6">
-              <span className="font-display-md font-semibold text-on-surface">299 ₺</span>
-              <span className="font-body-md text-on-surface-variant ml-1">/ay</span>
+            <h3 className="font-headline-md text-primary mb-2 mt-2">Pro</h3>
+            <p className="text-on-surface-variant text-sm mb-6 h-10">Aktif danışmanlar için eksiksiz otopilot.</p>
+            <div className="flex items-baseline mb-8">
+              <span className="font-display-md font-bold text-on-surface">299 ₺</span>
+              <span className="font-body-sm text-on-surface-variant ml-1">/ay</span>
             </div>
-            <ul className="font-body-md text-on-surface space-y-3 mb-8 flex-1">
-              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-primary">check_circle</span> Sınırsız lead</li>
-              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-primary">check_circle</span> Not & Sesli not</li>
-              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-primary">check_circle</span> Hatırlatıcı</li>
-              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-primary">check_circle</span> Günlük özet</li>
+            <ul className="font-body-sm text-on-surface space-y-4 mb-8 flex-1">
+              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check_circle</span> <strong>Sınırsız</strong> Lead Analizi</li>
+              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check_circle</span> AI Sesli Not & Otomatik Kayıt</li>
+              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check_circle</span> Akıllı Hatırlatıcılar & Bildirimler</li>
+              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check_circle</span> Portföy Eşleştirme Motoru</li>
             </ul>
-            <Link to="/auth" className="w-full py-2.5 text-center font-label-md bg-primary text-on-primary hover:bg-primary/90 rounded-md transition-colors">
+            <Link to="/auth" className="w-full py-3 text-center font-label-md bg-primary text-on-primary hover:bg-primary/90 rounded-xl transition-all shadow-[0_0_20px_rgba(99,102,241,0.3)]">
               Pro'ya Geç
             </Link>
           </div>
 
           {/* Pro+ */}
-          <div className="panel p-8 flex flex-col">
-            <h3 className="font-headline-md text-on-surface mb-4">Pro+</h3>
-            <div className="flex items-baseline mb-6">
-              <span className="font-display-md font-semibold text-on-surface">599 ₺</span>
-              <span className="font-body-md text-on-surface-variant ml-1">/ay</span>
+          <div className="bg-surface-container-low/50 backdrop-blur-lg border border-outline-variant/50 rounded-2xl p-8 flex flex-col shadow-lg">
+            <h3 className="font-headline-md text-on-surface mb-2">Pro+</h3>
+            <p className="text-on-surface-variant text-sm mb-6 h-10">Yoğun ekipler ve ofis yöneticileri için.</p>
+            <div className="flex items-baseline mb-8">
+              <span className="font-display-md font-bold text-on-surface">599 ₺</span>
+              <span className="font-body-sm text-on-surface-variant ml-1">/ay</span>
             </div>
-            <ul className="font-body-md text-on-surface-variant space-y-3 mb-8 flex-1">
-              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-primary">check</span> Tüm Pro özellikleri</li>
-              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-primary">check</span> İstatistik ve Raporlar</li>
-              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-primary">check</span> Timeline takibi</li>
-              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-primary">check</span> Öncelikli destek</li>
+            <ul className="font-body-sm text-on-surface-variant space-y-4 mb-8 flex-1">
+              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check</span> Pro planındaki her şey</li>
+              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check</span> Gelişmiş İstatistik ve Raporlama</li>
+              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check</span> Müşteri Timeline Takibi</li>
+              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check</span> 7/24 Öncelikli Destek</li>
             </ul>
-            <Link to="/auth" className="w-full py-2.5 text-center font-label-md text-on-surface border border-outline-variant hover:bg-surface-container rounded-md transition-colors">
+            <Link to="/auth" className="w-full py-3 text-center font-label-md text-on-surface border border-outline hover:border-primary/50 hover:bg-surface-container rounded-xl transition-all">
               Pro+'ya Geç
             </Link>
           </div>
 
           {/* Kurumsal */}
-          <div className="panel p-8 flex flex-col">
-            <h3 className="font-headline-md text-on-surface mb-4">Kurumsal</h3>
-            <div className="flex items-baseline mb-6">
-              <span className="font-display-md font-semibold text-on-surface">Özel</span>
+          <div className="bg-surface-container-low/50 backdrop-blur-lg border border-outline-variant/50 rounded-2xl p-8 flex flex-col shadow-lg">
+            <h3 className="font-headline-md text-on-surface mb-2">Kurumsal</h3>
+            <p className="text-on-surface-variant text-sm mb-6 h-10">Kendi sistemine entegre etmek isteyen brokerlar için.</p>
+            <div className="flex items-baseline mb-8">
+              <span className="font-display-md font-bold text-on-surface">Özel</span>
             </div>
-            <ul className="font-body-md text-on-surface-variant space-y-3 mb-8 flex-1">
-              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-primary">domain</span> Sınırsız Danışman</li>
-              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-primary">api</span> Özel API</li>
-              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-primary">chat</span> WhatsApp API</li>
-              <li className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px] text-primary">smart_toy</span> Özel Yapay Zeka</li>
+            <ul className="font-body-sm text-on-surface-variant space-y-4 mb-8 flex-1">
+              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">domain</span> Sınırsız Danışman Hesabı</li>
+              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">api</span> Özel API & CRM Entegrasyonu</li>
+              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">chat</span> WhatsApp Business API Bağlantısı</li>
+              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">smart_toy</span> Özel Eğitilmiş Yapay Zeka Modeliniz</li>
             </ul>
-            <a href="https://wa.me/905555555555?text=Merhaba,%20Emlak%20Asistanı%20Kurumsal%20plan%20hakkında%20bilgi%20almak%20istiyorum." target="_blank" rel="noopener noreferrer" className="w-full py-2.5 text-center font-label-md text-on-surface border border-outline-variant hover:bg-surface-container rounded-md transition-colors">
+            <a href="https://wa.me/905555555555?text=Merhaba,%20Emlak%20Asistanı%20Kurumsal%20plan%20hakkında%20bilgi%20almak%20istiyorum." target="_blank" rel="noopener noreferrer" className="w-full py-3 text-center font-label-md text-on-surface border border-outline hover:border-primary/50 hover:bg-surface-container rounded-xl transition-all">
               Satışla İletişime Geç
             </a>
           </div>

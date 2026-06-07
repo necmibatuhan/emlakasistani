@@ -22,11 +22,9 @@ export default defineConfig({
         identifierNamesGenerator: 'hexadecimal',
         log: false,
         renameGlobals: false,
-        rotateStringArray: true,
+        rotateStringArray: false,
         selfDefending: false,
-        stringArray: true,
-        stringArrayEncoding: ['base64'],
-        stringArrayThreshold: 0.75,
+        stringArray: false,
         unicodeEscapeSequence: false
       }
     })

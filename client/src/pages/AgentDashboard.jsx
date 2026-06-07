@@ -148,15 +148,15 @@ const AgentDashboard = () => {
   };
 
   const getStatusColor = (status) => {
-    if (status === 'Sıcak') return '#EF4444'; // error (red)
-    if (status === 'Ilık') return '#F5A623'; // primary (orange)
-    return '#3B82F6'; // blue
+    if (status === 'Sıcak') return 'var(--color-status-hot)';
+    if (status === 'Ilık') return 'var(--color-status-warm)';
+    return 'var(--color-status-cold)';
   };
 
   const getStatusBgColor = (status) => {
-    if (status === 'Sıcak') return 'bg-[#EF4444]/10 border-[#EF4444]/30 text-[#EF4444]';
-    if (status === 'Ilık') return 'bg-[#F5A623]/10 border-[#F5A623]/30 text-[#F5A623]';
-    return 'bg-[#3B82F6]/10 border-[#3B82F6]/30 text-[#3B82F6]';
+    if (status === 'Sıcak') return 'bg-status-hot/10 border-status-hot/30 text-status-hot';
+    if (status === 'Ilık') return 'bg-status-warm/10 border-status-warm/30 text-status-warm';
+    return 'bg-status-cold/10 border-status-cold/30 text-status-cold';
   };
 
   const hotLeads = leads.filter(l => l.label === 'Sıcak').length;
@@ -165,7 +165,7 @@ const AgentDashboard = () => {
   const remindersToday = leads.filter(l => l.reminder_date && isToday(new Date(l.reminder_date)));
 
   return (
-    <div className="flex min-h-screen bg-[#06080A]"> {/* Darker Fintech Background */}
+    <div className="flex min-h-screen bg-background"> {/* Premium Fintech Background */}
       <Sidebar />
 
       <div className="lg:ml-[240px] flex-1 flex flex-col h-screen w-full overflow-hidden">
@@ -173,9 +173,9 @@ const AgentDashboard = () => {
 
         {/* Alert Banner */}
         {remindersToday.length > 0 && (
-          <div className="w-full bg-[#2A1A00] border-b border-[#F5A623] px-6 py-2 flex items-center gap-3 shrink-0">
-            <span className="material-symbols-outlined text-[#F5A623]" style={{fontVariationSettings: "'FILL' 1"}}>alarm</span>
-            <p className="font-medium text-sm text-[#F1F2F4]">⏰ Bugün {remindersToday.length} lead için takip zamanı — {remindersToday.map(l => l.name).join(', ')}</p>
+          <div className="w-full bg-status-warm/10 border-b border-status-warm px-6 py-2 flex items-center gap-3 shrink-0">
+            <span className="material-symbols-outlined text-status-warm" style={{fontVariationSettings: "'FILL' 1"}}>alarm</span>
+            <p className="font-medium text-sm text-on-surface">⏰ Bugün {remindersToday.length} lead için takip zamanı — {remindersToday.map(l => l.name).join(', ')}</p>
           </div>
         )}
 
@@ -183,43 +183,43 @@ const AgentDashboard = () => {
           
           {/* Smart Data Display (Top Metrics) */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 shrink-0">
-            <div className="bg-[#13151A] border border-[#23262F] rounded-xl p-4 flex flex-col shadow-lg">
-              <span className="text-xs font-semibold text-[#8E929C] uppercase tracking-wider mb-1">Toplam Lead</span>
-              <span className="text-2xl font-bold text-[#F1F2F4]">{leads.length}</span>
-              <Sparkline data={dummySparklines.total} color="#8E929C" />
+            <div className="bg-surface-container border border-outline-variant rounded-xl p-4 flex flex-col shadow-lg shadow-black/20">
+              <span className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-1">Toplam Lead</span>
+              <span className="text-2xl font-bold text-on-surface">{leads.length}</span>
+              <Sparkline data={dummySparklines.total} color="var(--color-primary)" />
             </div>
-            <div className="bg-[#13151A] border border-[#23262F] rounded-xl p-4 flex flex-col shadow-lg">
-              <span className="text-xs font-semibold text-[#8E929C] uppercase tracking-wider mb-1">Sıcak Lead</span>
+            <div className="bg-surface-container border border-outline-variant rounded-xl p-4 flex flex-col shadow-lg shadow-black/20">
+              <span className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-1">Sıcak Lead</span>
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold text-[#EF4444]">{hotLeads}</span>
+                <span className="text-2xl font-bold text-status-hot">{hotLeads}</span>
                 <span className="flex h-3 w-3 relative">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#EF4444] opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-[#EF4444]"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-hot opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-status-hot"></span>
                 </span>
               </div>
-              <Sparkline data={dummySparklines.hot} color="#EF4444" />
+              <Sparkline data={dummySparklines.hot} color="var(--color-status-hot)" />
             </div>
-            <div className="bg-[#13151A] border border-[#23262F] rounded-xl p-4 flex flex-col shadow-lg">
-              <span className="text-xs font-semibold text-[#8E929C] uppercase tracking-wider mb-1">Ilık Lead</span>
-              <span className="text-2xl font-bold text-[#F5A623]">{warmLeads}</span>
-              <Sparkline data={dummySparklines.warm} color="#F5A623" />
+            <div className="bg-surface-container border border-outline-variant rounded-xl p-4 flex flex-col shadow-lg shadow-black/20">
+              <span className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-1">Ilık Lead</span>
+              <span className="text-2xl font-bold text-status-warm">{warmLeads}</span>
+              <Sparkline data={dummySparklines.warm} color="var(--color-status-warm)" />
             </div>
-            <div className="bg-[#13151A] border border-[#23262F] rounded-xl p-4 flex flex-col shadow-lg">
-              <span className="text-xs font-semibold text-[#8E929C] uppercase tracking-wider mb-1">Soğuk Lead</span>
-              <span className="text-2xl font-bold text-[#3B82F6]">{coldLeads}</span>
-              <Sparkline data={dummySparklines.cold} color="#3B82F6" />
+            <div className="bg-surface-container border border-outline-variant rounded-xl p-4 flex flex-col shadow-lg shadow-black/20">
+              <span className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-1">Soğuk Lead</span>
+              <span className="text-2xl font-bold text-status-cold">{coldLeads}</span>
+              <Sparkline data={dummySparklines.cold} color="var(--color-status-cold)" />
             </div>
           </div>
 
           {/* Mobile Tabs */}
-          <div className="md:hidden flex gap-2 overflow-x-auto shrink-0 pb-2 border-b border-[#23262F]">
+          <div className="md:hidden flex gap-2 overflow-x-auto shrink-0 pb-2 border-b border-outline-variant">
             {['Sıcak', 'Ilık', 'Soğuk'].map(status => (
               <button 
                 key={status} 
                 onClick={() => setActiveTab(status)} 
                 className={clsx(
                   "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors", 
-                  activeTab === status ? getStatusBgColor(status) : 'bg-[#13151A] text-[#8E929C] border border-[#23262F]'
+                  activeTab === status ? getStatusBgColor(status) : 'bg-surface-container text-on-surface-variant border border-outline-variant'
                 )}
               >
                 {status} ({leads.filter(l => l.label === status).length})
@@ -262,18 +262,18 @@ const AgentDashboard = () => {
                   <div 
                     key={status} 
                     className={clsx(
-                      "w-full md:w-[340px] shrink-0 flex flex-col bg-[#0F1115] rounded-xl border border-[#23262F] h-full shadow-xl",
+                      "w-full md:w-[340px] shrink-0 flex flex-col bg-surface-container-low rounded-xl border border-outline-variant h-full shadow-2xl",
                       "md:flex",
                       activeTab === status ? "flex" : "hidden"
                     )} 
                   >
                     {/* Column Header */}
-                    <div className="p-4 border-b border-[#23262F] flex items-center justify-between shrink-0 bg-[#13151A]/50 rounded-t-xl">
-                       <h3 className="font-semibold text-[#F1F2F4] flex items-center gap-2">
-                          <span className="w-2.5 h-2.5 rounded-full" style={{backgroundColor: getStatusColor(status)}}></span>
+                    <div className="p-4 border-b border-outline-variant flex items-center justify-between shrink-0 bg-surface-container/50 rounded-t-xl">
+                       <h3 className="font-semibold text-on-surface flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 rounded-full shadow-[0_0_8px_currentColor]" style={{backgroundColor: getStatusColor(status), color: getStatusColor(status)}}></span>
                           {status}
                        </h3>
-                       <span className="text-xs font-bold text-[#8E929C] bg-[#1C1E24] px-2.5 py-1 rounded-full border border-[#2A2D35]">
+                       <span className="text-xs font-bold text-on-surface-variant bg-surface-container-high px-2.5 py-1 rounded-full border border-outline">
                          {leads.filter(l => l.label === status).length}
                        </span>
                     </div>
@@ -286,14 +286,14 @@ const AgentDashboard = () => {
                           {...provided.droppableProps}
                           className={clsx(
                             "p-3 flex-1 overflow-y-auto flex flex-col gap-3 custom-scrollbar transition-colors",
-                            snapshot.isDraggingOver ? "bg-[#1C1E24]/30" : ""
+                            snapshot.isDraggingOver ? "bg-primary/5" : ""
                           )}
                         >
-                           {loading && <p className="text-[#8E929C] text-sm text-center mt-4">Yükleniyor...</p>}
+                           {loading && <p className="text-on-surface-variant text-sm text-center mt-4">Yükleniyor...</p>}
                            {!loading && leads.filter(l => l.label === status).length === 0 && (
-                             <div className="flex flex-col items-center justify-center h-32 opacity-50 border border-dashed border-[#2A2D35] rounded-lg mt-2">
-                               <span className="material-symbols-outlined text-[#8E929C] text-2xl mb-1">inbox</span>
-                               <p className="text-[#8E929C] text-sm text-center">Lead yok</p>
+                             <div className="flex flex-col items-center justify-center h-32 opacity-50 border border-dashed border-outline rounded-lg mt-2">
+                               <span className="material-symbols-outlined text-on-surface-variant text-2xl mb-1">inbox</span>
+                               <p className="text-on-surface-variant text-sm text-center">Lead yok</p>
                              </div>
                            )}
                            
@@ -306,34 +306,34 @@ const AgentDashboard = () => {
                                     {...provided.dragHandleProps}
                                     onClick={() => setSelectedLeadId(lead.id)} 
                                     className={clsx(
-                                      "bg-[#1A1D24] p-4 rounded-lg border transition-all relative overflow-hidden group",
-                                      snapshot.isDragging ? "shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-[#F5A623] scale-105 z-50 ring-2 ring-[#F5A623]/50" : "shadow-sm border-[#2A2D35] hover:border-[#424652]",
-                                      selectedLeadId === lead.id && !snapshot.isDragging ? "border-[#F5A623] ring-1 ring-[#F5A623]/30" : ""
+                                      "bg-surface-container p-4 rounded-lg border transition-all relative overflow-hidden group",
+                                      snapshot.isDragging ? "shadow-[0_10px_30px_rgba(99,102,241,0.2)] border-primary scale-105 z-50 ring-2 ring-primary/50" : "shadow-sm border-outline hover:border-primary/50 hover:shadow-[0_0_15px_rgba(99,102,241,0.1)]",
+                                      selectedLeadId === lead.id && !snapshot.isDragging ? "border-primary ring-1 ring-primary/30 shadow-[0_0_20px_rgba(99,102,241,0.15)]" : ""
                                     )}
                                   >
                                      <div className="flex justify-between items-start mb-2">
-                                       <div className="text-[15px] font-semibold text-[#F1F2F4] leading-tight">
+                                       <div className="text-[15px] font-semibold text-on-surface leading-tight">
                                          {lead.name === '[İsim Belirtilmedi]' ? 'İsimsiz Lead' : lead.name}
                                        </div>
-                                       <div className="text-[11px] font-bold text-[#8E929C] bg-[#23262F] px-1.5 py-0.5 rounded ml-2 shrink-0">
+                                       <div className="text-[11px] font-bold text-on-surface-variant bg-surface-container-high px-1.5 py-0.5 rounded ml-2 shrink-0 border border-outline-variant">
                                          {lead.score || 5}/10
                                        </div>
                                      </div>
-                                     <div className="text-[13px] text-[#A1A5B0] flex items-center gap-1.5 mb-3">
+                                     <div className="text-[13px] text-on-surface-variant flex items-center gap-1.5 mb-3">
                                        <span className="material-symbols-outlined text-[14px]">call</span>
                                        {lead.phone === '[Telefon Belirtilmedi]' ? 'Telefon Yok' : lead.phone}
                                      </div>
                                      {lead.tags && lead.tags.length > 0 && (
                                        <div className="flex flex-wrap gap-1.5">
                                          {lead.tags.slice(0, 3).map((tag, i) => (
-                                           <span key={i} className="text-[10px] px-1.5 py-0.5 bg-[#23262F] text-[#D1D5DB] rounded border border-[#2A2D35]">{tag}</span>
+                                           <span key={i} className="text-[10px] px-1.5 py-0.5 bg-surface-container-high text-on-surface rounded border border-outline">{tag}</span>
                                          ))}
-                                         {lead.tags.length > 3 && <span className="text-[10px] px-1.5 py-0.5 text-[#8E929C]">+{lead.tags.length - 3}</span>}
+                                         {lead.tags.length > 3 && <span className="text-[10px] px-1.5 py-0.5 text-on-surface-variant">+{lead.tags.length - 3}</span>}
                                        </div>
                                      )}
                                      
                                      {/* Hover indicator for drag */}
-                                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-[#F5A623]/30 transition-colors"></div>
+                                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-primary/50 transition-colors"></div>
                                   </div>
                                 )}
                               </Draggable>
@@ -353,23 +353,23 @@ const AgentDashboard = () => {
       {/* Slide-over Detail Pane (Glassmorphism) */}
       {selectedLeadId && leadDetails && (
         <>
-          <div className="fixed inset-0 bg-black/40 z-40 lg:hidden" onClick={() => setSelectedLeadId(null)}></div>
-          <div className="fixed inset-y-0 right-0 w-full md:w-[420px] bg-[#12141A]/85 backdrop-blur-2xl border-l border-[#2A2D35] shadow-[0_0_40px_rgba(0,0,0,0.5)] z-50 flex flex-col transform transition-transform duration-300 ease-out">
-            <div className="p-6 border-b border-[#2A2D35]/50 flex justify-between items-start shrink-0">
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden" onClick={() => setSelectedLeadId(null)}></div>
+          <div className="fixed inset-y-0 right-0 w-full md:w-[420px] bg-surface-container-low/95 backdrop-blur-2xl border-l border-outline-variant shadow-[0_0_50px_rgba(0,0,0,0.8)] z-50 flex flex-col transform transition-transform duration-300 ease-out">
+            <div className="p-6 border-b border-outline-variant/50 flex justify-between items-start shrink-0">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#23262F] to-[#16181D] border border-[#2A2D35] flex items-center justify-center text-xl font-bold text-[#F1F2F4] shadow-inner">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-surface-container-high to-surface-container border border-outline flex items-center justify-center text-xl font-bold text-on-surface shadow-inner">
                   {leadDetails.name === '[İsim Belirtilmedi]' ? '?' : leadDetails.name?.substring(0,2).toUpperCase()}
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-[#F1F2F4] leading-tight">
+                  <h2 className="text-xl font-bold text-on-surface leading-tight">
                     {leadDetails.name === '[İsim Belirtilmedi]' ? 'İsimsiz Lead' : leadDetails.name}
                   </h2>
-                  <p className="text-sm text-[#8E929C] mt-0.5">
+                  <p className="text-sm text-on-surface-variant mt-0.5">
                     {format(new Date(leadDetails.created_at), 'dd MMM yyyy, HH:mm', { locale: tr })}
                   </p>
                 </div>
               </div>
-              <button onClick={() => setSelectedLeadId(null)} className="w-8 h-8 flex items-center justify-center rounded-full bg-[#1C1E24] text-[#8E929C] hover:text-white hover:bg-[#2A2D35] transition-colors border border-[#2A2D35]">
+              <button onClick={() => setSelectedLeadId(null)} className="w-8 h-8 flex items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant hover:text-on-surface hover:bg-outline-variant transition-colors border border-outline">
                 <span className="material-symbols-outlined text-[18px]">close</span>
               </button>
             </div>
@@ -378,10 +378,10 @@ const AgentDashboard = () => {
               
               {/* Score and Status Row */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-[#16181D]/80 border border-[#2A2D35]/50 rounded-xl p-4 flex flex-col items-center justify-center gap-2">
+                <div className="bg-surface-container/80 border border-outline/50 rounded-xl p-4 flex flex-col items-center justify-center gap-2">
                    <div className="relative w-16 h-16 flex items-center justify-center">
                      <svg className="absolute inset-0 w-full h-full transform -rotate-90" viewBox="0 0 88 88">
-                       <circle cx="44" cy="44" fill="none" r="40" stroke="#23262F" strokeWidth="6"></circle>
+                       <circle cx="44" cy="44" fill="none" r="40" stroke="var(--color-outline-variant)" strokeWidth="6"></circle>
                        <circle 
                          className="transition-all duration-1000 ease-out" 
                          cx="44" cy="44" fill="none" r="40" 
@@ -390,17 +390,18 @@ const AgentDashboard = () => {
                          strokeDashoffset={251.2 - (251.2 * (leadDetails.score || 5) / 10)} 
                          strokeWidth="6"
                          strokeLinecap="round"
+                         style={{ filter: `drop-shadow(0 0 4px ${getStatusColor(leadDetails.label)}80)` }}
                        ></circle>
                      </svg>
-                     <span className="text-lg font-bold text-[#F1F2F4] relative z-10">{leadDetails.score || 5}</span>
+                     <span className="text-lg font-bold text-on-surface relative z-10">{leadDetails.score || 5}</span>
                    </div>
-                   <span className="text-[11px] font-bold text-[#8E929C] tracking-wider uppercase">Lead Skoru</span>
+                   <span className="text-[11px] font-bold text-on-surface-variant tracking-wider uppercase">Lead Skoru</span>
                 </div>
-                <div className="bg-[#16181D]/80 border border-[#2A2D35]/50 rounded-xl p-4 flex flex-col items-center justify-center gap-2">
+                <div className="bg-surface-container/80 border border-outline/50 rounded-xl p-4 flex flex-col items-center justify-center gap-2">
                    <div className={clsx("w-16 h-16 rounded-full flex items-center justify-center text-3xl mb-1 border shadow-lg", getStatusBgColor(leadDetails.label))}>
                      <span className="material-symbols-outlined text-[28px]">{leadDetails.label === 'Sıcak' ? 'local_fire_department' : leadDetails.label === 'Ilık' ? 'thermostat' : 'ac_unit'}</span>
                    </div>
-                   <span className="text-[11px] font-bold text-[#8E929C] tracking-wider uppercase">Durum</span>
+                   <span className="text-[11px] font-bold text-on-surface-variant tracking-wider uppercase">Durum</span>
                 </div>
               </div>
 
@@ -416,12 +417,12 @@ const AgentDashboard = () => {
                     WhatsApp'ta Görüş
                   </a>
                 ) : (
-                  <button disabled className="w-full bg-[#1C1E24] text-[#8E929C] px-4 py-3 rounded-xl font-bold flex items-center justify-center gap-2 border border-[#2A2D35]">
+                  <button disabled className="w-full bg-surface-container-high text-on-surface-variant px-4 py-3 rounded-xl font-bold flex items-center justify-center gap-2 border border-outline">
                     <span className="material-symbols-outlined text-[20px]">chat</span>
                     Telefon Numarası Yok
                   </button>
                 )}
-                <button className="w-full bg-transparent border border-[#2A2D35] hover:border-[#F5A623] hover:text-[#F5A623] text-[#F1F2F4] px-4 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors">
+                <button className="w-full bg-transparent border border-outline hover:border-primary hover:text-primary text-on-surface px-4 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors">
                   <span className="material-symbols-outlined text-[20px]">edit</span>
                   Bilgileri Düzenle
                 </button>
@@ -430,10 +431,10 @@ const AgentDashboard = () => {
               {/* Preferences */}
               {leadDetails.tags && leadDetails.tags.length > 0 && (
                 <div>
-                  <h4 className="text-[11px] font-bold text-[#8E929C] tracking-wider uppercase mb-3 border-b border-[#2A2D35]/50 pb-2">Müşteri Tercihleri</h4>
+                  <h4 className="text-[11px] font-bold text-on-surface-variant tracking-wider uppercase mb-3 border-b border-outline-variant pb-2">Müşteri Tercihleri</h4>
                   <div className="flex flex-wrap gap-2">
                     {leadDetails.tags.map((tag, i) => (
-                      <span key={i} className="px-3 py-1.5 bg-[#16181D] border border-[#2A2D35] shadow-sm rounded-lg text-[13px] text-[#D1D5DB] font-medium">
+                      <span key={i} className="px-3 py-1.5 bg-surface-container border border-outline shadow-sm rounded-lg text-[13px] text-on-surface font-medium">
                         {tag}
                       </span>
                     ))}
@@ -443,9 +444,9 @@ const AgentDashboard = () => {
 
               {/* Message / Summary */}
               <div className="mb-8">
-                <h4 className="text-[11px] font-bold text-[#8E929C] tracking-wider uppercase mb-3 border-b border-[#2A2D35]/50 pb-2">Analiz Özeti / Notlar</h4>
-                <div className="bg-[#16181D]/80 border border-[#2A2D35]/50 rounded-xl p-4 shadow-inner">
-                  <p className="text-[14px] text-[#A1A5B0] leading-relaxed italic">
+                <h4 className="text-[11px] font-bold text-on-surface-variant tracking-wider uppercase mb-3 border-b border-outline-variant pb-2">Analiz Özeti / Notlar</h4>
+                <div className="bg-surface-container/80 border border-outline/50 rounded-xl p-4 shadow-inner relative">
+                  <p className="text-[14px] text-on-surface-variant leading-relaxed italic relative z-10">
                     "{leadDetails.summary || leadDetails.original_message || 'Not eklenmemiş.'}"
                   </p>
                 </div>
