@@ -49,7 +49,7 @@ const Landing = () => {
   React.useEffect(() => {
     const interval = setInterval(() => {
       setActiveMockIndex((prev) => (prev + 1) % MOCK_LEADS.length);
-    }, 4000);
+    }, 2000);
     return () => clearInterval(interval);
   }, []);
 
