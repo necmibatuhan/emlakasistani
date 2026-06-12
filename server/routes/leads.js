@@ -2,7 +2,7 @@ const express = require('express');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const db = require('../db');
 const { authMiddleware } = require('../middleware/auth');
-const { maskPII, unmaskPII } = require('../services/piiService');
+const PrivacyPipeline = require('../utils/PrivacyPipeline');
 
 const router = express.Router();
 
@@ -130,8 +130,13 @@ router.post('/analyze', authMiddleware, async (req, res) => {
       return res.status(429).json({ message: 'Rate limit aşıldı.' });
     }
 
-    // 1. Sanitize input to remove PII (Regex based masking)
-    const { maskedText, tokenMap } = maskPII(message, name);
+    // 1. Sanitize input to remove PII (Regex + Custom masking)
+    const pipeline = new PrivacyPipeline();
+    const customReplacements = [];
+    if (name) customReplacements.push({ originalValue: name.trim(), type: 'CLIENT_NAME' });
+    if (phone) customReplacements.push({ originalValue: phone.trim(), type: 'PHONE' });
+    
+    const maskedText = pipeline.mask(message, customReplacements);
 
     const prompt = `Sen profesyonel bir emlak danışmanlığı AI asistanısın. 10+ yıllık tecrübeye sahip, detaycı, gerçekçi ve Türkiye'deki emlak piyasasını çok iyi bilen bir uzmansın.
 
@@ -210,12 +215,8 @@ Sadece aşağıdaki JSON formatında yanıt dön:
     }
 
     // 2. Restore PII into the AI's response before saving to database
-    if (parsedResult.suggested_whatsapp_reply) {
-      parsedResult.suggested_whatsapp_reply = unmaskPII(parsedResult.suggested_whatsapp_reply, tokenMap);
-    }
-    if (parsedResult.extracted_raw_quotes) {
-      parsedResult.extracted_raw_quotes = parsedResult.extracted_raw_quotes.map(q => unmaskPII(q, tokenMap));
-    }
+    // PrivacyPipeline handles the entire JSON structure and clears the vault automatically
+    parsedResult = pipeline.unmask(parsedResult);
 
     const finalName = name?.trim() ? name.trim() : '[İsim Belirtilmedi]';
     const finalPhone = phone?.trim() ? phone.trim() : '[Telefon Belirtilmedi]';

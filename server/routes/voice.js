@@ -3,7 +3,7 @@ const multer = require('multer');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const db = require('../db');
 const { authMiddleware } = require('../middleware/auth');
-const { maskPII, unmaskPII } = require('../services/piiService');
+const PrivacyPipeline = require('../utils/PrivacyPipeline');
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } }); // 10MB limit
@@ -102,7 +102,12 @@ router.post('/analyze', authMiddleware, async (req, res) => {
     if (leadRes.rows.length === 0) return res.status(404).json({ error: 'Lead bulunamadı' });
     const lead = leadRes.rows[0];
 
-    const { maskedText, tokenMap } = maskPII(transcript, lead.name);
+    const pipeline = new PrivacyPipeline();
+    const customReplacements = [];
+    if (lead.name) customReplacements.push({ originalValue: lead.name.trim(), type: 'CLIENT_NAME' });
+    if (lead.phone) customReplacements.push({ originalValue: lead.phone.trim(), type: 'PHONE' });
+    
+    const maskedText = pipeline.mask(transcript, customReplacements);
 
     const userPrompt = `
 Mevcut müşteri skor ve durumu: ${lead.score}/10 (${lead.label}) - ${lead.status}
@@ -157,12 +162,9 @@ Danışmanın sesli notu:
     }
 
     // Restore names in summary and draft
+    analysis = pipeline.unmask(analysis);
     const ozetStr = `Niyet: ${analysis.customer_intent}. Riskler: ${(analysis.potential_risks || []).join(', ')}`;
-    analysis.ozet = unmaskPII(ozetStr, tokenMap);
-    
-    if (analysis.suggested_whatsapp_reply) {
-      analysis.suggested_whatsapp_reply = unmaskPII(analysis.suggested_whatsapp_reply, tokenMap);
-    }
+    analysis.ozet = ozetStr;
 
     await db.query('BEGIN');
 
