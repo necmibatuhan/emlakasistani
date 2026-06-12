@@ -455,7 +455,7 @@ const AgentDashboard = () => {
                 <h4 className="text-[11px] font-bold text-on-surface-variant tracking-wider uppercase mb-3 border-b border-outline-variant pb-2">Analiz Özeti / Notlar</h4>
                 <div className="bg-surface-container/80 border border-outline/50 rounded-xl p-4 shadow-inner relative">
                   <p className="text-[14px] text-on-surface-variant leading-relaxed italic relative z-10">
-                    "{leadDetails.summary || leadDetails.original_message || 'Not eklenmemiş.'}"
+                    "{leadDetails.reasoning || leadDetails.message || leadDetails.summary || leadDetails.original_message || 'Not eklenmemiş.'}"
                   </p>
                 </div>
               </div>
