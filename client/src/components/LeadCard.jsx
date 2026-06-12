@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flame, Clock, Home, ArrowRight, User } from 'lucide-react';
+import { Flame, Clock, Home, ArrowRight, User, AlertTriangle } from 'lucide-react';
 
 /**
  * Premium Lead Card Component
@@ -16,6 +16,8 @@ export default function LeadCard({
   budgetStr = "Bütçe Belirsiz",
   summary = "Herhangi bir özet bilgisi girilmemiş.",
   matchedCount = 0,
+  redFlag = false,
+  redFlagReason = null,
   onClick
 }) {
   // Aciliyet (Urgency) bazlı renk ve ikon ayarlamaları
@@ -58,6 +60,17 @@ export default function LeadCard({
           <span>%{score} Etkileşim</span>
         </div>
       </div>
+      
+      {/* Risk Badge (Red Flag) */}
+      {redFlag && (
+        <div className="mb-3 flex items-start gap-2 bg-red-500/10 border border-red-500/20 text-red-400 p-2.5 rounded-lg">
+          <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+          <div className="text-xs">
+            <span className="font-semibold block mb-0.5">Riskli Müşteri</span>
+            <span className="text-red-400/80 line-clamp-2">{redFlagReason || 'Yapay zeka bu lead için risk tespit etti.'}</span>
+          </div>
+        </div>
+      )}
 
       {/* Orta Kısım: İstek Detayları & Ses Notu Özeti */}
       <div className="flex-1">

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Flame, Clock, User, Phone, MapPin, Building, Banknote, FileText } from 'lucide-react';
+import { Flame, Clock, User, Phone, MapPin, Building, Banknote, FileText, AlertTriangle } from 'lucide-react';
 import clsx from 'clsx';
 
 // Stagger Ayarları (Sayfa açılışında kartların sırayla yukarıdan gelmesi)
@@ -26,6 +26,14 @@ function AnimatedLeadCard({ lead }) {
   
   const score = lead.score || 50;
   const isUrgent = score >= 90;
+  
+  let hasRedFlag = false;
+  let redFlagReason = '';
+  try {
+    const props = typeof lead.properties === 'string' ? JSON.parse(lead.properties) : lead.properties;
+    hasRedFlag = props?.risk_analysis?.has_red_flag === true;
+    redFlagReason = props?.risk_analysis?.risk_reason || '';
+  } catch(e) {}
 
   return (
     <motion.div
@@ -68,6 +76,17 @@ function AnimatedLeadCard({ lead }) {
             <span>% {score}</span>
           </motion.div>
         </motion.div>
+        
+        {/* Risk Badge (Red Flag) */}
+        {hasRedFlag && (
+          <motion.div layout className="flex items-start gap-2 bg-red-500/10 border border-red-500/20 text-red-400 p-2.5 rounded-lg">
+            <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+            <div className="text-xs">
+              <span className="font-semibold block mb-0.5">Riskli Müşteri</span>
+              <span className="text-red-400/80 line-clamp-2">{redFlagReason || 'Yapay zeka bu lead için risk tespit etti.'}</span>
+            </div>
+          </motion.div>
+        )}
 
         {/* Genişleyebilir Detay Bölümü (Layout Animation ile pürüzsüz açılır) */}
         <AnimatePresence>
