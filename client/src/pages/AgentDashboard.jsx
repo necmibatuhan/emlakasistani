@@ -6,6 +6,7 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import VoiceNoteModal from '../components/VoiceNoteModal';
+import LeadCard from '../components/LeadCard';
 import clsx from 'clsx';
 import { format, isToday } from 'date-fns';
 import { tr } from 'date-fns/locale';
@@ -304,36 +305,39 @@ const AgentDashboard = () => {
                                     ref={provided.innerRef}
                                     {...provided.draggableProps}
                                     {...provided.dragHandleProps}
-                                    onClick={() => setSelectedLeadId(lead.id)} 
                                     className={clsx(
-                                      "bg-surface-container p-4 rounded-lg border transition-all relative overflow-hidden group",
-                                      snapshot.isDragging ? "shadow-[0_10px_30px_rgba(99,102,241,0.2)] border-primary scale-105 z-50 ring-2 ring-primary/50" : "shadow-sm border-outline hover:border-primary/50 hover:shadow-[0_0_15px_rgba(99,102,241,0.1)]",
-                                      selectedLeadId === lead.id && !snapshot.isDragging ? "border-primary ring-1 ring-primary/30 shadow-[0_0_20px_rgba(99,102,241,0.15)]" : ""
+                                      "transition-all relative group",
+                                      snapshot.isDragging ? "z-50 scale-105" : "",
+                                      selectedLeadId === lead.id && !snapshot.isDragging ? "ring-2 ring-primary/50 rounded-xl" : ""
                                     )}
                                   >
-                                     <div className="flex justify-between items-start mb-2">
-                                       <div className="text-[15px] font-semibold text-on-surface leading-tight">
-                                         {lead.name === '[İsim Belirtilmedi]' ? 'İsimsiz Lead' : lead.name}
-                                       </div>
-                                       <div className="text-[11px] font-bold text-on-surface-variant bg-surface-container-high px-1.5 py-0.5 rounded ml-2 shrink-0 border border-outline-variant">
-                                         {lead.score || 5}/10
-                                       </div>
-                                     </div>
-                                     <div className="text-[13px] text-on-surface-variant flex items-center gap-1.5 mb-3">
-                                       <span className="material-symbols-outlined text-[14px]">call</span>
-                                       {lead.phone === '[Telefon Belirtilmedi]' ? 'Telefon Yok' : lead.phone}
-                                     </div>
-                                     {lead.tags && lead.tags.length > 0 && (
-                                       <div className="flex flex-wrap gap-1.5">
-                                         {lead.tags.slice(0, 3).map((tag, i) => (
-                                           <span key={i} className="text-[10px] px-1.5 py-0.5 bg-surface-container-high text-on-surface rounded border border-outline">{tag}</span>
-                                         ))}
-                                         {lead.tags.length > 3 && <span className="text-[10px] px-1.5 py-0.5 text-on-surface-variant">+{lead.tags.length - 3}</span>}
-                                       </div>
-                                     )}
-                                     
-                                     {/* Hover indicator for drag */}
-                                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-primary/50 transition-colors"></div>
+                                    <LeadCard 
+                                      name={lead.name === '[İsim Belirtilmedi]' ? 'İsimsiz Lead' : lead.name}
+                                      phone={lead.phone === '[Telefon Belirtilmedi]' ? 'Telefon Yok' : lead.phone}
+                                      score={lead.score ? lead.score * 10 : 50} 
+                                      urgency={lead.score >= 8 ? 'high' : lead.score >= 5 ? 'medium' : 'low'}
+                                      summary={lead.reasoning || lead.whatsapp_draft || 'Özet bekleniyor...'}
+                                      onClick={() => setSelectedLeadId(lead.id)}
+                                      actionType={(() => {
+                                        try {
+                                          const p = typeof lead.properties === 'string' ? JSON.parse(lead.properties) : lead.properties;
+                                          return p?.customer_intent === 'buyer' || p?.customer_intent === 'investor' ? 'sale' : 'rent';
+                                        } catch(e) { return 'unknown'; }
+                                      })()}
+                                      budgetStr={(() => {
+                                        try {
+                                          const p = typeof lead.properties === 'string' ? JSON.parse(lead.properties) : lead.properties;
+                                          return p?.budget?.max ? `${p.budget.min || 0} - ${p.budget.max} ${p.budget.currency || 'TRY'}` : 'Bütçe Belirsiz';
+                                        } catch(e) { return 'Bütçe Belirsiz'; }
+                                      })()}
+                                      roomCount={(() => {
+                                        try {
+                                          const p = typeof lead.properties === 'string' ? JSON.parse(lead.properties) : lead.properties;
+                                          if (p?.room_count?.min) return `${p.room_count.min}${p.room_count.max ? '-'+p.room_count.max : ''} Oda`;
+                                          return 'Bilinmiyor';
+                                        } catch(e) { return 'Bilinmiyor'; }
+                                      })()}
+                                    />
                                   </div>
                                 )}
                               </Draggable>
