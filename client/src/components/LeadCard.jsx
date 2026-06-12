@@ -1,5 +1,6 @@
 import React from 'react';
 import { Flame, Clock, Home, ArrowRight, User, AlertTriangle } from 'lucide-react';
+import WhatsAppShareButton from './WhatsAppShareButton';
 
 /**
  * Premium Lead Card Component
@@ -16,6 +17,7 @@ export default function LeadCard({
   budgetStr = "Bütçe Belirsiz",
   summary = "Herhangi bir özet bilgisi girilmemiş.",
   matchedCount = 0,
+  whatsappDraft = null,
   redFlag = false,
   redFlagReason = null,
   onClick
@@ -106,8 +108,13 @@ export default function LeadCard({
           </span>
         </div>
         
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-900 border border-zinc-800 text-zinc-500 group-hover:bg-zinc-100 group-hover:text-zinc-950 transition-all duration-300">
-          <ArrowRight className="h-4 w-4" />
+        <div className="flex items-center gap-2">
+          {/* WhatsApp ile Paylaş Butonu */}
+          {whatsappDraft && <WhatsAppShareButton message={whatsappDraft} />}
+          
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-900 border border-zinc-800 text-zinc-500 group-hover:bg-zinc-100 group-hover:text-zinc-950 transition-all duration-300">
+            <ArrowRight className="h-4 w-4" />
+          </div>
         </div>
       </div>
     </div>

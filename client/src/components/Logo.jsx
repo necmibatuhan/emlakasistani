@@ -9,9 +9,9 @@ export const LogoIcon = ({ className = "w-8 h-8", color = "currentColor" }) => (
 
 export const Logo = ({ className = "", iconSize = "w-8 h-8", textSize = "text-[20px]" }) => {
   return (
-    <div className={`flex items-center space-x-2 ${className}`}>
+    <a href="/" className={`flex items-center space-x-2 cursor-pointer ${className}`}>
       <LogoIcon className={iconSize} />
       <span className={`text-on-surface font-headline-md font-semibold tracking-tight ${textSize}`}>Kapora</span>
-    </div>
+    </a>
   );
 };
