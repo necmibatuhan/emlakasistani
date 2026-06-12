@@ -65,6 +65,7 @@ KURALLAR:
    - "Kararsızlık / Net olmama" (Örn: Hem satılık hem kiralık, her yer olur demek)
    - "Güvenilirlik / İletişim riski" (Örn: Emlakçıyı aradan çıkarmaya çalışmak, tutarsız konuşmak)
    Eğer risk varsa risk_score'u 1-5 arası belirle (5 en riskli) ve Türkçe açıkla. Risk yoksa has_red_flag: false yap.
+7. TAKVİM & GÖREV ANALİZİ: Danışman "Yarın Ahmet Bey'e evi göstereceğim", "Pazartesi günü sözleşme var" gibi geleceğe yönelik bir eylemden bahsediyorsa, verilen güncel sistem saatini kullanarak bunu YYYY-MM-DD formatına çevir ve 'calendar_event' objesini doldur. Eğer hiçbir görev/randevu yoksa null yap.
 
 # Output Format
 SADECE aşağıdaki JSON şemasında yanıt dön:
@@ -94,6 +95,14 @@ SADECE aşağıdaki JSON şemasında yanıt dön:
     "risk_reason": "string (Eğer has_red_flag true ise Türkçe açıklama, false ise null)"
   },
 
+  "calendar_event": {
+    "title": "string (Görevin kısa özeti, Örn: Ev Gösterme)",
+    "description": "string (Görevin detayı)",
+    "start_date": "YYYY-MM-DD",
+    "start_time": "HH:MM:SS veya null",
+    "is_task": "boolean (Gerçek bir görevse true)"
+  } | null,
+
   "key_motivations": ["sebep1", "sebep2"],
   "potential_risks": ["risk1", "risk2"],
   "recommended_next_action": "Bugün ara | Bu hafta ara | Takip listesine ekle",
@@ -120,7 +129,17 @@ router.post('/analyze', authMiddleware, async (req, res) => {
     
     const maskedText = pipeline.mask(transcript, customReplacements);
 
+    // Sistem saatini LLM'e referans olarak gönderiyoruz (Zaman analizi için)
+    const now = new Date();
+    const currentDateStr = now.toLocaleDateString('tr-TR', { timeZone: 'Europe/Istanbul', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const currentTimeStr = now.toLocaleTimeString('tr-TR', { timeZone: 'Europe/Istanbul', hour: '2-digit', minute: '2-digit' });
+
     const userPrompt = `
+SİSTEM BİLGİSİ (ZAMAN REFERANSI):
+Şu anki tarih: ${currentDateStr}
+Şu anki saat: ${currentTimeStr}
+Bu tarihi referans alarak, metindeki "yarın", "haftaya" gibi zamanları YYYY-MM-DD formatına dönüştür.
+
 Mevcut müşteri skor ve durumu: ${lead.score}/10 (${lead.label}) - ${lead.status}
 
 Danışmanın sesli notu:
