@@ -26,8 +26,8 @@ export default function WhatsAppShareButton({
 
       // Opsiyonel 3. Eğer telefonda ise veya WhatsApp Web açıksa direkt uygulamaya yönlendir
       // if (phoneNumber) {
-      //   const cleanPhone = phoneNumber.replace(/\\D/g, '');
-      //   const waUrl = \`https://wa.me/\${cleanPhone}?text=\${encodeURIComponent(message)}\`;
+      //   const cleanPhone = phoneNumber.replace(/\D/g, '');
+      //   const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
       //   window.open(waUrl, '_blank');
       // }
 

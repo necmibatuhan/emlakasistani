@@ -52,7 +52,7 @@ export default function ExternalListingCard({ listing }) {
             İlana Git
           </a>
           <a 
-            href={\`tel:\${listing.owner_phone}\`}
+            href={`tel:${listing.owner_phone}`}
             className="flex justify-center items-center gap-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 transition-colors px-3 py-2 rounded-lg text-xs font-medium border border-emerald-500/20"
           >
             <PhoneCall className="w-3.5 h-3.5" />

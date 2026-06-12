@@ -51,7 +51,7 @@ export default function RemindersWidget({ leads = [], onLeadClick }) {
               <div className="flex justify-between items-start mb-2">
                 <span className="text-indigo-400 font-medium text-sm flex items-center gap-1.5">
                   <Clock className="w-3.5 h-3.5" />
-                  {ev.start_date} {ev.start_time ? \`| \${ev.start_time.substring(0,5)}\` : ''}
+                  {ev.start_date} {ev.start_time ? `| ${ev.start_time.substring(0,5)}` : ''}
                 </span>
                 <button className="text-zinc-600 hover:text-emerald-400 transition-colors">
                   <CheckCircle2 className="w-5 h-5" />
