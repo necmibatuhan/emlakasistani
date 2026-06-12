@@ -79,19 +79,46 @@ const AgentDashboard = () => {
     enabled: !!selectedLeadId
   });
 
+  const handleNewLeadClick = () => {
+    setSelectedLeadId(null);
+    setName('');
+    setPhone('');
+    setMessage('');
+    setIsNewLeadDrawerOpen(true);
+  };
+
+  const handleEditClick = () => {
+    if (!leadDetails) return;
+    setName(leadDetails.name === '[İsim Belirtilmedi]' ? '' : leadDetails.name);
+    setPhone(leadDetails.phone === '[Telefon Belirtilmedi]' ? '' : leadDetails.phone);
+    setMessage(leadDetails.message || '');
+    setIsNewLeadDrawerOpen(true);
+  };
+
   const handleAnalyze = async (e) => {
     if (e) e.preventDefault();
     setAnalyzing(true);
     setAnalyzeError('');
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/analyze`, {
-        name, phone, message
-      }, { headers: { Authorization: `Bearer ${token}` } });
+      let res;
+      if (selectedLeadId) {
+        // Düzenleme (Update)
+        res = await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/${selectedLeadId}/analyze`, {
+          name, phone, message
+        }, { headers: { Authorization: `Bearer ${token}` } });
+      } else {
+        // Yeni Lead Ekleme
+        res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/analyze`, {
+          name, phone, message
+        }, { headers: { Authorization: `Bearer ${token}` } });
+      }
       
       setName(''); setPhone(''); setMessage('');
       await queryClient.invalidateQueries(['leads']);
       setSelectedLeadId(res.data.id);
       setIsNewLeadDrawerOpen(false);
+      setShowSuccessTick(true);
+      setTimeout(() => setShowSuccessTick(false), 2000);
     } catch (err) {
       setAnalyzeError(err.response?.data?.message || 'Analiz hatası');
     } finally {
@@ -430,7 +457,7 @@ const AgentDashboard = () => {
                     Telefon Numarası Yok
                   </button>
                 )}
-                <button className="w-full bg-transparent border border-outline hover:border-primary hover:text-primary text-on-surface px-4 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors">
+                <button onClick={handleEditClick} className="w-full bg-transparent border border-outline hover:border-primary hover:text-primary text-on-surface px-4 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors">
                   <span className="material-symbols-outlined text-[20px]">edit</span>
                   Bilgileri Düzenle
                 </button>
@@ -474,7 +501,7 @@ const AgentDashboard = () => {
           <span className="material-symbols-outlined text-[24px]">mic</span>
         </button>
         <button 
-          onClick={() => setIsNewLeadDrawerOpen(true)} 
+          onClick={handleNewLeadClick} 
           className="w-14 h-14 bg-gradient-to-br from-[#F5A623] to-[#d48c1a] rounded-full shadow-[0_8px_16px_rgba(245,166,35,0.3)] flex items-center justify-center hover:scale-110 hover:shadow-[0_12px_24px_rgba(245,166,35,0.5)] transition-all"
           title="Yeni Lead Ekle"
         >
@@ -488,7 +515,7 @@ const AgentDashboard = () => {
           <div className="fixed inset-0 bg-black/60 z-40 backdrop-blur-sm" onClick={() => setIsNewLeadDrawerOpen(false)}></div>
           <div className="fixed inset-y-0 right-0 w-full md:w-[400px] bg-[#12141A] border-l border-[#2A2D35] shadow-2xl z-50 flex flex-col transform transition-transform duration-300">
             <div className="p-6 border-b border-[#2A2D35] flex justify-between items-center bg-[#16181D]">
-              <h2 className="text-xl font-bold text-[#F1F2F4]">Yeni Lead Ekle</h2>
+              <h2 className="text-xl font-bold text-[#F1F2F4]">{selectedLeadId ? 'Bilgileri Düzenle' : 'Yeni Lead Ekle'}</h2>
               <button onClick={() => setIsNewLeadDrawerOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full bg-[#1C1E24] text-[#8E929C] hover:text-white border border-[#2A2D35]">
                 <span className="material-symbols-outlined text-[18px]">close</span>
               </button>
