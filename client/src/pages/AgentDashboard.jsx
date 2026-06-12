@@ -7,6 +7,7 @@ import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import VoiceNoteModal from '../components/VoiceNoteModal';
 import LeadCard from '../components/LeadCard';
+import RemindersWidget from '../components/RemindersWidget';
 import clsx from 'clsx';
 import { format, isToday } from 'date-fns';
 import { tr } from 'date-fns/locale';
@@ -211,6 +212,9 @@ const AgentDashboard = () => {
               <Sparkline data={dummySparklines.cold} color="var(--color-status-cold)" />
             </div>
           </div>
+          
+          {/* AI Takvim Görevleri / Hatırlatıcılar */}
+          <RemindersWidget leads={leads} onLeadClick={setSelectedLeadId} />
 
           {/* Mobile Tabs */}
           <div className="md:hidden flex gap-2 overflow-x-auto shrink-0 pb-2 border-b border-outline-variant">
