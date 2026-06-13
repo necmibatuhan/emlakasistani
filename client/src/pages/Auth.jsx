@@ -116,7 +116,7 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-[#0A0B0D] flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-[420px] md:max-w-[480px] bg-[#16181D] rounded-[12px] border border-[#2A2D35] p-8 md:p-10 relative shadow-2xl">
+      <div className="w-full max-w-[420px] md:max-w-[560px] lg:max-w-[600px] bg-[#16181D] rounded-[16px] border border-[#2A2D35] p-8 md:p-12 lg:p-14 relative shadow-2xl">
         {(isForgotPassword || (!isLogin && registerStep === 2)) && (
           <button 
             onClick={() => { isForgotPassword ? setIsForgotPassword(false) : setRegisterStep(1); }}
@@ -126,16 +126,16 @@ const Auth = () => {
           </button>
         )}
 
-        <div className="flex justify-center mb-8">
-          <Logo iconSize="w-10 h-10" textSize="text-[24px]" />
+        <div className="flex justify-center mb-8 md:mb-10 lg:mb-12">
+          <Logo iconSize="w-12 h-12 md:w-16 md:h-16" textSize="text-[28px] md:text-[36px]" />
         </div>
         
-        <h2 className="text-[20px] font-medium text-center text-[#F1F2F4] mb-2">
+        <h2 className="text-[22px] md:text-[28px] lg:text-[32px] font-bold text-center text-[#F1F2F4] mb-3 md:mb-4">
           {isForgotPassword ? 'Şifremi Unuttum' : (isLogin ? 'Tekrar Hoşgeldiniz' : (registerStep === 1 ? 'Hesap Oluşturun' : 'Profilinizi Seçin'))}
         </h2>
         
-        <div className="text-center mb-8">
-          <p className="text-[14px] text-[#7C8090]">
+        <div className="text-center mb-8 md:mb-10">
+          <p className="text-[14px] md:text-[16px] text-[#7C8090]">
             {isForgotPassword 
               ? 'Hesabınıza kayıtlı e-posta adresini girin, size şifre sıfırlama bağlantısı gönderelim.'
               : isLogin 
@@ -165,7 +165,7 @@ const Auth = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-[#0A0B0D] border border-[#2A2D35] rounded-[8px] px-4 py-3 md:py-3.5 text-[#F1F2F4] text-[14px] md:text-[15px] focus:outline-none focus:border-[#F5A623] focus:ring-1 focus:ring-[#F5A623] focus:bg-[#13151A] transition-all shadow-inner" 
+                className="w-full bg-[#0A0B0D] border border-[#2A2D35] rounded-[8px] px-4 py-3 md:px-5 md:py-4 text-[#F1F2F4] text-[14px] md:text-[16px] focus:outline-none focus:border-[#F5A623] focus:ring-2 focus:ring-[#F5A623] focus:bg-[#13151A] transition-all shadow-inner" 
                 placeholder="ornek@sirket.com" 
               />
             </div>
@@ -195,24 +195,24 @@ const Auth = () => {
                   <label className="block text-[12px] font-medium text-[#7C8090] mb-1.5">Ad Soyad</label>
                   <input 
                     type="text" required 
-                    className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#F1F2F4] rounded-[8px] px-4 py-3 md:py-3.5 text-[14px] md:text-[15px] focus:border-[#F5A623] focus:ring-1 focus:ring-[#F5A623] focus:bg-[#13151A] outline-none transition-all shadow-inner placeholder-[#7C8090]"
+                    className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#F1F2F4] rounded-[8px] px-4 py-3 md:px-5 md:py-4 text-[14px] md:text-[16px] focus:border-[#F5A623] focus:ring-2 focus:ring-[#F5A623] focus:bg-[#13151A] outline-none transition-all shadow-inner placeholder-[#7C8090]"
                     value={name} onChange={e => setName(e.target.value)}
                   />
                 </div>
               )}
-              <div>
-                <label className="block text-[12px] md:text-[13px] font-medium text-[#7C8090] mb-1.5">E-posta</label>
+              <div className="md:mt-6">
+                <label className="block text-[12px] md:text-[14px] font-medium text-[#7C8090] mb-2">E-posta</label>
                 <input 
                   type="email" required 
-                  className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#F1F2F4] rounded-[8px] px-4 py-3 md:py-3.5 text-[14px] md:text-[15px] focus:border-[#F5A623] focus:ring-1 focus:ring-[#F5A623] focus:bg-[#13151A] outline-none transition-all shadow-inner placeholder-[#7C8090]"
+                  className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#F1F2F4] rounded-[8px] px-4 py-3 md:px-5 md:py-4 text-[14px] md:text-[16px] focus:border-[#F5A623] focus:ring-2 focus:ring-[#F5A623] focus:bg-[#13151A] outline-none transition-all shadow-inner placeholder-[#7C8090]"
                   value={email} onChange={e => setEmail(e.target.value)}
                 />
               </div>
-              <div>
-                <label className="block text-[12px] md:text-[13px] font-medium text-[#7C8090] mb-1.5">Şifre</label>
+              <div className="md:mt-6">
+                <label className="block text-[12px] md:text-[14px] font-medium text-[#7C8090] mb-2">Şifre</label>
                 <input 
                   type="password" required 
-                  className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#F1F2F4] rounded-[8px] px-4 py-3 md:py-3.5 text-[14px] md:text-[15px] focus:border-[#F5A623] focus:ring-1 focus:ring-[#F5A623] focus:bg-[#13151A] outline-none transition-all shadow-inner placeholder-[#7C8090]"
+                  className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#F1F2F4] rounded-[8px] px-4 py-3 md:px-5 md:py-4 text-[14px] md:text-[16px] focus:border-[#F5A623] focus:ring-2 focus:ring-[#F5A623] focus:bg-[#13151A] outline-none transition-all shadow-inner placeholder-[#7C8090]"
                   value={password} onChange={e => setPassword(e.target.value)}
                 />
               </div>
@@ -236,11 +236,11 @@ const Auth = () => {
               )}
 
               {isLogin && (
-                <div className="mb-6 flex justify-end">
+                <div className="mb-6 md:mb-8 flex justify-end mt-2 md:mt-3">
                   <button 
                     type="button"
                     onClick={() => { setIsForgotPassword(true); setError(''); setMessage(''); }}
-                    className="text-[12px] text-[#F5A623] hover:underline"
+                    className="text-[13px] md:text-[15px] text-[#F5A623] hover:underline font-medium"
                   >
                     Şifremi unuttum
                   </button>
@@ -259,7 +259,7 @@ const Auth = () => {
               <button 
                 type="submit" 
                 disabled={isSubmitting}
-                className="w-full bg-gradient-to-r from-[#F5A623] to-[#FF8C00] text-[#0A0B0D] font-bold text-[14px] md:text-[15px] py-3.5 rounded-[8px] hover:shadow-[0_0_20px_rgba(245,166,35,0.4)] transition-all mt-4 disabled:opacity-50"
+                className="w-full bg-gradient-to-r from-[#F5A623] to-[#FF8C00] text-[#0A0B0D] font-bold text-[15px] md:text-[18px] py-4 md:py-5 rounded-[10px] hover:shadow-[0_0_25px_rgba(245,166,35,0.5)] transition-all mt-6 disabled:opacity-50"
               >
                 {isLogin ? 'Giriş Yap' : 'Devam Et'}
               </button>
@@ -286,13 +286,13 @@ const Auth = () => {
               </div>
             </div>
 
-            <div className="mt-8 text-center bg-[#1E2028]/50 p-4 rounded-xl border border-[#2A2D35]">
-              <span className="text-[13px] md:text-[14px] text-[#7C8090] font-medium mr-2">
+            <div className="mt-8 md:mt-10 text-center bg-[#1E2028]/80 p-5 md:p-6 rounded-[12px] border border-[#2A2D35]">
+              <span className="text-[14px] md:text-[16px] text-[#7C8090] font-medium mr-2">
                 {isLogin ? 'Hesabınız yok mu?' : 'Zaten hesabınız var mı?'}
               </span>
               <button 
                 onClick={() => { setIsLogin(!isLogin); setRegisterStep(1); setError(''); setMessage(''); }} 
-                className="text-[13px] md:text-[14px] font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#F5A623] to-[#FF8C00] hover:from-[#FF8C00] hover:to-[#ff7300] transition-all hover:underline"
+                className="text-[14px] md:text-[18px] font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#F5A623] via-[#ffaa00] to-[#FF8C00] hover:from-[#FF8C00] hover:to-[#ff7300] transition-all hover:underline"
               >
                 {isLogin ? 'Hemen Kayıt Olun 🚀' : 'Giriş Yapın'}
               </button>
