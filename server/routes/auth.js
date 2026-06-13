@@ -350,20 +350,52 @@ router.post('/forgot-password', async (req, res) => {
     const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${resetToken}&id=${user.id}`;
     
     try {
-      const { data, error } = await resend.events.send({
-        event: 'password-reset',
-        email: user.email,
-        data: {
-          resetUrl: resetUrl,
-          name: user.name
-        }
-      });
-      
-      if (error) {
-        console.error("Resend Event Error (Password Reset):", error);
-        return res.status(500).json({ message: "Mail gönderilemedi. Hata: " + error.message });
+      if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+        const transporter = nodemailer.createTransport({
+          host: process.env.SMTP_HOST || 'smtp.gmail.com',
+          port: parseInt(process.env.SMTP_PORT || '465', 10),
+          secure: process.env.SMTP_PORT === '465' || (!process.env.SMTP_PORT && true),
+          auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS
+          }
+        });
+
+        const info = await transporter.sendMail({
+          from: `"Kapora Asistan" <${process.env.SMTP_USER}>`,
+          to: user.email,
+          subject: 'Kapora - Şifre Sıfırlama Talebi',
+          html: `
+            <div style="font-family: sans-serif; max-w-xl mx-auto p-6 bg-white rounded-lg shadow-sm border border-gray-100">
+              <h2 style="color: #111827; font-size: 24px; font-weight: bold; margin-bottom: 16px;">Merhaba ${user.name},</h2>
+              <p style="color: #4B5563; font-size: 16px; margin-bottom: 24px;">Hesabınız için şifre sıfırlama talebinde bulundunuz. Aşağıdaki butona tıklayarak yeni şifrenizi belirleyebilirsiniz:</p>
+              <a href="${resetUrl}" style="display: inline-block; background-color: #F5A623; color: #111827; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 16px;">Şifremi Sıfırla</a>
+              <p style="color: #9CA3AF; font-size: 14px; margin-top: 32px;">Eğer bu talebi siz yapmadıysanız, lütfen bu mesajı görmezden gelin.</p>
+            </div>
+          `
+        });
+        console.log(`Şifre sıfırlama e-postası (Nodemailer) gönderildi: ${info.messageId}`);
       } else {
-        console.log(`Şifre sıfırlama otomasyon eventi tetiklendi: ${user.email} (ID: ${data?.id})`);
+        const { data, error } = await resend.emails.send({
+          from: 'Kapora <onboarding@resend.dev>',
+          to: user.email,
+          subject: 'Kapora - Şifre Sıfırlama Talebi',
+          html: `
+            <div style="font-family: sans-serif; max-w-xl mx-auto p-6 bg-white rounded-lg shadow-sm border border-gray-100">
+              <h2 style="color: #111827; font-size: 24px; font-weight: bold; margin-bottom: 16px;">Merhaba ${user.name},</h2>
+              <p style="color: #4B5563; font-size: 16px; margin-bottom: 24px;">Hesabınız için şifre sıfırlama talebinde bulundunuz. Aşağıdaki butona tıklayarak yeni şifrenizi belirleyebilirsiniz:</p>
+              <a href="${resetUrl}" style="display: inline-block; background-color: #F5A623; color: #111827; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 16px;">Şifremi Sıfırla</a>
+              <p style="color: #9CA3AF; font-size: 14px; margin-top: 32px;">Eğer bu talebi siz yapmadıysanız, lütfen bu mesajı görmezden gelin.</p>
+            </div>
+          `
+        });
+        
+        if (error) {
+          console.error("Resend Event Error (Password Reset):", error);
+          return res.status(500).json({ message: "Mail gönderilemedi. Hata: " + error.message });
+        } else {
+          console.log(`Şifre sıfırlama maili gönderildi: ${user.email} (ID: ${data?.id})`);
+        }
       }
     } catch (mailErr) {
       console.error('SMTP/Resend Gönderme Hatası:', mailErr);
