@@ -55,11 +55,11 @@ const sendVerificationEmail = async (email, token, name) => {
 
   try {
     if (process.env.SMTP_USER && process.env.SMTP_PASS) {
-      // Use Nodemailer with explicit Gmail SMTP config
+      // Use Nodemailer with explicit SMTP config from environment
       const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 465,
-        secure: true,
+        host: process.env.SMTP_HOST || 'smtp.gmail.com',
+        port: parseInt(process.env.SMTP_PORT || '465', 10),
+        secure: process.env.SMTP_PORT === '465' || (!process.env.SMTP_PORT && true), // true for 465, false for other ports
         auth: {
           user: process.env.SMTP_USER,
           pass: process.env.SMTP_PASS
