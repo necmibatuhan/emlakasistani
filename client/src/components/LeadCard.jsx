@@ -1,5 +1,5 @@
-import React from 'react';
-import { Flame, Clock, Home, ArrowRight, User, AlertTriangle } from 'lucide-react';
+import React, { useState } from 'react';
+import { Flame, Clock, Home, ArrowRight, User, AlertTriangle, Sparkles } from 'lucide-react';
 import WhatsAppShareButton from './WhatsAppShareButton';
 
 /**
@@ -20,8 +20,21 @@ export default function LeadCard({
   whatsappDraft = null,
   redFlag = false,
   redFlagReason = null,
+  onWakeUp,
   onClick
 }) {
+  const [isWakingUp, setIsWakingUp] = useState(false);
+
+  const handleWakeUp = async (e) => {
+    e.stopPropagation();
+    if (!onWakeUp) return;
+    setIsWakingUp(true);
+    try {
+      await onWakeUp();
+    } finally {
+      setIsWakingUp(false);
+    }
+  };
   // Aciliyet (Urgency) bazlı renk ve ikon ayarlamaları
   const getUrgencyConfig = () => {
     switch (urgency) {
@@ -96,12 +109,30 @@ export default function LeadCard({
       </div>
 
       {/* Alt Kısım: Hızlı Triage Aksiyonları */}
-      <div className="mt-4 pt-4 border-t border-zinc-800/80 flex items-center gap-2">
-        {whatsappDraft && <WhatsAppShareButton message={whatsappDraft} className="flex-1" />}
+      <div className="mt-4 pt-4 border-t border-zinc-800/80 flex items-center gap-2 flex-wrap">
+        {whatsappDraft && <WhatsAppShareButton message={whatsappDraft} className="flex-1 min-w-[120px]" />}
+        
+        {/* Uyandır AI Mesajı Butonu (Fırsat Sinyali) */}
+        {!whatsappDraft && (
+          <button
+            onClick={handleWakeUp}
+            disabled={isWakingUp}
+            className="bg-indigo-500/10 border border-indigo-500/20 hover:bg-indigo-500/20 text-indigo-400 rounded-md px-3 py-1.5 text-xs font-medium transition-colors flex items-center gap-1.5 flex-1 min-w-[120px] justify-center disabled:opacity-50"
+            title="Uyuyan Alıcıyı Yapay Zeka ile Uyandır (Fırsat Sinyali)"
+          >
+            {isWakingUp ? (
+              <svg className="animate-spin h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            ) : (
+              <Sparkles className="h-3.5 w-3.5" />
+            )}
+            AI Uyandır
+          </button>
+        )}
+
         <a 
           href={`tel:${phone.replace(/[^0-9]/g, '')}`} 
           onClick={(e) => e.stopPropagation()} 
-          className="bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 hover:text-zinc-100 text-zinc-400 rounded-md px-3 py-1.5 text-xs font-medium transition-colors flex items-center gap-1.5 flex-1 justify-center"
+          className="bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 hover:text-zinc-100 text-zinc-400 rounded-md px-3 py-1.5 text-xs font-medium transition-colors flex items-center gap-1.5 flex-1 justify-center min-w-[80px]"
         >
           Ara
         </a>

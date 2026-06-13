@@ -353,4 +353,52 @@ router.get('/:id/external-matches', authMiddleware, async (req, res) => {
   }
 });
 
+// WAKEUP AI MESSAGE (Fırsat Sinyali)
+router.post('/:id/wakeup', authMiddleware, async (req, res) => {
+  try {
+    const leadId = req.params.id;
+    const leadRes = await db.query('SELECT * FROM leads WHERE id = $1 AND company_id = $2', [leadId, req.user.company_id]);
+    if (leadRes.rows.length === 0) return res.status(404).json({ message: 'Lead bulunamadı' });
+    const lead = leadRes.rows[0];
+
+    const notesRes = await db.query('SELECT content, created_at FROM notes WHERE lead_id = $1 ORDER BY created_at ASC', [leadId]);
+    const notesStr = notesRes.rows.map(n => n.content).join(' | ');
+
+    const { MASTER_AGENT_PROMPT } = require('../utils/promptLibrary');
+
+    const prompt = `${MASTER_AGENT_PROMPT}
+    
+Senaryo 5 (Uyuyan Alıcı Datası Eşleştirme) kurallarına göre şu Müşteriyi analiz et ve 'Hazır Mesaj' üret. Başka hiçbir açıklama yapma.
+Müşteri Adı: ${lead.name}
+Geçmiş Notları/İhtiyacı: ${lead.message} | ${notesStr}
+`;
+
+    let generatedMessage = '';
+    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'mock') {
+      generatedMessage = `Merhaba ${lead.name} Bey, [Emlakçı Adı] ben. Rehberimde tam sizin kriterlerinize uygun, güncel piyasa koşullarında satılabilir fiyat öngörüsü çok doğru olan bir yer yakaladım. Kısa sürede satışa dönecek bir fırsat. Detaylar için arıyorum.`;
+    } else {
+      try {
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { temperature: 0.7 } });
+        const aiResult = await model.generateContent(prompt);
+        generatedMessage = aiResult.response.text().trim();
+      } catch (err) {
+        console.error('Gemini Wakeup Error:', err.message);
+        generatedMessage = 'Yapay zeka mesajı oluşturamadı, lütfen manuel yazın.';
+      }
+    }
+
+    // Update whatsapp_draft
+    const updatedLead = await db.query(
+      'UPDATE leads SET whatsapp_draft = $1, updated_at = NOW() WHERE id = $2 RETURNING *',
+      [generatedMessage, leadId]
+    );
+
+    res.json({ success: true, lead: updatedLead.rows[0] });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Sunucu hatası' });
+  }
+});
+
 module.exports = router;

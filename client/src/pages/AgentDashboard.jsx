@@ -141,6 +141,23 @@ const AgentDashboard = () => {
     e.dataTransfer.setData('leadId', leadId);
   };
 
+  const handleWakeUp = async (leadId) => {
+    try {
+      await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/${leadId}/wakeup`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      await queryClient.invalidateQueries(['leads']);
+      if (selectedLeadId === leadId) {
+        await queryClient.invalidateQueries(['lead', leadId]);
+      }
+      setShowSuccessTick(true);
+      setTimeout(() => setShowSuccessTick(false), 2000);
+    } catch (err) {
+      console.error(err);
+      alert('Yapay zeka uyanma mesajını oluşturamadı.');
+    }
+  };
+
   const handleDragOver = (e) => {
     e.preventDefault();
   };
@@ -350,6 +367,8 @@ const AgentDashboard = () => {
                                           return 'Bilinmiyor';
                                         } catch(e) { return 'Bilinmiyor'; }
                                       })()}
+                                      whatsappDraft={lead.whatsapp_draft}
+                                      onWakeUp={() => handleWakeUp(lead.id)}
                                     />
                                   </div>
                                 )}
