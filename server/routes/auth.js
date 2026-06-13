@@ -60,6 +60,9 @@ const sendVerificationEmail = async (email, token, name) => {
         host: process.env.SMTP_HOST || 'smtp.gmail.com',
         port: parseInt(process.env.SMTP_PORT || '465', 10),
         secure: process.env.SMTP_PORT === '465' || (!process.env.SMTP_PORT && true), // true for 465, false for other ports
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 10000,
         auth: {
           user: process.env.SMTP_USER,
           pass: process.env.SMTP_PASS
@@ -355,6 +358,9 @@ router.post('/forgot-password', async (req, res) => {
           host: process.env.SMTP_HOST || 'smtp.gmail.com',
           port: parseInt(process.env.SMTP_PORT || '465', 10),
           secure: process.env.SMTP_PORT === '465' || (!process.env.SMTP_PORT && true),
+          connectionTimeout: 10000,
+          greetingTimeout: 10000,
+          socketTimeout: 10000,
           auth: {
             user: process.env.SMTP_USER,
             pass: process.env.SMTP_PASS
