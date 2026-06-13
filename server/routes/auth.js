@@ -17,10 +17,40 @@ const resend = new Resend(process.env.RESEND_API_KEY || 're_5qWF7SiQ_2w4j9e68Bra
 const sendVerificationEmail = async (email, token, name) => {
   const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${token}`;
   
+  const subject = `🗝️ Kapora AI Giriş Kodunuz: ${token}`;
+  const htmlContent = `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px; background-color: #ffffff; border-radius: 12px; border: 1px solid #e5e7eb;">
+      <h3 style="color: #111827; font-size: 24px; font-weight: bold; margin-bottom: 24px;">Kapora'ya Hoş Geldiniz!</h3>
+      <p style="color: #374151; font-size: 16px; margin-bottom: 16px;">Merhaba,</p>
+      <p style="color: #374151; font-size: 16px; margin-bottom: 32px; line-height: 1.5;">Kapora AI platformuna yaptığınız giriş veya kayıt talebini onaylamak için aşağıdaki 6 haneli doğrulama kodunu kullanabilir veya doğrudan onay bağlantısına tıklayabilirsiniz.</p>
+      
+      <div style="text-align: center; margin-bottom: 16px;">
+        <h2 style="font-size: 40px; font-weight: bold; letter-spacing: 8px; color: #111827; margin: 0;">${token}</h2>
+      </div>
+      <p style="color: #111827; font-size: 14px; font-weight: bold; text-align: center; margin-bottom: 32px;">Bu kod güvenlik nedeniyle önümüzdeki 10 dakika boyunca geçerlidir.</p>
+      
+      <p style="color: #374151; font-size: 16px; margin-bottom: 16px;">Alternatif olarak, aşağıdaki bağlantıya tıklayarak da hesabınızı anında doğrulayabilirsiniz:</p>
+      
+      <div style="text-align: center; margin-bottom: 40px;">
+        <a href="${verificationUrl}" style="display: inline-block; background-color: #111827; color: #ffffff; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px;">Hesabımı Doğrula ve Sahaya Dön</a>
+      </div>
+      
+      <h4 style="color: #111827; font-size: 18px; font-weight: bold; margin-bottom: 12px; margin-top: 0;">Neden Buradasınız?</h4>
+      <p style="color: #4b5563; font-size: 15px; line-height: 1.6; margin-bottom: 32px;">Kapora ile artık hamallık (manuel veri girişi) yok. Ses kayıtlarınızla portföy oluşturmaya, müşteri takibini yapay zekaya bırakmaya çok az kaldı.</p>
+      
+      <div style="border-top: 1px solid #e5e7eb; padding-top: 24px;">
+        <p style="color: #374151; font-size: 15px; margin-bottom: 4px;">Hayırlı işler, bol kazançlar dileriz.</p>
+        <p style="color: #111827; font-size: 15px; font-weight: bold; margin-bottom: 8px;">Kapora AI Ekibi</p>
+        <a href="https://www.kapora.online" style="color: #6b7280; text-decoration: none; font-size: 14px;">https://www.kapora.online</a>
+      </div>
+    </div>
+  `;
+
   console.log(`\n============================`);
   console.log(`📩 YENİ KAYIT ONAY MAİLİ`);
   console.log(`Alıcı: ${email}`);
   console.log(`Onay Linki: ${verificationUrl}`);
+  console.log(`Kod: ${token}`);
   console.log(`============================\n`);
 
   try {
@@ -39,14 +69,8 @@ const sendVerificationEmail = async (email, token, name) => {
       const info = await transporter.sendMail({
         from: `"Kapora Asistan" <${process.env.SMTP_USER}>`,
         to: email,
-        subject: 'Kapora - E-posta Adresinizi Doğrulayın',
-        html: `
-          <div style="font-family: sans-serif; max-w-xl mx-auto p-6 bg-white rounded-lg shadow-sm border border-gray-100">
-            <h2 style="color: #111827; font-size: 24px; font-weight: bold; margin-bottom: 16px;">Hoş Geldiniz, ${name}!</h2>
-            <p style="color: #4B5563; font-size: 16px; margin-bottom: 24px;">Kapora akıllı emlak asistanına kayıt olduğunuz için teşekkür ederiz. Hesabınızı etkinleştirmek için lütfen aşağıdaki butona tıklayın:</p>
-            <a href="${verificationUrl}" style="display: inline-block; background-color: #F5A623; color: #111827; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 16px;">Hesabımı Doğrula</a>
-          </div>
-        `
+        subject: subject,
+        html: htmlContent
       });
       console.log(`Doğrulama e-postası (Nodemailer) gönderildi: ${info.messageId}`);
     } else {
@@ -54,14 +78,8 @@ const sendVerificationEmail = async (email, token, name) => {
       const { data, error } = await resend.emails.send({
         from: 'Kapora <onboarding@resend.dev>',
         to: email,
-        subject: 'Kapora - E-posta Adresinizi Doğrulayın',
-        html: `
-          <div style="font-family: sans-serif; max-w-xl mx-auto p-6 bg-white rounded-lg shadow-sm border border-gray-100">
-            <h2 style="color: #111827; font-size: 24px; font-weight: bold; margin-bottom: 16px;">Hoş Geldiniz, ${name}!</h2>
-            <p style="color: #4B5563; font-size: 16px; margin-bottom: 24px;">Kapora akıllı emlak asistanına kayıt olduğunuz için teşekkür ederiz. Hesabınızı etkinleştirmek için lütfen aşağıdaki butona tıklayın:</p>
-            <a href="${verificationUrl}" style="display: inline-block; background-color: #F5A623; color: #111827; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 16px;">Hesabımı Doğrula</a>
-          </div>
-        `
+        subject: subject,
+        html: htmlContent
       });
 
       if (error) {
@@ -118,7 +136,8 @@ router.post('/register', async (req, res) => {
 
     const salt = await bcrypt.genSalt(10);
     const password_hash = await bcrypt.hash(password, salt);
-    const verificationToken = crypto.randomBytes(32).toString('hex');
+    // 6 Haneli Doğrulama Kodu (OTP) üretimi
+    const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
 
     // Multi-tenant Setup: Create Company -> Office -> User
     await db.query('BEGIN');
