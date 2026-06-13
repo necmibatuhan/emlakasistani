@@ -23,6 +23,7 @@ import OfficeDetail from './pages/OfficeDetail';
 import VerifyEmail from './pages/VerifyEmail';
 import AydinlatmaMetni from './pages/AydinlatmaMetni';
 import GizlilikPolitikasi from './pages/GizlilikPolitikasi';
+import MockCheckout from './pages/MockCheckout';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
@@ -70,6 +71,7 @@ const AppRoutes = () => {
       <Route path="/stats" element={<ProtectedRoute><Stats /></ProtectedRoute>} />
       <Route path="/plans" element={<ProtectedRoute><Plans /></ProtectedRoute>} />
       <Route path="/payment-result" element={<ProtectedRoute><PaymentResult /></ProtectedRoute>} />
+      <Route path="/mock-checkout" element={<ProtectedRoute><MockCheckout /></ProtectedRoute>} />
     </Routes>
   );
 };

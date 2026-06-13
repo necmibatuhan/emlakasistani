@@ -3,6 +3,7 @@ import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
+import { useNavigate } from 'react-router-dom';
 
 const Plans = () => {
   const { user, token, setUser } = useContext(AuthContext);
@@ -11,20 +12,23 @@ const Plans = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const handlePayment = (plan) => {
-    // Statik Link Yönlendirmesi
-    let shopierLink = '';
-    
-    // TODO: Kullanıcı bu linkleri Shopier panelinden alıp buraya yapıştıracak
-    if (plan === 'pro') {
-      shopierLink = 'https://www.shopier.com/ShowProductNew/products.php?id=PRO_URUN_ID'; // Buraya kendi linkinizi girin
-    } else if (plan === 'proplus') {
-      shopierLink = 'https://www.shopier.com/ShowProductNew/products.php?id=PROPLUS_URUN_ID'; // Buraya kendi linkinizi girin
-    }
+  const navigate = useNavigate();
 
-    if (shopierLink) {
-      window.open(shopierLink, '_blank');
-      setSuccess('Shopier ödeme sayfasına yönlendirildiniz. Ödemenizi tamamladıktan sonra sistem yöneticisi hesabınızı aktif edecektir.');
+  const handlePayment = async (plan) => {
+    setLoading(true);
+    setError('');
+    try {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/payment/mock-checkout`, { plan }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (res.data.success) {
+        navigate('/mock-checkout', { state: res.data.data });
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Ödeme sistemi başlatılamadı.');
+    } finally {
+      setLoading(false);
     }
   };
 

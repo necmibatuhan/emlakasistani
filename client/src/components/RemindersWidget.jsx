@@ -1,8 +1,11 @@
-import React from 'react';
-import { Calendar, Clock, ArrowRight, CheckCircle2 } from 'lucide-react';
+import React, { useContext } from 'react';
+import { Calendar, Clock, ArrowRight, CheckCircle2, Link as LinkIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { AuthContext } from '../contexts/AuthContext';
 
 export default function RemindersWidget({ leads = [], onLeadClick }) {
+  const { user } = useContext(AuthContext);
+
   // Takvim etkinliği olan ve is_task = true olanları filtrele
   const tasks = leads.filter(lead => {
     try {
@@ -12,6 +15,12 @@ export default function RemindersWidget({ leads = [], onLeadClick }) {
   });
 
   if (tasks.length === 0) return null;
+
+  const handleSyncCalendar = () => {
+    if (!user) return;
+    const syncUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/calendar/sync/${user.id}`;
+    window.open(syncUrl, '_blank');
+  };
 
   // Tarihe göre sırala (En yakın tarih en üstte)
   tasks.sort((a, b) => {
@@ -24,14 +33,24 @@ export default function RemindersWidget({ leads = [], onLeadClick }) {
 
   return (
     <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-5 mb-6 shadow-xl shadow-black/20">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="p-2 bg-indigo-500/10 rounded-lg border border-indigo-500/20 text-indigo-400">
-          <Calendar className="w-5 h-5" />
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-indigo-500/10 rounded-lg border border-indigo-500/20 text-indigo-400">
+            <Calendar className="w-5 h-5" />
+          </div>
+          <div>
+            <h2 className="text-zinc-100 font-semibold text-lg tracking-tight">Akıllı Ajanda & Görevler</h2>
+            <p className="text-zinc-500 text-xs">Yapay zekanın ses kayıtlarından çıkardığı yaklaşan aksiyonlar.</p>
+          </div>
         </div>
-        <div>
-          <h2 className="text-zinc-100 font-semibold text-lg tracking-tight">Akıllı Ajanda & Görevler</h2>
-          <p className="text-zinc-500 text-xs">Yapay zekanın ses kayıtlarından çıkardığı yaklaşan aksiyonlar.</p>
-        </div>
+        <button 
+          onClick={handleSyncCalendar}
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-lg text-xs font-medium text-zinc-300 transition-colors"
+          title="Tüm görevleri Apple/Google Takvime aktar"
+        >
+          <LinkIcon className="w-3.5 h-3.5" />
+          Takvimime Bağla
+        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

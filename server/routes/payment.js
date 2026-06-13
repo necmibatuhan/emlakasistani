@@ -121,4 +121,51 @@ router.post('/shopier-callback', async (req, res) => {
   }
 });
 
+// MOCK CHECKOUT FOR DEMO/TESTING
+router.post('/mock-checkout', authMiddleware, async (req, res) => {
+  try {
+    const { plan } = req.body;
+    if (!['pro', 'proplus'].includes(plan)) {
+      return res.status(400).json({ message: 'Geçersiz plan seçimi' });
+    }
+    const price = plan === 'pro' ? 299 : 599;
+    const user = req.user;
+    
+    // Simulate creating a checkout session and returning its ID
+    const sessionId = `mock_sess_${crypto.randomBytes(8).toString('hex')}`;
+    
+    res.json({
+      success: true,
+      data: {
+        sessionId,
+        plan,
+        price,
+        userId: user.id
+      }
+    });
+  } catch (err) {
+    console.error('Mock Checkout error:', err);
+    res.status(500).json({ message: 'Ödeme başlatılamadı.' });
+  }
+});
+
+// MOCK CALLBACK FOR DEMO/TESTING
+router.post('/mock-callback', authMiddleware, async (req, res) => {
+  try {
+    const { plan, success } = req.body;
+    const userId = req.user.id;
+
+    if (success) {
+      await db.query('UPDATE users SET plan = $1 WHERE id = $2', [plan, userId]);
+      console.log(`Mock: User ${userId} upgraded to ${plan}`);
+      return res.json({ success: true, message: 'Ödeme başarılı, plan güncellendi.' });
+    } else {
+      return res.status(400).json({ success: false, message: 'Ödeme başarısız.' });
+    }
+  } catch (err) {
+    console.error('Mock Callback error:', err);
+    res.status(500).json({ message: 'Callback Error' });
+  }
+});
+
 module.exports = router;
