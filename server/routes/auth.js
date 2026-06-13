@@ -79,7 +79,7 @@ const sendVerificationEmail = async (email, token, name) => {
     } else {
       // Use Resend as fallback
       const { data, error } = await resend.emails.send({
-        from: 'Kapora <onboarding@resend.dev>',
+        from: 'Kapora AI <info@kapora.online>',
         to: email,
         subject: subject,
         html: htmlContent
@@ -383,7 +383,7 @@ router.post('/forgot-password', async (req, res) => {
         console.log(`Şifre sıfırlama e-postası (Nodemailer) gönderildi: ${info.messageId}`);
       } else {
         const { data, error } = await resend.emails.send({
-          from: 'Kapora <onboarding@resend.dev>',
+          from: 'Kapora AI <info@kapora.online>',
           to: user.email,
           subject: 'Kapora - Şifre Sıfırlama Talebi',
           html: `
