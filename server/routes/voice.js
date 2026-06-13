@@ -19,8 +19,7 @@ router.post('/transcribe', authMiddleware, upload.single('audio'), async (req, r
     const mimeType = audioFile.mimetype;
 
     if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'mock') {
-      // API Key yoksa test (mock) metni dön
-      return res.json({ transcript: "Merhaba Ahmet Bey, Kadıköy'deki ofisimizden arıyorum. Düşündüğünüz 3+1 daire için fiyatta anlaşabiliriz, yarın ofiste görüşelim." });
+      return res.status(500).json({ error: 'Yapay zeka (GEMINI_API_KEY) yapılandırması eksik.' });
     }
 
     try {
@@ -41,8 +40,7 @@ router.post('/transcribe', authMiddleware, upload.single('audio'), async (req, r
       return res.json({ transcript });
     } catch (apiErr) {
       console.error('Gemini Transcribe API Error:', apiErr.message);
-      // API hatası durumunda mock fallback'e dön
-      return res.json({ transcript: "Merhaba Ahmet Bey, Kadıköy'deki ofisimizden arıyorum. Düşündüğünüz 3+1 daire için fiyatta anlaşabiliriz, yarın ofiste görüşelim." });
+      return res.status(500).json({ error: 'Ses metne çevrilemedi. Lütfen tekrar deneyin.' });
     }
   } catch (err) {
     console.error('Transcribe error:', err);

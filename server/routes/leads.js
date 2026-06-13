@@ -156,6 +156,34 @@ Müşteri Mesajı: ${maskedText}
 # Output Format
 Sadece aşağıdaki JSON formatında yanıt dön:
 {
+  "customer_intent": "buyer" | "seller" | "investor" | "renter" | "unknown", (DİKKAT: Eğer kişi 'kiralık' arıyorsa kesinlikle 'renter' yap. 'satın almak' istiyorsa 'buyer' yap.)
+  "budget": {
+    "min": "number | null",
+    "max": "number | null",
+    "currency": "TRY" | "USD" | "EUR",
+    "confidence": "high" | "medium" | "low"
+  },
+  "location_preferences": ["semt1", "semt2"],
+  "property_type": ["daire", "villa", "rezidans", "ofis"],
+  "room_count": {
+    "min": "number | null",
+    "max": "number | null"
+  },
+  "urgency": "very_urgent" | "urgent" | "moderate" | "exploring" | "low",
+  "seriousness_score": "1-10 arası",
+  "budget_score": "1-10 arası",
+  "overall_lead_score": "1-100 arası",
+  
+7. INTENT CLASSIFICATION: 
+   - 'renter': Eğer kullanıcı 'kiralık', 'kira', 'kiralamak' gibi ifadeler kullanıyorsa kesinlikle 'renter' seç.
+   - 'buyer': Eğer kullanıcı 'satılık', 'satın almak', 'yatırım', 'mülk sahibi olmak' gibi ifadeler kullanıyorsa kesinlikle 'buyer' seç.
+
+# Input
+Müşteri Mesajı: ${maskedText}
+
+# Output Format
+Sadece aşağıdaki JSON formatında yanıt dön:
+{
   "customer_intent": "buyer" | "seller" | "investor" | "renter" | "unknown",
   "budget": {
     "min": "number | null",
@@ -185,33 +213,20 @@ Sadece aşağıdaki JSON formatında yanıt dön:
 }
 `;
 
-    let parsedResult;
     if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'mock') {
-      parsedResult = getMockAnalyzeResult();
-    } else {
-      try {
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { responseMimeType: "application/json", temperature: 0.2 } });
-        const aiResult = await model.generateContent(prompt);
-        let respText = aiResult.response.text().trim();
-        if (respText.startsWith('\`\`\`json')) respText = respText.replace('\`\`\`json', '').replace('\`\`\`', '').trim();
-        parsedResult = JSON.parse(respText);
-      } catch (apiErr) {
-        console.error('Gemini Analyze API Error:', apiErr.message);
-        parsedResult = getMockAnalyzeResult();
-      }
+      return res.status(500).json({ message: 'Yapay zeka (GEMINI_API_KEY) yapılandırması eksik.' });
     }
 
-    function getMockAnalyzeResult() {
-      return { 
-        customer_intent: "buyer",
-        key_motivations: ["Deneme/Mock verisi", "AI bağlantısı kurulamadı"],
-        potential_risks: ["API anahtarı eksik"],
-        overall_lead_score: 80,
-        skor: 8, 
-        etiket: "Sıcak", 
-        recommended_next_action: "Sistem yöneticisi ile görüşüp GEMINI_API_KEY ayarını Render'a ekle.", 
-        suggested_whatsapp_reply: `Merhaba ${name}, sistem AI entegrasyonu tamamlanmadığı için size bu test mesajını iletiyorum.`, 
-      };
+    let parsedResult;
+    try {
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { responseMimeType: "application/json", temperature: 0.2 } });
+      const aiResult = await model.generateContent(prompt);
+      let respText = aiResult.response.text().trim();
+      if (respText.startsWith('```json')) respText = respText.replace('```json', '').replace('```', '').trim();
+      parsedResult = JSON.parse(respText);
+    } catch (apiErr) {
+      console.error('Gemini Analyze API Error:', apiErr.message);
+      return res.status(500).json({ message: 'Yapay zeka analizi başarısız oldu' });
     }
 
     // 2. Restore PII into the AI's response before saving to database
@@ -265,25 +280,22 @@ router.put('/:id/analyze', authMiddleware, async (req, res) => {
     if (phone) customReplacements.push({ originalValue: phone.trim(), type: 'PHONE' });
     
     const maskedText = pipeline.mask(message, customReplacements);
-    const prompt = `Sen profesyonel bir emlak danışmanlığı AI asistanısın. 10+ yıllık tecrübeye sahip, detaycı, gerçekçi ve Türkiye'deki emlak piyasasını çok iyi bilen bir uzmansın.\n\nGörevin: Kullanıcı mesajı veya sesli not transkriptini analiz edip aşağıdaki JSON formatında yapılandırılmış çıktı üretmek.\n\nKURALLAR (Çok Önemli):# Privacy & Security Guidelines (MUST FOLLOW)\n1. Sadece gerçek metinde geçen bilgileri kullan. Bilmiyorsan null veya boş array koy.\n2. Halüsinasyon yapma! Tahmin etme, varsayımda bulundurma.\n3. Bütçe analizi yaparken Türkiye'deki gerçekçi piyasa koşullarını göz önünde bulundur.\n4. Aciliyet ve ciddiyet skorunu sadece metindeki dil, tekrarlar ve vurguya göre ver.\n5. Overall lead score = (Bütçe skoru × 0.35) + (Ciddiyet skoru × 0.40) + (Aciliyet skoru × 0.25) formülüyle hesapla.\n6. DATA ISOLATION & ANONYMIZATION: PII tespit edersen analiz et ama "Müşteri" olarak kullan. İşlem bitince unut.\n\n# Input\nMüşteri Mesajı: ${maskedText}\n\n# Output Format\nSadece aşağıdaki JSON formatında yanıt dön:\n{\n  "customer_intent": "buyer" | "seller" | "investor" | "renter" | "unknown",\n  "budget": {\n    "min": "number | null",\n    "max": "number | null",\n    "currency": "TRY" | "USD" | "EUR",\n    "confidence": "high" | "medium" | "low"\n  },\n  "location_preferences": ["semt1", "semt2"],\n  "property_type": ["daire", "villa", "rezidans", "ofis"],\n  "room_count": {\n    "min": "number | null",\n    "max": "number | null"\n  },\n  "urgency": "very_urgent" | "urgent" | "moderate" | "exploring" | "low",\n  "seriousness_score": "1-10 arası",\n  "budget_score": "1-10 arası",\n  "overall_lead_score": "1-100 arası",\n  \n  "skor": "1-10 arası (overall_lead_score/10 yuvarlanmış hali)",\n  "etiket": "Sıcak (overall 75+ ise) | Ilık (40-74 arası) | Soğuk (0-39 arası)",\n  \n  "key_motivations": ["sebep1", "sebep2"],\n  "potential_risks": ["risk1", "risk2"],\n  "recommended_next_action": "Bugün ara | Bu hafta ara | Takip listesine ekle",\n  "suggested_whatsapp_reply": "hazır mesaj taslağı (en fazla 2-3 cümle, samimi ve profesyonel)",\n  "extracted_raw_quotes": ["müşterinin tam söylediği önemli cümleler"]\n}\n`;
+    const prompt = `Sen profesyonel bir emlak danışmanlığı AI asistanısın. 10+ yıllık tecrübeye sahip, detaycı, gerçekçi ve Türkiye'deki emlak piyasasını çok iyi bilen bir uzmansın.\n\nGörevin: Kullanıcı mesajı veya sesli not transkriptini analiz edip aşağıdaki JSON formatında yapılandırılmış çıktı üretmek.\n\nKURALLAR (Çok Önemli):# Privacy & Security Guidelines (MUST FOLLOW)\n1. Sadece gerçek metinde geçen bilgileri kullan. Bilmiyorsan null veya boş array koy.\n2. Halüsinasyon yapma! Tahmin etme, varsayımda bulundurma.\n3. Bütçe analizi yaparken Türkiye'deki gerçekçi piyasa koşullarını göz önünde bulundur.\n4. Aciliyet ve ciddiyet skorunu sadece metindeki dil, tekrarlar ve vurguya göre ver.\n5. Overall lead score = (Bütçe skoru × 0.35) + (Ciddiyet skoru × 0.40) + (Aciliyet skoru × 0.25) formülüyle hesapla.\n6. DATA ISOLATION & ANONYMIZATION: PII tespit edersen analiz et ama "Müşteri" olarak kullan. İşlem bitince unut.\n7. INTENT CLASSIFICATION:\n   - 'renter': Eğer kullanıcı 'kiralık', 'kira', 'kiralamak' gibi ifadeler kullanıyorsa kesinlikle 'renter' seç.\n   - 'buyer': Eğer kullanıcı 'satılık', 'satın almak', 'yatırım', 'mülk sahibi olmak' gibi ifadeler kullanıyorsa kesinlikle 'buyer' seç.\n\n# Input\nMüşteri Mesajı: ${maskedText}\n\n# Output Format\nSadece aşağıdaki JSON formatında yanıt dön:\n{\n  "customer_intent": "buyer" | "seller" | "investor" | "renter" | "unknown", (DİKKAT: Eğer kişi 'kiralık' arıyorsa kesinlikle 'renter' yap. 'satın almak' istiyorsa 'buyer' yap.)\n  "budget": {\n    "min": "number | null",\n    "max": "number | null",\n    "currency": "TRY" | "USD" | "EUR",\n    "confidence": "high" | "medium" | "low"\n  },\n  "location_preferences": ["semt1", "semt2"],\n  "property_type": ["daire", "villa", "rezidans", "ofis"],\n  "room_count": {\n    "min": "number | null",\n    "max": "number | null"\n  },\n  "urgency": "very_urgent" | "urgent" | "moderate" | "exploring" | "low",\n  "seriousness_score": "1-10 arası",\n  "budget_score": "1-10 arası",\n  "overall_lead_score": "1-100 arası",\n  \n  "skor": "1-10 arası (overall_lead_score/10 yuvarlanmış hali)",\n  "etiket": "Sıcak (overall 75+ ise) | Ilık (40-74 arası) | Soğuk (0-39 arası)",\n  \n  "key_motivations": ["sebep1", "sebep2"],\n  "potential_risks": ["risk1", "risk2"],\n  "recommended_next_action": "Bugün ara | Bu hafta ara | Takip listesine ekle",\n  "suggested_whatsapp_reply": "hazır mesaj taslağı (en fazla 2-3 cümle, samimi ve profesyonel)",\n  "extracted_raw_quotes": ["müşterinin tam söylediği önemli cümleler"]\n}\n`;
 
     let parsedResult;
     if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'mock') {
-      parsedResult = { 
-        customer_intent: "buyer", key_motivations: ["Güncellendi/Mock"], potential_risks: [], overall_lead_score: 90,
-        skor: 9, etiket: "Sıcak", recommended_next_action: "Hemen Ara", suggested_whatsapp_reply: "Merhaba güncelledik." 
-      };
-    } else {
-      try {
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { responseMimeType: "application/json", temperature: 0.2 } });
-        const aiResult = await model.generateContent(prompt);
-        let respText = aiResult.response.text().trim();
-        if (respText.startsWith('```json')) respText = respText.replace('```json', '').replace('```', '').trim();
-        parsedResult = JSON.parse(respText);
-      } catch (apiErr) {
-        console.error('Gemini Analyze API Error:', apiErr.message);
-        return res.status(500).json({ message: 'Yapay zeka analizi başarısız oldu' });
-      }
+      return res.status(500).json({ message: 'Yapay zeka (GEMINI_API_KEY) yapılandırması eksik.' });
+    }
+    
+    try {
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { responseMimeType: "application/json", temperature: 0.2 } });
+      const aiResult = await model.generateContent(prompt);
+      let respText = aiResult.response.text().trim();
+      if (respText.startsWith('```json')) respText = respText.replace('```json', '').replace('```', '').trim();
+      parsedResult = JSON.parse(respText);
+    } catch (apiErr) {
+      console.error('Gemini Analyze API Error:', apiErr.message);
+      return res.status(500).json({ message: 'Yapay zeka analizi başarısız oldu' });
     }
 
     parsedResult = pipeline.unmask(parsedResult);
@@ -317,36 +329,61 @@ router.get('/:id/external-matches', authMiddleware, async (req, res) => {
     const lead = await db.query('SELECT properties FROM leads WHERE id = $1', [req.params.id]);
     if (lead.rows.length === 0) return res.json([]);
     
-    // Basit bir mock dış havuz dönüşü
-    // Gerçekte sahibinden/hepsiemlak scraper veya havuz DB'si taranır.
-    const mockListings = [
-      {
-        id: 'ext_1',
-        source_name: 'Sahibinden',
-        title: 'Fırsat! Krediye Uygun Masrafsız Daire',
-        price: 3500000,
-        currency: 'TRY',
-        district: 'Beşiktaş',
-        city: 'İstanbul',
-        rooms: '2+1',
-        url: 'https://sahibinden.com/ilan/mock-1',
-        owner_phone: '+905550001122'
-      },
-      {
-        id: 'ext_2',
-        source_name: 'Hepsiemlak',
-        title: 'Metroya 5dk Acil Satılık',
-        price: 3250000,
-        currency: 'TRY',
-        district: 'Şişli',
-        city: 'İstanbul',
-        rooms: '2+1',
-        url: 'https://hepsiemlak.com/ilan/mock-2',
-        owner_phone: '+905330002233'
-      }
-    ];
+    // Dinamik AI Portföy Eşleştirme Motoru
+    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'mock') {
+      return res.status(500).json({ message: 'Yapay zeka yapılandırması eksik. Lütfen GEMINI_API_KEY ayarlayın.' });
+    }
 
-    res.json(mockListings);
+    const leadProps = lead.rows[0].properties;
+    let propsObj = {};
+    if (typeof leadProps === 'string') {
+      try { propsObj = JSON.parse(leadProps); } catch(e){}
+    } else {
+      propsObj = leadProps;
+    }
+
+    const aiPrompt = `Sen Türkiye emlak piyasasını çok iyi bilen bir portföy uzmanısın.
+Müşterinin talebine göre, sahibinden.com veya hepsiemlak.com'da bulunabilecek tarzda, GERÇEKÇİ 2 veya 3 adet eşleşen portföy ilanı üret.
+
+Müşteri Talebi Analizi:
+- Niyet: ${propsObj.customer_intent} (DİKKAT: 'renter' ise kesinlikle KİRALIK ilan üret. 'buyer' ise SATILIK ilan üret.)
+- Bütçe: ${propsObj.budget?.min || 0} - ${propsObj.budget?.max || 'Limitsiz'} ${propsObj.budget?.currency || 'TRY'}
+- Lokasyon Tercihleri: ${(propsObj.location_preferences || []).join(', ')}
+- Emlak Tipi: ${(propsObj.property_type || []).join(', ')}
+
+Üreteceğin ilanların fiyatları müşterinin bütçe aralığına ve bölgeye GÖRE MANTIKLI olsun. (Örn: Beşiktaş'ta 2+1 kiralık arıyorsa, fiyatı 25.000 - 45.000 TL arası mantıklıdır. Milyonluk kiralık olmaz, 3.000 TL'ye kiralık da olmaz.)
+
+SADECE AŞAĞIDAKİ JSON ARRAY FORMATINDA YANIT DÖN:
+[
+  {
+    "id": "ext_ai_1",
+    "source_name": "Sahibinden",
+    "title": "İlan Başlığı (Örn: Beşiktaş Merkezde Yeni Boyalı 2+1 Kiralık)",
+    "price": 28000,
+    "currency": "TRY",
+    "district": "Beşiktaş",
+    "city": "İstanbul",
+    "rooms": "2+1",
+    "url": "https://sahibinden.com/ilan/mock-1",
+    "owner_phone": "+905550001122"
+  }
+]
+`;
+
+    try {
+      const { GoogleGenerativeAI } = require('@google/generative-ai');
+      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { responseMimeType: "application/json", temperature: 0.4 } });
+      const aiResult = await model.generateContent(aiPrompt);
+      let respText = aiResult.response.text().trim();
+      if (respText.startsWith('\`\`\`json')) respText = respText.replace('\`\`\`json', '').replace('\`\`\`', '').trim();
+      
+      const dynamicListings = JSON.parse(respText);
+      res.json(dynamicListings);
+    } catch (apiErr) {
+      console.error('Gemini External Matches API Error:', apiErr.message);
+      res.status(500).json({ message: 'Portföy eşleştirmesi sırasında hata oluştu.' });
+    }
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Sunucu hatası' });
