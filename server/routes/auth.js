@@ -25,9 +25,11 @@ const sendVerificationEmail = async (email, token, name) => {
 
   try {
     if (process.env.SMTP_USER && process.env.SMTP_PASS) {
-      // Use Nodemailer with Gmail/SMTP
+      // Use Nodemailer with explicit Gmail SMTP config
       const transporter = nodemailer.createTransport({
-        service: 'gmail', // Assuming Gmail for MVP, can be changed
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
         auth: {
           user: process.env.SMTP_USER,
           pass: process.env.SMTP_PASS
@@ -64,12 +66,14 @@ const sendVerificationEmail = async (email, token, name) => {
 
       if (error) {
         console.error("Resend Email Error:", error);
+        throw new Error(error.message || 'Resend API e-postayı gönderemedi. Domain doğrulaması eksik olabilir.');
       } else {
         console.log(`Doğrulama e-postası (Resend) gönderildi: ${email}`);
       }
     }
   } catch (error) {
     console.error("E-posta gönderme hatası:", error);
+    throw error;
   }
 };
 
@@ -138,18 +142,26 @@ router.post('/register', async (req, res) => {
       [companyId, officeId, email, name, password_hash, role, verificationToken, false]
     );
 
-    await db.query('COMMIT');
-
     const user = newUser.rows[0];
-    
-    // Send email synchronously or catch
-    sendVerificationEmail(user.email, verificationToken, user.name).catch(console.error);
 
+    // Send email synchronously to catch errors
+    try {
+      await sendVerificationEmail(user.email, verificationToken, user.name);
+    } catch (emailError) {
+      // Mail gitmezse DB'yi geri al (Kullanıcı kaydedilmesin ki tekrar deneyebilsin)
+      await db.query('ROLLBACK');
+      return res.status(400).json({ 
+        message: 'Mail gönderim hatası. Lütfen SMTP veya Resend ayarlarınızı kontrol edin.', 
+        error: emailError.message 
+      });
+    }
+
+    await db.query('COMMIT');
     res.status(201).json({ message: 'Kayıt başarılı. Lütfen e-postanıza gönderilen doğrulama linkine tıklayın.', user });
   } catch (err) {
     try { await db.query('ROLLBACK'); } catch(e) {}
     console.error(err);
-    res.status(500).json({ message: 'Sunucu hatası', error: err.message, stack: err.stack });
+    res.status(500).json({ message: 'Sunucu hatası', error: err.message });
   }
 });
 
