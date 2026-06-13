@@ -13,6 +13,8 @@ import clsx from 'clsx';
 import { format, isToday } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import ActionCenter from '../components/ActionCenter';
+import AgendaView from '../components/AgendaView';
+import PricingModal from '../components/PricingModal';
 
 const AgentDashboard = () => {
   const { token, user } = useContext(AuthContext);
@@ -34,6 +36,16 @@ const AgentDashboard = () => {
 
   // Success Tick Animation
   const [showSuccessTick, setShowSuccessTick] = useState(false);
+
+  // Pricing Modal State
+  const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
+  const [currentPlan, setCurrentPlan] = useState(user?.plan || 'free');
+
+  const handleUpgradeSuccess = (newPlan) => {
+    setCurrentPlan(newPlan);
+    setShowSuccessTick(true);
+    setTimeout(() => setShowSuccessTick(false), 3000);
+  };
 
   const { data: leads = [], isLoading: loading } = useQuery({
     queryKey: ['leads'],
@@ -222,13 +234,39 @@ const AgentDashboard = () => {
 
         <div className="flex-1 flex flex-col p-6 gap-6 overflow-hidden">
           
-          {/* AI Action Center (Günün Komutları) */}
-          <ActionCenter leads={leads} onActionClick={(action) => {
-            if (action.leadId) setSelectedLeadId(action.leadId);
-          }} />
+          {/* Top Banner for Plan */}
+          <div className="w-full bg-[#16181D] border border-[#2A2D35] rounded-xl px-6 py-4 flex items-center justify-between shrink-0 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
+                <span className="material-symbols-outlined text-white text-[20px]">diamond</span>
+              </div>
+              <div>
+                <h3 className="text-[#F1F2F4] font-bold text-sm">Mevcut Planınız: <span className="text-[#F5A623] uppercase tracking-wider ml-1">{currentPlan === 'free' ? 'ÜCRETSİZ BAŞLANGIÇ' : currentPlan}</span></h3>
+                <p className="text-[#7C8090] text-xs mt-0.5">Daha fazla özellik için planınızı yükseltin.</p>
+              </div>
+            </div>
+            {currentPlan !== 'proplus' && (
+              <button 
+                onClick={() => setIsPricingModalOpen(true)}
+                className="bg-[#F5A623] hover:bg-[#d9921e] text-[#0A0B0D] font-bold px-4 py-2 rounded-lg text-sm transition-colors shadow-[0_0_15px_rgba(245,166,35,0.2)]"
+              >
+                Planı Yükselt
+              </button>
+            )}
+          </div>
 
-          {/* AI Takvim Görevleri / Hatırlatıcılar */}
-          <RemindersWidget leads={leads} onLeadClick={setSelectedLeadId} />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 shrink-0">
+            <div className="lg:col-span-2">
+              {/* AI Action Center (Günün Komutları) */}
+              <ActionCenter leads={leads} onActionClick={(action) => {
+                if (action.leadId) setSelectedLeadId(action.leadId);
+              }} />
+            </div>
+            <div className="h-[280px]">
+              {/* AI Takvim Görevleri / Hatırlatıcılar */}
+              <AgendaView leads={leads} />
+            </div>
+          </div>
 
           {/* Mobile Tabs */}
           <div className="md:hidden flex gap-2 overflow-x-auto shrink-0 pb-2 border-b border-outline-variant">
@@ -598,11 +636,19 @@ const AgentDashboard = () => {
       {showSuccessTick && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none">
           <div className="bg-[#10B981]/20 border border-[#10B981]/50 backdrop-blur-md text-[#10B981] p-6 rounded-2xl shadow-[0_0_40px_rgba(16,185,129,0.3)] animate-bounce-custom flex flex-col items-center">
-            <span className="material-symbols-outlined text-[64px]">check_circle</span>
-            <span className="font-bold text-lg mt-2">Durum Güncellendi!</span>
+            <span className="material-symbols-outlined text-[64px] mb-2">check_circle</span>
+            <span className="font-bold text-lg">İşlem Başarılı!</span>
           </div>
         </div>
       )}
+
+      {/* Pricing / Upgrade Modal */}
+      <PricingModal 
+        isOpen={isPricingModalOpen} 
+        onClose={() => setIsPricingModalOpen(false)} 
+        token={token} 
+        onUpgradeSuccess={handleUpgradeSuccess} 
+      />
 
       <VoiceNoteModal 
         isOpen={isVoiceModalOpen} 
