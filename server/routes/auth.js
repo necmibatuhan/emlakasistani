@@ -17,7 +17,6 @@ const resend = new Resend(process.env.RESEND_API_KEY || 're_5qWF7SiQ_2w4j9e68Bra
 const sendVerificationEmail = async (email, token, name) => {
   const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${token}`;
   
-  // Console fallback for testing/dev without verified domains
   console.log(`\n============================`);
   console.log(`📩 YENİ KAYIT ONAY MAİLİ`);
   console.log(`Alıcı: ${email}`);
@@ -25,24 +24,49 @@ const sendVerificationEmail = async (email, token, name) => {
   console.log(`============================\n`);
 
   try {
-    const { data, error } = await resend.emails.send({
-      from: 'Kapora <onboarding@resend.dev>',
-      to: email,
-      subject: 'Kapora - E-posta Adresinizi Doğrulayın',
-      html: `
-        <div style="font-family: sans-serif; max-w-xl mx-auto p-6 bg-white rounded-lg shadow-sm border border-gray-100">
-          <h2 style="color: #111827; font-size: 24px; font-weight: bold; margin-bottom: 16px;">Hoş Geldiniz, ${name}!</h2>
-          <p style="color: #4B5563; font-size: 16px; margin-bottom: 24px;">Kapora akıllı emlak asistanına kayıt olduğunuz için teşekkür ederiz. Hesabınızı etkinleştirmek için lütfen aşağıdaki butona tıklayın:</p>
-          <a href="${verificationUrl}" style="display: inline-block; background-color: #F5A623; color: #111827; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 16px;">Hesabımı Doğrula</a>
-          <p style="color: #9CA3AF; font-size: 14px; margin-top: 32px;">Eğer bu kaydı siz yapmadıysanız, lütfen bu mesajı görmezden gelin.</p>
-        </div>
-      `
-    });
+    if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+      // Use Nodemailer with Gmail/SMTP
+      const transporter = nodemailer.createTransport({
+        service: 'gmail', // Assuming Gmail for MVP, can be changed
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS
+        }
+      });
 
-    if (error) {
-      console.error("Resend Email Error:", error);
+      const info = await transporter.sendMail({
+        from: `"Kapora Asistan" <${process.env.SMTP_USER}>`,
+        to: email,
+        subject: 'Kapora - E-posta Adresinizi Doğrulayın',
+        html: `
+          <div style="font-family: sans-serif; max-w-xl mx-auto p-6 bg-white rounded-lg shadow-sm border border-gray-100">
+            <h2 style="color: #111827; font-size: 24px; font-weight: bold; margin-bottom: 16px;">Hoş Geldiniz, ${name}!</h2>
+            <p style="color: #4B5563; font-size: 16px; margin-bottom: 24px;">Kapora akıllı emlak asistanına kayıt olduğunuz için teşekkür ederiz. Hesabınızı etkinleştirmek için lütfen aşağıdaki butona tıklayın:</p>
+            <a href="${verificationUrl}" style="display: inline-block; background-color: #F5A623; color: #111827; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 16px;">Hesabımı Doğrula</a>
+          </div>
+        `
+      });
+      console.log(`Doğrulama e-postası (Nodemailer) gönderildi: ${info.messageId}`);
     } else {
-      console.log(`Doğrulama e-postası gönderildi: ${email} (ID: ${data?.id})`);
+      // Use Resend as fallback
+      const { data, error } = await resend.emails.send({
+        from: 'Kapora <onboarding@resend.dev>',
+        to: email,
+        subject: 'Kapora - E-posta Adresinizi Doğrulayın',
+        html: `
+          <div style="font-family: sans-serif; max-w-xl mx-auto p-6 bg-white rounded-lg shadow-sm border border-gray-100">
+            <h2 style="color: #111827; font-size: 24px; font-weight: bold; margin-bottom: 16px;">Hoş Geldiniz, ${name}!</h2>
+            <p style="color: #4B5563; font-size: 16px; margin-bottom: 24px;">Kapora akıllı emlak asistanına kayıt olduğunuz için teşekkür ederiz. Hesabınızı etkinleştirmek için lütfen aşağıdaki butona tıklayın:</p>
+            <a href="${verificationUrl}" style="display: inline-block; background-color: #F5A623; color: #111827; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 16px;">Hesabımı Doğrula</a>
+          </div>
+        `
+      });
+
+      if (error) {
+        console.error("Resend Email Error:", error);
+      } else {
+        console.log(`Doğrulama e-postası (Resend) gönderildi: ${email}`);
+      }
     }
   } catch (error) {
     console.error("E-posta gönderme hatası:", error);
@@ -111,24 +135,17 @@ router.post('/register', async (req, res) => {
       `INSERT INTO users (company_id, office_id, email, name, password_hash, role, verification_token, is_verified) 
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
        RETURNING id, company_id, office_id, role, email, name, plan, is_verified`,
-      [companyId, officeId, email, name, password_hash, role, verificationToken, true]
+      [companyId, officeId, email, name, password_hash, role, verificationToken, false]
     );
 
     await db.query('COMMIT');
 
     const user = newUser.rows[0];
     
-    // Asenkron olarak karşılama/doğrulama mailini arka planda at (hata verirse kullanıcıyı bloklamasın)
+    // Send email synchronously or catch
     sendVerificationEmail(user.email, verificationToken, user.name).catch(console.error);
 
-    // MVP için anında giriş yapıyoruz (is_verified = true yapıldı)
-    const token = jwt.sign(
-      { id: user.id, role: user.role, company_id: user.company_id, office_id: user.office_id, plan: user.plan },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-
-    res.status(201).json({ message: 'Kayıt başarılı. Giriş yapılıyor...', user, token });
+    res.status(201).json({ message: 'Kayıt başarılı. Lütfen e-postanıza gönderilen doğrulama linkine tıklayın.', user });
   } catch (err) {
     try { await db.query('ROLLBACK'); } catch(e) {}
     console.error(err);

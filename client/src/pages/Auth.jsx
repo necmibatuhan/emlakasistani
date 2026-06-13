@@ -99,10 +99,10 @@ const Auth = () => {
     setIsSubmitting(true);
     try {
       const res = await register(name, email, password, selectedRole, captchaToken);
-      if (res.data.token) {
+      if (res?.data?.token) {
         navigate('/dashboard');
       } else {
-        setMessage(res.data.message || 'Kayıt başarılı. Lütfen e-postanıza gönderilen doğrulama linkine tıklayın.');
+        setMessage(res?.data?.message || 'Kayıt başarılı. Lütfen e-postanıza gönderilen doğrulama linkine tıklayın.');
         setRegisterStep(1);
         setIsLogin(true);
       }
