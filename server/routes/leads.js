@@ -311,4 +311,46 @@ router.put('/:id/analyze', authMiddleware, async (req, res) => {
   }
 });
 
+// GET External Matches (Ters Eşleşme Mock)
+router.get('/:id/external-matches', authMiddleware, async (req, res) => {
+  try {
+    const lead = await db.query('SELECT properties FROM leads WHERE id = $1', [req.params.id]);
+    if (lead.rows.length === 0) return res.json([]);
+    
+    // Basit bir mock dış havuz dönüşü
+    // Gerçekte sahibinden/hepsiemlak scraper veya havuz DB'si taranır.
+    const mockListings = [
+      {
+        id: 'ext_1',
+        source_name: 'Sahibinden',
+        title: 'Fırsat! Krediye Uygun Masrafsız Daire',
+        price: 3500000,
+        currency: 'TRY',
+        district: 'Beşiktaş',
+        city: 'İstanbul',
+        rooms: '2+1',
+        url: 'https://sahibinden.com/ilan/mock-1',
+        owner_phone: '+905550001122'
+      },
+      {
+        id: 'ext_2',
+        source_name: 'Hepsiemlak',
+        title: 'Metroya 5dk Acil Satılık',
+        price: 3250000,
+        currency: 'TRY',
+        district: 'Şişli',
+        city: 'İstanbul',
+        rooms: '2+1',
+        url: 'https://hepsiemlak.com/ilan/mock-2',
+        owner_phone: '+905330002233'
+      }
+    ];
+
+    res.json(mockListings);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Sunucu hatası' });
+  }
+});
+
 module.exports = router;

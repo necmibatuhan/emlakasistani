@@ -95,27 +95,23 @@ export default function LeadCard({
         </p>
       </div>
 
-      {/* Alt Kısım: Eşleşen Portföy & Aksiyon */}
-      <div className="mt-5 pt-4 border-t border-zinc-800/80 flex items-center justify-between">
-        <div className="flex items-center gap-2 text-zinc-400">
-          <Home className="h-4 w-4" />
-          <span className="text-xs font-medium">
-            {matchedCount > 0 ? (
-              <span className="text-zinc-200">{matchedCount} Eşleşen Portföy</span>
-            ) : (
-              <span>Eşleşme Bekleniyor</span>
-            )}
-          </span>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          {/* WhatsApp ile Paylaş Butonu */}
-          {whatsappDraft && <WhatsAppShareButton message={whatsappDraft} />}
-          
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-900 border border-zinc-800 text-zinc-500 group-hover:bg-zinc-100 group-hover:text-zinc-950 transition-all duration-300">
-            <ArrowRight className="h-4 w-4" />
-          </div>
-        </div>
+      {/* Alt Kısım: Hızlı Triage Aksiyonları */}
+      <div className="mt-4 pt-4 border-t border-zinc-800/80 flex items-center gap-2">
+        {whatsappDraft && <WhatsAppShareButton message={whatsappDraft} className="flex-1" />}
+        <a 
+          href={`tel:${phone.replace(/[^0-9]/g, '')}`} 
+          onClick={(e) => e.stopPropagation()} 
+          className="bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 hover:text-zinc-100 text-zinc-400 rounded-md px-3 py-1.5 text-xs font-medium transition-colors flex items-center gap-1.5 flex-1 justify-center"
+        >
+          Ara
+        </a>
+        <button 
+          onClick={(e) => { e.stopPropagation(); onClick(); }} 
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-zinc-900 border border-zinc-800 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-950 transition-all duration-300"
+          title="Detayları Gör"
+        >
+          <ArrowRight className="h-4 w-4" />
+        </button>
       </div>
     </div>
   );

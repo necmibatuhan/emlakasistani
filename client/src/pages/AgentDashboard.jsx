@@ -8,27 +8,11 @@ import Header from '../components/Header';
 import VoiceNoteModal from '../components/VoiceNoteModal';
 import LeadCard from '../components/LeadCard';
 import RemindersWidget from '../components/RemindersWidget';
+import ExternalListingCard from '../components/ExternalListingCard';
 import clsx from 'clsx';
 import { format, isToday } from 'date-fns';
 import { tr } from 'date-fns/locale';
-import { LineChart, Line, ResponsiveContainer } from 'recharts';
-
-const Sparkline = ({ data, color }) => (
-  <div className="h-[40px] w-full mt-2">
-    <ResponsiveContainer width="100%" height="100%">
-      <LineChart data={data}>
-        <Line type="monotone" dataKey="v" stroke={color} strokeWidth={2} dot={false} isAnimationActive={false} />
-      </LineChart>
-    </ResponsiveContainer>
-  </div>
-);
-
-const dummySparklines = {
-  hot: [{v:2}, {v:3}, {v:2}, {v:5}, {v:4}, {v:7}],
-  warm: [{v:5}, {v:4}, {v:6}, {v:5}, {v:8}, {v:6}],
-  cold: [{v:10}, {v:12}, {v:11}, {v:9}, {v:10}, {v:8}],
-  total: [{v:17}, {v:19}, {v:19}, {v:19}, {v:22}, {v:21}]
-};
+import ActionCenter from '../components/ActionCenter';
 
 const AgentDashboard = () => {
   const { token, user } = useContext(AuthContext);
@@ -72,6 +56,17 @@ const AgentDashboard = () => {
     queryKey: ['lead', selectedLeadId],
     queryFn: async () => {
       const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/${selectedLeadId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return res.data;
+    },
+    enabled: !!selectedLeadId
+  });
+
+  const { data: externalMatches } = useQuery({
+    queryKey: ['externalMatches', selectedLeadId],
+    queryFn: async () => {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/${selectedLeadId}/external-matches`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return res.data;
@@ -210,36 +205,11 @@ const AgentDashboard = () => {
 
         <div className="flex-1 flex flex-col p-6 gap-6 overflow-hidden">
           
-          {/* Smart Data Display (Top Metrics) */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 shrink-0">
-            <div className="bg-surface-container border border-outline-variant rounded-xl p-4 flex flex-col shadow-lg shadow-black/20">
-              <span className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-1">Toplam Lead</span>
-              <span className="text-2xl font-bold text-on-surface">{leads.length}</span>
-              <Sparkline data={dummySparklines.total} color="var(--color-primary)" />
-            </div>
-            <div className="bg-surface-container border border-outline-variant rounded-xl p-4 flex flex-col shadow-lg shadow-black/20">
-              <span className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-1">Sıcak Lead</span>
-              <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold text-status-hot">{hotLeads}</span>
-                <span className="flex h-3 w-3 relative">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-hot opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-status-hot"></span>
-                </span>
-              </div>
-              <Sparkline data={dummySparklines.hot} color="var(--color-status-hot)" />
-            </div>
-            <div className="bg-surface-container border border-outline-variant rounded-xl p-4 flex flex-col shadow-lg shadow-black/20">
-              <span className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-1">Ilık Lead</span>
-              <span className="text-2xl font-bold text-status-warm">{warmLeads}</span>
-              <Sparkline data={dummySparklines.warm} color="var(--color-status-warm)" />
-            </div>
-            <div className="bg-surface-container border border-outline-variant rounded-xl p-4 flex flex-col shadow-lg shadow-black/20">
-              <span className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-1">Soğuk Lead</span>
-              <span className="text-2xl font-bold text-status-cold">{coldLeads}</span>
-              <Sparkline data={dummySparklines.cold} color="var(--color-status-cold)" />
-            </div>
-          </div>
-          
+          {/* AI Action Center (Günün Komutları) */}
+          <ActionCenter leads={leads} onActionClick={(action) => {
+            if (action.leadId) setSelectedLeadId(action.leadId);
+          }} />
+
           {/* AI Takvim Görevleri / Hatırlatıcılar */}
           <RemindersWidget leads={leads} onLeadClick={setSelectedLeadId} />
 
@@ -349,6 +319,18 @@ const AgentDashboard = () => {
                                       urgency={lead.score >= 8 ? 'high' : lead.score >= 5 ? 'medium' : 'low'}
                                       summary={lead.reasoning || lead.whatsapp_draft || 'Özet bekleniyor...'}
                                       onClick={() => setSelectedLeadId(lead.id)}
+                                      redFlag={(() => {
+                                        try {
+                                          const p = typeof lead.properties === 'string' ? JSON.parse(lead.properties) : lead.properties;
+                                          return p?.potential_risks && p.potential_risks.length > 0;
+                                        } catch(e) { return false; }
+                                      })()}
+                                      redFlagReason={(() => {
+                                        try {
+                                          const p = typeof lead.properties === 'string' ? JSON.parse(lead.properties) : lead.properties;
+                                          return p?.potential_risks?.join(', ') || null;
+                                        } catch(e) { return null; }
+                                      })()}
                                       actionType={(() => {
                                         try {
                                           const p = typeof lead.properties === 'string' ? JSON.parse(lead.properties) : lead.properties;
@@ -478,7 +460,7 @@ const AgentDashboard = () => {
               )}
 
               {/* Message / Summary */}
-              <div className="mb-8">
+              <div className="mb-4">
                 <h4 className="text-[11px] font-bold text-on-surface-variant tracking-wider uppercase mb-3 border-b border-outline-variant pb-2">Analiz Özeti / Notlar</h4>
                 <div className="bg-surface-container/80 border border-outline/50 rounded-xl p-4 shadow-inner relative">
                   <p className="text-[14px] text-on-surface-variant leading-relaxed italic relative z-10">
@@ -486,6 +468,21 @@ const AgentDashboard = () => {
                   </p>
                 </div>
               </div>
+
+              {/* External Matches (Ters Eşleşme) */}
+              {externalMatches && externalMatches.length > 0 && (
+                <div className="mb-8">
+                  <h4 className="text-[11px] font-bold text-emerald-400 tracking-wider uppercase mb-3 border-b border-outline-variant pb-2 flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[14px]">radar</span>
+                    Dış Havuz Eşleşmeleri (Ters Eşleşme)
+                  </h4>
+                  <div className="flex flex-col gap-3">
+                    {externalMatches.map(match => (
+                      <ExternalListingCard key={match.id} listing={match} />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </>
