@@ -38,18 +38,22 @@ export default function ActionCenter({ leads = [], onActionClick }) {
     });
   }
 
-  // Uyuyan Müşteri Senaryosu Mock
-  actions.push({
-    id: `dormant_1`,
-    type: 'opportunity',
-    icon: <TrendingUp className="w-5 h-5 text-emerald-400" />,
-    title: 'Fırsat Sinyali: Uyuyan Müşteri',
-    description: 'Murat Bey 2 aydır aranmadı. Ataşehir bölgesinde fiyatlar %5 düştü. Tam hamle zamanı.',
-    buttonText: 'Uyandır (AI Mesajı)',
-    leadId: null,
-    color: 'border-emerald-500/50 bg-emerald-500/10 text-emerald-100',
-    btnColor: 'bg-emerald-500 hover:bg-emerald-600 text-white'
-  });
+  const coldLeads = leads.filter(l => l.label === 'Soğuk' || l.score < 40);
+  if (coldLeads.length > 0) {
+    const dormant = coldLeads[0];
+    actions.push({
+      id: `dormant_1`,
+      type: 'opportunity',
+      icon: <TrendingUp className="w-5 h-5 text-emerald-400" />,
+      title: 'Fırsat Sinyali: Uyuyan Müşteri',
+      description: `${dormant.name} bir süredir işlem görmedi. Tam hamle zamanı.`,
+      buttonText: 'Uyandır (AI Mesajı)',
+      leadId: dormant.id,
+      color: 'border-emerald-500/50 bg-emerald-500/10 text-emerald-100',
+      btnColor: 'bg-emerald-500 hover:bg-emerald-600 text-white',
+      actionName: 'wakeup'
+    });
+  }
 
   if (actions.length === 0) return null;
 

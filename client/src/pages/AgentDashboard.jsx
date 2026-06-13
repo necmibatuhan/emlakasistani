@@ -259,7 +259,11 @@ const AgentDashboard = () => {
             <div className="lg:col-span-2">
               {/* AI Action Center (Günün Komutları) */}
               <ActionCenter leads={leads} onActionClick={(action) => {
-                if (action.leadId) setSelectedLeadId(action.leadId);
+                if (action.actionName === 'wakeup' && action.leadId) {
+                  handleWakeUp(action.leadId);
+                } else if (action.leadId) {
+                  setSelectedLeadId(action.leadId);
+                }
               }} />
             </div>
             <div className="h-[280px]">
