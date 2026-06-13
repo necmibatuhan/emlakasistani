@@ -29,6 +29,31 @@ const AgendaView = ({ leads }) => {
     });
   }
 
+  // Demo için sahte (mock) etkinlikler ekleyelim
+  if (events.length === 0) {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    events.push({
+      id: 'demo_1',
+      leadName: 'Ahmet Yılmaz',
+      title: 'Kadıköy Daire Gösterimi',
+      description: 'Müşteriyle evde buluşulacak.',
+      date: today.toISOString().split('T')[0],
+      time: '14:30'
+    });
+
+    events.push({
+      id: 'demo_2',
+      leadName: 'Cemre Polat',
+      title: 'Kapora Sözleşmesi',
+      description: 'Ofiste imza atılacak.',
+      date: tomorrow.toISOString().split('T')[0],
+      time: '11:00'
+    });
+  }
+
   // Sort events by date and time
   events.sort((a, b) => {
     const dateA = new Date(`${a.date}T${a.time}`);
