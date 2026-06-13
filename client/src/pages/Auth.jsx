@@ -99,12 +99,12 @@ const Auth = () => {
     setIsSubmitting(true);
     try {
       const res = await register(name, email, password, selectedRole, captchaToken);
-      if (res.data.message) {
-        setMessage(res.data.message);
-        setIsLogin(true); 
-        setRegisterStep(1);
-      } else {
+      if (res.data.token) {
         navigate('/dashboard');
+      } else {
+        setMessage(res.data.message || 'Kayıt başarılı. Lütfen e-postanıza gönderilen doğrulama linkine tıklayın.');
+        setRegisterStep(1);
+        setIsLogin(true);
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Kayıt olurken bir hata oluştu.');

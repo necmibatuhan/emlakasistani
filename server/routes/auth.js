@@ -111,19 +111,24 @@ router.post('/register', async (req, res) => {
       `INSERT INTO users (company_id, office_id, email, name, password_hash, role, verification_token, is_verified) 
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
        RETURNING id, company_id, office_id, role, email, name, plan, is_verified`,
-      [companyId, officeId, email, name, password_hash, role, verificationToken, false]
+      [companyId, officeId, email, name, password_hash, role, verificationToken, true]
     );
 
     await db.query('COMMIT');
 
     const user = newUser.rows[0];
     
-    // Send verification email automation event
-    await sendVerificationEmail(user.email, verificationToken, user.name);
+    // Asenkron olarak karşılama/doğrulama mailini arka planda at (hata verirse kullanıcıyı bloklamasın)
+    sendVerificationEmail(user.email, verificationToken, user.name).catch(console.error);
 
-    // DİKKAT: Henüz onaylanmadığı için token dönmüyoruz (veya is_verified kontrolü ekliyoruz)
-    // Front-end tarafı bu mesajı görünce "lütfen mailinizi onaylayın" desin.
-    res.status(201).json({ message: 'Kayıt başarılı. Lütfen e-postanıza gönderilen doğrulama linkine tıklayın.', user });
+    // MVP için anında giriş yapıyoruz (is_verified = true yapıldı)
+    const token = jwt.sign(
+      { id: user.id, role: user.role, company_id: user.company_id, office_id: user.office_id, plan: user.plan },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.status(201).json({ message: 'Kayıt başarılı. Giriş yapılıyor...', user, token });
   } catch (err) {
     try { await db.query('ROLLBACK'); } catch(e) {}
     console.error(err);
