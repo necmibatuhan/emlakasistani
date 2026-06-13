@@ -24,12 +24,19 @@ export default function WhatsAppShareButton({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
 
-      // Opsiyonel 3. Eğer telefonda ise veya WhatsApp Web açıksa direkt uygulamaya yönlendir
-      // if (phoneNumber) {
-      //   const cleanPhone = phoneNumber.replace(/\D/g, '');
-      //   const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
-      //   window.open(waUrl, '_blank');
-      // }
+      // 3. Eğer telefonda ise veya WhatsApp Web açıksa direkt uygulamaya yönlendir
+      if (phoneNumber) {
+        let cleanPhone = phoneNumber.replace(/\D/g, '');
+        // Türkiye alan kodu kontrolü
+        if (cleanPhone.length === 10) {
+          cleanPhone = '90' + cleanPhone;
+        } else if (cleanPhone.length === 11 && cleanPhone.startsWith('0')) {
+          cleanPhone = '9' + cleanPhone;
+        }
+        
+        const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+        window.open(waUrl, '_blank');
+      }
 
     } catch (err) {
       console.error('Kopyalama başarısız:', err);
@@ -62,7 +69,7 @@ export default function WhatsAppShareButton({
         />
       </div>
       
-      <span>{copied ? 'Kopyalandı' : 'WhatsApp İletisi'}</span>
+      <span>{copied ? 'Gönderiliyor...' : 'WhatsApp İletisi'}</span>
     </button>
   );
 }

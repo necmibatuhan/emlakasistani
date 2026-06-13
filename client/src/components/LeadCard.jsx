@@ -110,7 +110,7 @@ export default function LeadCard({
 
       {/* Alt Kısım: Hızlı Triage Aksiyonları */}
       <div className="mt-4 pt-4 border-t border-zinc-800/80 flex items-center gap-2 flex-wrap">
-        {whatsappDraft && <WhatsAppShareButton message={whatsappDraft} className="flex-1 min-w-[120px]" />}
+        {whatsappDraft && <WhatsAppShareButton message={whatsappDraft} phoneNumber={phone} className="flex-1 min-w-[120px]" />}
         
         {/* Uyandır AI Mesajı Butonu (Fırsat Sinyali) */}
         {!whatsappDraft && (
