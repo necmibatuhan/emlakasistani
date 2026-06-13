@@ -17,23 +17,35 @@ const resend = new Resend(process.env.RESEND_API_KEY || 're_5qWF7SiQ_2w4j9e68Bra
 const sendVerificationEmail = async (email, token, name) => {
   const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${token}`;
   
+  // Console fallback for testing/dev without verified domains
+  console.log(`\n============================`);
+  console.log(`📩 YENİ KAYIT ONAY MAİLİ`);
+  console.log(`Alıcı: ${email}`);
+  console.log(`Onay Linki: ${verificationUrl}`);
+  console.log(`============================\n`);
+
   try {
-    const { data, error } = await resend.events.send({
-      event: 'email-verification',
-      email: email,
-      data: {
-        verificationUrl: verificationUrl,
-        name: name
-      }
+    const { data, error } = await resend.emails.send({
+      from: 'Kapora <onboarding@resend.dev>',
+      to: email,
+      subject: 'Kapora - E-posta Adresinizi Doğrulayın',
+      html: `
+        <div style="font-family: sans-serif; max-w-xl mx-auto p-6 bg-white rounded-lg shadow-sm border border-gray-100">
+          <h2 style="color: #111827; font-size: 24px; font-weight: bold; margin-bottom: 16px;">Hoş Geldiniz, ${name}!</h2>
+          <p style="color: #4B5563; font-size: 16px; margin-bottom: 24px;">Kapora akıllı emlak asistanına kayıt olduğunuz için teşekkür ederiz. Hesabınızı etkinleştirmek için lütfen aşağıdaki butona tıklayın:</p>
+          <a href="${verificationUrl}" style="display: inline-block; background-color: #F5A623; color: #111827; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 16px;">Hesabımı Doğrula</a>
+          <p style="color: #9CA3AF; font-size: 14px; margin-top: 32px;">Eğer bu kaydı siz yapmadıysanız, lütfen bu mesajı görmezden gelin.</p>
+        </div>
+      `
     });
 
     if (error) {
-      console.error("Resend Event Error (Verification):", error);
+      console.error("Resend Email Error:", error);
     } else {
-      console.log(`Doğrulama otomasyon eventi tetiklendi: ${email} (ID: ${data?.id})`);
+      console.log(`Doğrulama e-postası gönderildi: ${email} (ID: ${data?.id})`);
     }
   } catch (error) {
-    console.error("Otomasyon tetikleme hatası:", error);
+    console.error("E-posta gönderme hatası:", error);
   }
 };
 

@@ -47,7 +47,7 @@ const Auth = () => {
     setMessage('');
     
     // Bypass Captcha for Demo Accounts
-    const demoEmails = ['admin@c21.com', 'manager@c21.com', 'agent@c21.com'];
+    const demoEmails = ['demo@kapora.online'];
     const isDemoAccount = demoEmails.includes(email.toLowerCase().trim());
 
     // Sadece lokal test için devrede bırakılabilir, ama production'da zorunludur:
