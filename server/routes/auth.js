@@ -54,43 +54,18 @@ const sendVerificationEmail = async (email, token, name) => {
   console.log(`============================\n`);
 
   try {
-    if (process.env.SMTP_USER && process.env.SMTP_PASS) {
-      // Use Nodemailer with explicit SMTP config from environment
-      const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST || 'smtp.gmail.com',
-        port: parseInt(process.env.SMTP_PORT || '465', 10),
-        secure: process.env.SMTP_PORT === '465' || (!process.env.SMTP_PORT && true), // true for 465, false for other ports
-        connectionTimeout: 10000,
-        greetingTimeout: 10000,
-        socketTimeout: 10000,
-        auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS
-        }
-      });
+    const { data, error } = await resend.emails.send({
+      from: 'Kapora AI <info@kapora.online>',
+      to: email,
+      subject: subject,
+      html: htmlContent
+    });
 
-      const info = await transporter.sendMail({
-        from: `"Kapora Asistan" <${process.env.SMTP_USER}>`,
-        to: email,
-        subject: subject,
-        html: htmlContent
-      });
-      console.log(`Doğrulama e-postası (Nodemailer) gönderildi: ${info.messageId}`);
+    if (error) {
+      console.error("Resend Email Error:", error);
+      throw new Error(error.message || 'Resend API e-postayı gönderemedi.');
     } else {
-      // Use Resend as fallback
-      const { data, error } = await resend.emails.send({
-        from: 'Kapora AI <info@kapora.online>',
-        to: email,
-        subject: subject,
-        html: htmlContent
-      });
-
-      if (error) {
-        console.error("Resend Email Error:", error);
-        throw new Error(error.message || 'Resend API e-postayı gönderemedi. Domain doğrulaması eksik olabilir.');
-      } else {
-        console.log(`Doğrulama e-postası (Resend) gönderildi: ${email}`);
-      }
+      console.log(`Doğrulama e-postası (Resend) gönderildi: ${email}`);
     }
   } catch (error) {
     console.error("E-posta gönderme hatası:", error);
@@ -353,55 +328,25 @@ router.post('/forgot-password', async (req, res) => {
     const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${resetToken}&id=${user.id}`;
     
     try {
-      if (process.env.SMTP_USER && process.env.SMTP_PASS) {
-        const transporter = nodemailer.createTransport({
-          host: process.env.SMTP_HOST || 'smtp.gmail.com',
-          port: parseInt(process.env.SMTP_PORT || '465', 10),
-          secure: process.env.SMTP_PORT === '465' || (!process.env.SMTP_PORT && true),
-          connectionTimeout: 10000,
-          greetingTimeout: 10000,
-          socketTimeout: 10000,
-          auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS
-          }
-        });
-
-        const info = await transporter.sendMail({
-          from: `"Kapora Asistan" <${process.env.SMTP_USER}>`,
-          to: user.email,
-          subject: 'Kapora - Şifre Sıfırlama Talebi',
-          html: `
-            <div style="font-family: sans-serif; max-w-xl mx-auto p-6 bg-white rounded-lg shadow-sm border border-gray-100">
-              <h2 style="color: #111827; font-size: 24px; font-weight: bold; margin-bottom: 16px;">Merhaba ${user.name},</h2>
-              <p style="color: #4B5563; font-size: 16px; margin-bottom: 24px;">Hesabınız için şifre sıfırlama talebinde bulundunuz. Aşağıdaki butona tıklayarak yeni şifrenizi belirleyebilirsiniz:</p>
-              <a href="${resetUrl}" style="display: inline-block; background-color: #F5A623; color: #111827; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 16px;">Şifremi Sıfırla</a>
-              <p style="color: #9CA3AF; font-size: 14px; margin-top: 32px;">Eğer bu talebi siz yapmadıysanız, lütfen bu mesajı görmezden gelin.</p>
-            </div>
-          `
-        });
-        console.log(`Şifre sıfırlama e-postası (Nodemailer) gönderildi: ${info.messageId}`);
+      const { data, error } = await resend.emails.send({
+        from: 'Kapora AI <info@kapora.online>',
+        to: user.email,
+        subject: 'Kapora - Şifre Sıfırlama Talebi',
+        html: `
+          <div style="font-family: sans-serif; max-w-xl mx-auto p-6 bg-white rounded-lg shadow-sm border border-gray-100">
+            <h2 style="color: #111827; font-size: 24px; font-weight: bold; margin-bottom: 16px;">Merhaba ${user.name},</h2>
+            <p style="color: #4B5563; font-size: 16px; margin-bottom: 24px;">Hesabınız için şifre sıfırlama talebinde bulundunuz. Aşağıdaki butona tıklayarak yeni şifrenizi belirleyebilirsiniz:</p>
+            <a href="${resetUrl}" style="display: inline-block; background-color: #F5A623; color: #111827; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 16px;">Şifremi Sıfırla</a>
+            <p style="color: #9CA3AF; font-size: 14px; margin-top: 32px;">Eğer bu talebi siz yapmadıysanız, lütfen bu mesajı görmezden gelin.</p>
+          </div>
+        `
+      });
+      
+      if (error) {
+        console.error("Resend Event Error (Password Reset):", error);
+        return res.status(500).json({ message: "Mail gönderilemedi. Hata: " + error.message });
       } else {
-        const { data, error } = await resend.emails.send({
-          from: 'Kapora AI <info@kapora.online>',
-          to: user.email,
-          subject: 'Kapora - Şifre Sıfırlama Talebi',
-          html: `
-            <div style="font-family: sans-serif; max-w-xl mx-auto p-6 bg-white rounded-lg shadow-sm border border-gray-100">
-              <h2 style="color: #111827; font-size: 24px; font-weight: bold; margin-bottom: 16px;">Merhaba ${user.name},</h2>
-              <p style="color: #4B5563; font-size: 16px; margin-bottom: 24px;">Hesabınız için şifre sıfırlama talebinde bulundunuz. Aşağıdaki butona tıklayarak yeni şifrenizi belirleyebilirsiniz:</p>
-              <a href="${resetUrl}" style="display: inline-block; background-color: #F5A623; color: #111827; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 16px;">Şifremi Sıfırla</a>
-              <p style="color: #9CA3AF; font-size: 14px; margin-top: 32px;">Eğer bu talebi siz yapmadıysanız, lütfen bu mesajı görmezden gelin.</p>
-            </div>
-          `
-        });
-        
-        if (error) {
-          console.error("Resend Event Error (Password Reset):", error);
-          return res.status(500).json({ message: "Mail gönderilemedi. Hata: " + error.message });
-        } else {
-          console.log(`Şifre sıfırlama maili gönderildi: ${user.email} (ID: ${data?.id})`);
-        }
+        console.log(`Şifre sıfırlama maili gönderildi: ${user.email} (ID: ${data?.id})`);
       }
     } catch (mailErr) {
       console.error('SMTP/Resend Gönderme Hatası:', mailErr);
