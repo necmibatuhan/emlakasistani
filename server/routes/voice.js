@@ -16,7 +16,8 @@ router.post('/transcribe', authMiddleware, upload.single('audio'), async (req, r
     if (!audioFile) return res.status(400).json({ error: 'Ses dosyası bulunamadı' });
 
     const audioBase64 = audioFile.buffer.toString('base64');
-    const mimeType = audioFile.mimetype;
+    // Sanitize mimeType for Gemini (e.g., 'audio/webm;codecs=opus' -> 'audio/webm')
+    const mimeType = audioFile.mimetype.split(';')[0];
 
     if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'mock') {
       return res.status(500).json({ error: 'Yapay zeka (GEMINI_API_KEY) yapılandırması eksik.' });
@@ -40,7 +41,7 @@ router.post('/transcribe', authMiddleware, upload.single('audio'), async (req, r
       return res.json({ transcript });
     } catch (apiErr) {
       console.error('Gemini Transcribe API Error:', apiErr.message);
-      return res.status(500).json({ error: 'Ses metne çevrilemedi. Lütfen tekrar deneyin.' });
+      return res.status(500).json({ error: `Ses işlenemedi: ${apiErr.message}` });
     }
   } catch (err) {
     console.error('Transcribe error:', err);

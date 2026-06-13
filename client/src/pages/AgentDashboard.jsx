@@ -145,7 +145,7 @@ const AgentDashboard = () => {
       setIsNewLeadDrawerOpen(true);
     } catch (err) {
       console.error(err);
-      alert('Ses metne çevrilemedi.');
+      alert(err.response?.data?.error || 'Ses metne çevrilemedi.');
     }
   };
 
