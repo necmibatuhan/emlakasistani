@@ -307,20 +307,47 @@ const AgentDashboard = () => {
             </div>
           </div>
           
-          {/* Lead Yönetimi CTA (Küçültüldü) */}
-          <div className="w-full bg-gradient-to-r from-[#16181D] to-[#1E2025] border border-[#2A2D35] rounded-xl p-5 flex items-center justify-between shrink-0 shadow-sm relative overflow-hidden">
-             <div className="flex items-center gap-5 z-10">
-               <div className="w-12 h-12 rounded-full bg-[#F5A623]/10 flex items-center justify-center border border-[#F5A623]/20">
-                  <span className="material-symbols-outlined text-[#F5A623] text-2xl">group</span>
-               </div>
-               <div>
-                 <h2 className="text-base font-bold text-[#F1F2F4]">Tüm Leadleriniz Artık Tek Bir Sayfada</h2>
-                 <p className="text-[#7C8090] text-sm mt-0.5">Adayları listelemek, filtrelemek ve daha detaylı yönetmek için Lead sayfasına göz atın.</p>
-               </div>
-             </div>
-             <Link to="/leads" className="z-10 bg-[#F5A623] hover:bg-[#d9921e] text-[#0A0B0D] font-bold px-6 py-2.5 rounded-lg text-sm transition-colors shadow-[0_0_15px_rgba(245,166,35,0.2)] flex items-center gap-2 whitespace-nowrap">
-                Sayfaya Git <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
-             </Link>
+          {/* Kanban Board */}
+          <div className="flex-1 flex gap-6 overflow-x-auto min-h-[400px]">
+            {['Sıcak', 'Ilık', 'Soğuk'].map(status => (
+              <div 
+                key={status}
+                className="flex-1 min-w-[300px] flex flex-col bg-[#16181D] rounded-xl border border-[#2A2D35] overflow-hidden"
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, status)}
+              >
+                <div className={`p-4 border-b border-[#2A2D35] flex justify-between items-center ${getStatusBgColor(status)} bg-opacity-20`}>
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-[18px]">
+                      {status === 'Sıcak' ? 'local_fire_department' : status === 'Ilık' ? 'thermostat' : 'ac_unit'}
+                    </span>
+                    <h3 className="font-semibold text-sm">{status}</h3>
+                  </div>
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-black/20">
+                    {leads.filter(l => l.label === status).length}
+                  </span>
+                </div>
+                <div className="flex-1 p-3 overflow-y-auto space-y-3 custom-scrollbar bg-[#0A0B0D]/50">
+                  {leads.filter(l => l.label === status).map(lead => (
+                    <div
+                      key={lead.id}
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, lead.id)}
+                      onClick={() => setSelectedLeadId(lead.id)}
+                      className="cursor-pointer"
+                    >
+                      <LeadCard lead={lead} />
+                    </div>
+                  ))}
+                  {leads.filter(l => l.label === status).length === 0 && (
+                    <div className="h-full flex flex-col items-center justify-center text-[#7C8090] opacity-50 space-y-2 py-8">
+                      <span className="material-symbols-outlined text-[32px]">inbox</span>
+                      <p className="text-xs">Bu listede lead yok</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
