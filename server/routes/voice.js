@@ -80,11 +80,11 @@ SADECE aşağıdaki JSON şemasında yanıt dön:
   "property_type": ["daire", "villa", "rezidans", "ofis"],
   "room_count": { "min": "number | null", "max": "number | null" },
   "urgency": "very_urgent" | "urgent" | "moderate" | "exploring" | "low",
-  "seriousness_score": "1-10",
-  "budget_score": "1-10",
-  "overall_lead_score": "1-100",
+  "seriousness_score": "number (integer 1-10)",
+  "budget_score": "number (integer 1-10)",
+  "overall_lead_score": "number (integer 1-100)",
   
-  "skor": "1-10 (overall_lead_score'un 10'a bölünmüş hali)",
+  "skor": "number (integer 1-10, overall_lead_score'un 10'a bölünmüş hali)",
   "etiket": "Sıcak (overall 75+ ise) | Ilık (40-74 arası) | Soğuk (0-39 arası)",
   "yeni_durum": "Takipte | Arandı | Randevu Alındı | Teklif Verildi | Sözleşme Aşamasında | Satış Tamamlandı | İptal (Durum değişmiyorsa mevcut durumu koru)",
 
@@ -95,12 +95,13 @@ SADECE aşağıdaki JSON şemasında yanıt dön:
   },
 
   "calendar_event": {
-    "title": "string (Görevin kısa özeti, Örn: Ev Gösterme)",
+    "title": "string (Görevin kısa özeti)",
     "description": "string (Görevin detayı)",
     "start_date": "YYYY-MM-DD",
-    "start_time": "HH:MM:SS veya null",
-    "is_task": "boolean (Gerçek bir görevse true)"
-  } | null,
+    "start_time": "HH:MM:SS",
+    "is_task": "boolean"
+  },
+  "has_calendar_event": "boolean (Eğer bir takvim etkinliği varsa true, yoksa false yap ve calendar_event içini boş bırakabilirsin)",
 
   "key_motivations": ["sebep1", "sebep2"],
   "potential_risks": ["risk1", "risk2"],
@@ -209,9 +210,11 @@ Danışmanın sesli notu:
     let setClause = [];
     let idx = 1;
 
-    let newScore = analysis.skor || Math.ceil((analysis.overall_lead_score || 50) / 10);
+    const rawScore = analysis.skor || Math.ceil((analysis.overall_lead_score || 50) / 10);
+    const finalScore = Math.max(1, Math.min(10, Math.round(Number(rawScore)) || 5));
+    
     setClause.push(`score = $${idx++}`);
-    values.push(newScore);
+    values.push(finalScore);
 
     if (analysis.etiket) {
       setClause.push(`label = $${idx++}`);

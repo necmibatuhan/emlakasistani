@@ -198,11 +198,11 @@ Sadece aşağıdaki JSON formatında yanıt dön:
     "max": "number | null"
   },
   "urgency": "very_urgent" | "urgent" | "moderate" | "exploring" | "low",
-  "seriousness_score": "1-10 arası",
-  "budget_score": "1-10 arası",
-  "overall_lead_score": "1-100 arası",
+  "seriousness_score": "number (integer 1-10)",
+  "budget_score": "number (integer 1-10)",
+  "overall_lead_score": "number (integer 1-100)",
   
-  "skor": "1-10 arası (overall_lead_score/10 yuvarlanmış hali)",
+  "skor": "number (integer 1-10, overall_lead_score/10 yuvarlanmış hali)",
   "etiket": "Sıcak (overall 75+ ise) | Ilık (40-74 arası) | Soğuk (0-39 arası)",
   
   "key_motivations": ["sebep1", "sebep2"],
@@ -238,12 +238,15 @@ Sadece aşağıdaki JSON formatında yanıt dön:
 
     const reasoningText = `Motivasyon: ${(parsedResult.key_motivations || []).join(', ')}. Riskler: ${(parsedResult.potential_risks || []).join(', ')}. Intent: ${parsedResult.customer_intent}`;
 
+    const rawScore = parsedResult.skor || Math.ceil((parsedResult.overall_lead_score || 50) / 10);
+    const finalScore = Math.max(1, Math.min(10, Math.round(Number(rawScore)) || 5));
+
     const leadInsert = await db.query(
       `INSERT INTO leads (company_id, office_id, assigned_to, source, name, phone, message, score, label, reasoning, recommended_action, whatsapp_draft, properties) 
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`,
       [
         req.user.company_id, req.user.office_id, req.user.id, 'manual', finalName, finalPhone, message, 
-        parsedResult.skor || Math.ceil(parsedResult.overall_lead_score / 10), 
+        finalScore, 
         parsedResult.etiket, 
         reasoningText, 
         parsedResult.recommended_next_action, 
@@ -298,17 +301,85 @@ router.put('/:id/analyze', authMiddleware, async (req, res) => {
       return res.status(500).json({ message: 'Yapay zeka analizi başarısız oldu' });
     }
 
+    const prompt = `Sen profesyonel bir emlak danışmanlığı AI asistanısın. 10+ yıllık tecrübeye sahip, detaycı, gerçekçi ve Türkiye'deki emlak piyasasını çok iyi bilen bir uzmansın.
+
+Görevin: Kullanıcı mesajı veya sesli not transkriptini analiz edip aşağıdaki JSON formatında yapılandırılmış çıktı üretmek.
+
+KURALLAR (Çok Önemli):# Privacy & Security Guidelines (MUST FOLLOW)
+1. Sadece gerçek metinde geçen bilgileri kullan. Bilmiyorsan null veya boş array koy.
+2. Halüsinasyon yapma! Tahmin etme, varsayımda bulundurma.
+3. Bütçe analizi yaparken Türkiye'deki gerçekçi piyasa koşullarını göz önünde bulundur.
+4. Aciliyet ve ciddiyet skorunu sadece metindeki dil, tekrarlar ve vurguya göre ver.
+5. Overall lead score = (Bütçe skoru × 0.35) + (Ciddiyet skoru × 0.40) + (Aciliyet skoru × 0.25) formülüyle hesapla.
+6. DATA ISOLATION & ANONYMIZATION: PII tespit edersen analiz et ama "Müşteri" olarak kullan. İşlem bitince unut.
+7. INTENT CLASSIFICATION:
+   - 'renter': Eğer kullanıcı 'kiralık', 'kira', 'kiralamak' gibi ifadeler kullanıyorsa kesinlikle 'renter' seç.
+   - 'buyer': Eğer kullanıcı 'satılık', 'satın almak', 'yatırım', 'mülk sahibi olmak' gibi ifadeler kullanıyorsa kesinlikle 'buyer' seç.
+
+# Input
+Müşteri Mesajı: ${maskedText}
+
+# Output Format
+Sadece aşağıdaki JSON formatında yanıt dön:
+{
+  "customer_intent": "buyer" | "seller" | "investor" | "renter" | "unknown",
+  "budget": {
+    "min": "number | null",
+    "max": "number | null",
+    "currency": "TRY" | "USD" | "EUR",
+    "confidence": "high" | "medium" | "low"
+  },
+  "location_preferences": ["semt1", "semt2"],
+  "property_type": ["daire", "villa", "rezidans", "ofis"],
+  "room_count": {
+    "min": "number | null",
+    "max": "number | null"
+  },
+  "urgency": "very_urgent" | "urgent" | "moderate" | "exploring" | "low",
+  "seriousness_score": "number (integer 1-10)",
+  "budget_score": "number (integer 1-10)",
+  "overall_lead_score": "number (integer 1-100)",
+  "skor": "number (integer 1-10, overall_lead_score/10 yuvarlanmış hali)",
+  "etiket": "Sıcak (overall 75+ ise) | Ilık (40-74 arası) | Soğuk (0-39 arası)",
+  "key_motivations": ["sebep1", "sebep2"],
+  "potential_risks": ["risk1", "risk2"],
+  "recommended_next_action": "Bugün ara | Bu hafta ara | Takip listesine ekle",
+  "suggested_whatsapp_reply": "hazır mesaj taslağı (en fazla 2-3 cümle, samimi ve profesyonel)",
+  "extracted_raw_quotes": ["müşterinin tam söylediği önemli cümleler"]
+}
+`;
+
+    let parsedResult;
+    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'mock') {
+      return res.status(500).json({ message: 'Yapay zeka (GEMINI_API_KEY) yapılandırması eksik.' });
+    }
+    
+    try {
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash", generationConfig: { responseMimeType: "application/json", temperature: 0.2 } });
+      const aiResult = await model.generateContent(prompt);
+      let respText = aiResult.response.text().trim();
+      if (respText.startsWith('```json')) respText = respText.replace('```json', '').replace('```', '').trim();
+      parsedResult = JSON.parse(respText);
+    } catch (apiErr) {
+      console.error('Gemini Analyze API Error:', apiErr.message);
+      return res.status(500).json({ message: 'Yapay zeka analizi başarısız oldu' });
+    }
+
     parsedResult = pipeline.unmask(parsedResult);
     const finalName = name?.trim() ? name.trim() : '[İsim Belirtilmedi]';
     const finalPhone = phone?.trim() ? phone.trim() : '[Telefon Belirtilmedi]';
     const reasoningText = `Motivasyon: ${(parsedResult.key_motivations || []).join(', ')}. Riskler: ${(parsedResult.potential_risks || []).join(', ')}. Intent: ${parsedResult.customer_intent}`;
 
+    const rawScore = parsedResult.skor || Math.ceil((parsedResult.overall_lead_score || 50) / 10);
+    const finalScore = Math.max(1, Math.min(10, Math.round(Number(rawScore)) || 5));
+
     const updateRes = await db.query(
-      `UPDATE leads SET name=$1, phone=$2, message=$3, score=$4, label=$5, reasoning=$6, recommended_action=$7, whatsapp_draft=$8, properties=$9, updated_at=NOW() 
+      `UPDATE leads 
+       SET name=$1, phone=$2, message=$3, score=$4, label=$5, reasoning=$6, recommended_action=$7, whatsapp_draft=$8, properties=$9, updated_at=NOW() 
        WHERE id=$10 AND company_id=$11 RETURNING *`,
       [
         finalName, finalPhone, message, 
-        parsedResult.skor || Math.ceil(parsedResult.overall_lead_score / 10), 
+        finalScore, 
         parsedResult.etiket, reasoningText, parsedResult.recommended_next_action, 
         parsedResult.suggested_whatsapp_reply, JSON.stringify(parsedResult),
         req.params.id, req.user.company_id
