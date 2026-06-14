@@ -1,147 +1,117 @@
-import React, { useState } from 'react';
-import { Flame, Clock, Home, ArrowRight, User, AlertTriangle, Sparkles } from 'lucide-react';
-import WhatsAppShareButton from './WhatsAppShareButton';
+import React from 'react';
 
-/**
- * Premium Lead Card Component
- * Designed for Dark Mode, Geist Font, and High Contrast.
- */
 export default function LeadCard({
-  name = "Belirtilmedi",
-  phone = "Telefon Yok",
-  score = 0,
-  urgency = "low", // 'high' | 'medium' | 'low'
-  actionType = "unknown", // 'rent' | 'sale'
-  propertyType = "apartment",
-  roomCount = "Bilinmiyor",
-  budgetStr = "Bütçe Belirsiz",
-  summary = "Herhangi bir özet bilgisi girilmemiş.",
-  matchedCount = 0,
-  whatsappDraft = null,
-  redFlag = false,
-  redFlagReason = null,
-  onWakeUp,
+  lead,
   onClick
 }) {
-  const [isWakingUp, setIsWakingUp] = useState(false);
+  const {
+    name,
+    phone,
+    score,
+    label,
+    actionType,
+    propertyType,
+    roomCount,
+    budgetStr,
+    summary,
+  } = lead || {};
 
-  const handleWakeUp = async (e) => {
-    e.stopPropagation();
-    if (!onWakeUp) return;
-    setIsWakingUp(true);
-    try {
-      await onWakeUp();
-    } finally {
-      setIsWakingUp(false);
-    }
-  };
-  // Aciliyet (Urgency) bazlı renk ve ikon ayarlamaları
-  const getUrgencyConfig = () => {
-    switch (urgency) {
-      case 'high': return { color: 'text-amber-400', bg: 'bg-amber-400/10', border: 'border-amber-400/20', icon: <Flame className="w-3.5 h-3.5" /> };
-      case 'medium': return { color: 'text-blue-400', bg: 'bg-blue-400/10', border: 'border-blue-400/20', icon: <Clock className="w-3.5 h-3.5" /> };
-      default: return { color: 'text-zinc-400', bg: 'bg-zinc-800/50', border: 'border-zinc-700/50', icon: null };
-    }
-  };
+  // Status Colors
+  let borderColor = 'border-l-[#3B82F6]'; // Soğuk
+  let scoreColor = 'text-[#3B82F6]';
+  if (label === 'Sıcak') {
+    borderColor = 'border-l-[#EF4444]';
+    scoreColor = 'text-[#EF4444]';
+  } else if (label === 'Ilık') {
+    borderColor = 'border-l-[#F5A623]';
+    scoreColor = 'text-[#F5A623]';
+  }
 
-  const urgencyConfig = getUrgencyConfig();
+  // Formatting preferences (Kadıköy · Satılık · 3+1)
+  const prefs = [];
+  if (actionType && actionType !== 'unknown') {
+    prefs.push(actionType === 'rent' ? 'Kiralık' : actionType === 'sale' ? 'Satılık' : actionType);
+  }
+  if (propertyType && propertyType !== 'unknown') {
+    prefs.push(propertyType);
+  }
+  if (roomCount && roomCount !== 'Bilinmiyor') {
+    prefs.push(roomCount);
+  }
+  if (budgetStr && budgetStr !== 'Bütçe Belirsiz') {
+    prefs.push(`Bütçe: ${budgetStr}`);
+  }
 
-  // İşlem türünü Türkçeleştir
-  const actionLabel = actionType === 'rent' ? 'Kiralık' : actionType === 'sale' ? 'Satılık' : 'Belirsiz';
+  const hasName = name && name !== 'Belirtilmedi' && name !== '[İsim Belirtilmedi]';
+  const hasPhone = phone && phone !== 'Telefon Yok';
+  const hasSummary = summary && summary !== 'Herhangi bir özet bilgisi girilmemiş.';
 
   return (
     <div 
       onClick={onClick}
-      className="group relative flex flex-col w-full max-w-sm rounded-xl border border-zinc-800 bg-zinc-950 p-5 text-zinc-100 transition-all duration-300 hover:-translate-y-1 hover:border-zinc-700 hover:shadow-2xl hover:shadow-black/50 cursor-pointer overflow-hidden font-sans tracking-tight"
+      className={`flex flex-col w-full bg-[#16181D] border border-[#2A2D35] border-l-[3px] ${borderColor} rounded-[8px] p-[14px] hover:bg-[#1E2028] hover:shadow-sm transition-all cursor-pointer font-sans`}
     >
-      {/* İnce Glow Efekti (Sadece Hover'da) */}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-zinc-800/0 via-zinc-800/0 to-zinc-800/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-
-      {/* Üst Kısım: Kimlik & Skor */}
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400 group-hover:text-zinc-200 transition-colors">
-            <User className="h-5 w-5" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-zinc-100 text-sm">{name}</h3>
-            <p className="text-xs text-zinc-500">{phone}</p>
-          </div>
-        </div>
-
-        {/* Lead Score Badge */}
-        <div className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium border ${urgencyConfig.bg} ${urgencyConfig.color} ${urgencyConfig.border}`}>
-          {urgencyConfig.icon}
-          <span>%{score} Etkileşim</span>
-        </div>
+      {/* Top Row: Name & Score */}
+      <div className="flex items-start justify-between mb-1">
+        <h3 className="text-[13px] font-medium text-[#F1F2F4]">
+          {hasName ? name : 'İsimsiz Lead'}
+        </h3>
+        {score !== undefined && score > 0 && (
+          <span className={`font-mono text-[13px] ${scoreColor}`}>
+            {score}/10
+          </span>
+        )}
       </div>
-      
-      {/* Risk Badge (Red Flag) */}
-      {redFlag && (
-        <div className="mb-3 flex items-start gap-2 bg-red-500/10 border border-red-500/20 text-red-400 p-2.5 rounded-lg">
-          <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-          <div className="text-xs">
-            <span className="font-semibold block mb-0.5">Riskli Müşteri</span>
-            <span className="text-red-400/80 line-clamp-2">{redFlagReason || 'Yapay zeka bu lead için risk tespit etti.'}</span>
-          </div>
-        </div>
+
+      {/* Phone */}
+      {hasPhone && (
+        <p className="text-[12px] text-[#7C8090] mb-2">{phone}</p>
       )}
 
-      {/* Orta Kısım: İstek Detayları & Ses Notu Özeti */}
-      <div className="flex-1">
-        <div className="mb-3 flex flex-wrap gap-2">
-          <span className="inline-flex items-center rounded-md bg-zinc-900 px-2 py-1 text-xs font-medium text-zinc-300 border border-zinc-800">
-            {actionLabel}
-          </span>
-          {roomCount && roomCount !== "Bilinmiyor" && (
-            <span className="inline-flex items-center rounded-md bg-zinc-900 px-2 py-1 text-xs font-medium text-zinc-300 border border-zinc-800">
-              {roomCount}
-            </span>
-          )}
-          <span className="inline-flex items-center rounded-md bg-zinc-900 px-2 py-1 text-xs font-medium text-amber-500/80 border border-amber-500/10">
-            {budgetStr}
-          </span>
-        </div>
-        
-        <p className="text-sm leading-relaxed text-zinc-400 line-clamp-2 group-hover:text-zinc-300 transition-colors">
+      {/* Preferences Line */}
+      {prefs.length > 0 && (
+        <p className="text-[12px] text-[#7C8090] mb-2">
+          {prefs.join(' · ')}
+        </p>
+      )}
+
+      {/* Summary */}
+      {hasSummary && (
+        <p className="text-[12px] text-[#7C8090] italic line-clamp-2 mb-3">
           "{summary}"
         </p>
-      </div>
+      )}
 
-      {/* Alt Kısım: Hızlı Triage Aksiyonları */}
-      <div className="mt-4 pt-4 border-t border-zinc-800/80 flex items-center gap-2 flex-wrap">
-        {whatsappDraft && <WhatsAppShareButton message={whatsappDraft} phoneNumber={phone} className="flex-1 min-w-[120px]" />}
-        
-        {/* Uyandır AI Mesajı Butonu (Fırsat Sinyali) */}
-        {!whatsappDraft && (
-          <button
-            onClick={handleWakeUp}
-            disabled={isWakingUp}
-            className="bg-indigo-500/10 border border-indigo-500/20 hover:bg-indigo-500/20 text-indigo-400 rounded-md px-3 py-1.5 text-xs font-medium transition-colors flex items-center gap-1.5 flex-1 min-w-[120px] justify-center disabled:opacity-50"
-            title="Uyuyan Alıcıyı Yapay Zeka ile Uyandır (Fırsat Sinyali)"
+      {/* Action Buttons */}
+      <div className="flex items-center gap-2 mt-auto pt-2">
+        {hasPhone && (
+          <a 
+            href={`https://wa.me/${phone.replace(/[^0-9]/g, '')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#0A1A0A] text-[#25D366] text-[11px] font-medium hover:bg-[#0f240f] transition-colors"
           >
-            {isWakingUp ? (
-              <svg className="animate-spin h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-            ) : (
-              <Sparkles className="h-3.5 w-3.5" />
-            )}
-            AI Uyandır
-          </button>
+            💬 WhatsApp
+          </a>
         )}
-
-        <a 
-          href={`tel:${phone.replace(/[^0-9]/g, '')}`} 
-          onClick={(e) => e.stopPropagation()} 
-          className="bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 hover:text-zinc-100 text-zinc-400 rounded-md px-3 py-1.5 text-xs font-medium transition-colors flex items-center gap-1.5 flex-1 justify-center min-w-[80px]"
-        >
-          Ara
-        </a>
+        {hasPhone && (
+          <a 
+            href={`tel:${phone.replace(/[^0-9]/g, '')}`}
+            onClick={(e) => e.stopPropagation()}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-[#2A2D35] text-[#F1F2F4] text-[11px] font-medium hover:bg-[#2A2D35] transition-colors"
+          >
+            📞 Ara
+          </a>
+        )}
         <button 
-          onClick={(e) => { e.stopPropagation(); onClick(); }} 
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-zinc-900 border border-zinc-800 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-950 transition-all duration-300"
-          title="Detayları Gör"
+          onClick={(e) => {
+             e.stopPropagation();
+             onClick && onClick();
+          }}
+          className="ml-auto flex items-center justify-center w-7 h-7 rounded-md bg-[#2A2D35] text-[#F1F2F4] hover:bg-[#F5A623] hover:text-[#0A0B0D] transition-colors"
         >
-          <ArrowRight className="h-4 w-4" />
+          →
         </button>
       </div>
     </div>

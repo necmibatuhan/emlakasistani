@@ -235,119 +235,92 @@ const AgentDashboard = () => {
 
         <div className="flex-1 flex flex-col p-6 gap-6 overflow-hidden">
           
-          {/* KPI Widgets & Plan Banner Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 shrink-0">
-            {/* KPI 1: Toplam Lead */}
-            <div className="bg-[#16181D] border border-[#2A2D35] rounded-xl p-4 flex items-center justify-between shadow-sm">
-              <div>
-                <p className="text-[#7C8090] text-xs font-medium mb-1">Toplam Lead</p>
-                <h4 className="text-2xl font-bold text-[#F1F2F4]">{leads.length}</h4>
-              </div>
-              <div className="w-10 h-10 rounded-full bg-[#3B82F6]/10 flex items-center justify-center text-[#3B82F6]">
-                <span className="material-symbols-outlined">group</span>
-              </div>
-            </div>
-            
-            {/* KPI 2: Sıcak Fırsatlar */}
-            <div className="bg-[#16181D] border border-[#2A2D35] rounded-xl p-4 flex items-center justify-between shadow-sm">
-              <div>
-                <p className="text-[#7C8090] text-xs font-medium mb-1">Sıcak Fırsatlar</p>
-                <h4 className="text-2xl font-bold text-[#10B981]">{hotLeads}</h4>
-              </div>
-              <div className="w-10 h-10 rounded-full bg-[#10B981]/10 flex items-center justify-center text-[#10B981]">
-                <span className="material-symbols-outlined">local_fire_department</span>
-              </div>
-            </div>
-
-            {/* KPI 3: Bugünkü Takipler */}
-            <div className="bg-[#16181D] border border-[#2A2D35] rounded-xl p-4 flex items-center justify-between shadow-sm">
-              <div>
-                <p className="text-[#7C8090] text-xs font-medium mb-1">Bugünkü Takipler</p>
-                <h4 className="text-2xl font-bold text-[#F5A623]">{remindersToday.length}</h4>
-              </div>
-              <div className="w-10 h-10 rounded-full bg-[#F5A623]/10 flex items-center justify-center text-[#F5A623]">
-                <span className="material-symbols-outlined">alarm</span>
-              </div>
-            </div>
-
-            {/* Plan Banner */}
-            <div className="bg-gradient-to-br from-[#1E2025] to-[#16181D] border border-[#2A2D35] rounded-xl p-4 flex flex-col justify-center shadow-sm relative overflow-hidden">
-              <div className="absolute -top-2 -right-2 p-2 opacity-[0.03]">
-                 <span className="material-symbols-outlined text-[80px] text-white">diamond</span>
-              </div>
-              <p className="text-[#7C8090] text-xs font-medium mb-1 z-10">Mevcut Planınız</p>
-              <div className="flex items-center justify-between z-10 mt-1">
-                <h4 className="text-sm font-bold text-[#F5A623] uppercase tracking-wider">{currentPlan === 'free' ? 'ÜCRETSİZ' : currentPlan}</h4>
-                {currentPlan !== 'proplus' && (
-                  <button 
-                    onClick={() => setIsPricingModalOpen(true)}
-                    className="text-xs font-bold text-[#F1F2F4] bg-[#2A2D35] hover:bg-[#3A3D45] px-2.5 py-1.5 rounded transition-colors shadow-sm"
-                  >
-                    Yükselt
-                  </button>
-                )}
-              </div>
-            </div>
+          {/* STAT BANTI */}
+          <div className="w-full flex items-center bg-transparent border-b border-[#2A2D35] pb-4 shrink-0">
+             <div className="flex-1 flex flex-col items-start px-4 border-r border-[#2A2D35]">
+                 <span className="text-[#7C8090] text-[11px] uppercase tracking-wider mb-1">Toplam Lead</span>
+                 <span className="font-mono text-[24px] text-[#F1F2F4] leading-none font-bold">{leads.length}</span>
+             </div>
+             <div className="flex-1 flex flex-col items-start px-4 border-r border-[#2A2D35]">
+                 <span className="text-[#7C8090] text-[11px] uppercase tracking-wider mb-1">Sıcak Fırsatlar</span>
+                 <span className="font-mono text-[24px] text-[#EF4444] leading-none font-bold">{hotLeads}</span>
+             </div>
+             <div className="flex-1 flex flex-col items-start px-4 border-r border-[#2A2D35]">
+                 <span className="text-[#7C8090] text-[11px] uppercase tracking-wider mb-1">Bugünkü Takipler</span>
+                 <span className="font-mono text-[24px] text-[#F5A623] leading-none font-bold">{remindersToday.length}</span>
+             </div>
+             <div className="flex-1 flex flex-col items-start px-4">
+                 <span className="text-[#7C8090] text-[11px] uppercase tracking-wider mb-1">Bu Ay Satış</span>
+                 <span className="font-mono text-[24px] text-[#10B981] leading-none font-bold">2</span>
+             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 shrink-0 h-[280px]">
-            <div className="lg:col-span-2 h-full">
-              {/* AI Action Center (Günün Komutları) */}
-              <ActionCenter leads={leads} onActionClick={(action) => {
-                if (action.actionName === 'wakeup' && action.leadId) {
-                  handleWakeUp(action.leadId);
-                } else if (action.leadId) {
-                  setSelectedLeadId(action.leadId);
-                }
-              }} />
-            </div>
-            <div className="h-full">
-              {/* AI Takvim Görevleri / Hatırlatıcılar */}
-              <AgendaView leads={leads} />
-            </div>
+          {/* GÜNÜN ÖNERİSİ */}
+          <div className="shrink-0">
+            <ActionCenter leads={leads} onActionClick={(action) => {
+              if (action.actionName === 'wakeup' && action.leadId) {
+                handleWakeUp(action.leadId);
+              } else if (action.leadId) {
+                setSelectedLeadId(action.leadId);
+              }
+            }} />
           </div>
           
-          {/* Kanban Board */}
-          <div className="flex-1 flex gap-6 overflow-x-auto min-h-[400px]">
-            {['Sıcak', 'Ilık', 'Soğuk'].map(status => (
-              <div 
-                key={status}
-                className="flex-1 min-w-[300px] flex flex-col bg-[#16181D] rounded-xl border border-[#2A2D35] overflow-hidden"
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, status)}
-              >
-                <div className={`p-4 border-b border-[#2A2D35] flex justify-between items-center ${getStatusBgColor(status)} bg-opacity-20`}>
-                  <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-[18px]">
-                      {status === 'Sıcak' ? 'local_fire_department' : status === 'Ilık' ? 'thermostat' : 'ac_unit'}
-                    </span>
-                    <h3 className="font-semibold text-sm">{status}</h3>
-                  </div>
-                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-black/20">
-                    {leads.filter(l => l.label === status).length}
-                  </span>
-                </div>
-                <div className="flex-1 p-3 overflow-y-auto space-y-3 custom-scrollbar bg-[#0A0B0D]/50">
-                  {leads.filter(l => l.label === status).map(lead => (
-                    <div
-                      key={lead.id}
-                      draggable
-                      onDragStart={(e) => handleDragStart(e, lead.id)}
-                      onClick={() => setSelectedLeadId(lead.id)}
-                      className="cursor-pointer"
-                    >
-                      <LeadCard lead={lead} />
-                    </div>
-                  ))}
-                  {leads.filter(l => l.label === status).length === 0 && (
-                    <div className="h-full flex flex-col items-center justify-center text-[#7C8090] opacity-50 space-y-2 py-8">
-                      <span className="material-symbols-outlined text-[32px]">inbox</span>
-                      <p className="text-xs">Bu listede lead yok</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
+          {/* LEAD KANBAN & AJANDA */}
+          <div className="flex-1 flex gap-6 overflow-hidden min-h-[400px]">
+             {/* Kanban (flex:3) */}
+             <div className="flex-[3] flex gap-4 overflow-x-auto">
+               {['Sıcak', 'Ilık', 'Soğuk'].map(status => {
+                 const statusData = {
+                   'Sıcak': { color: 'text-[#EF4444]', bg: 'bg-[#EF4444]/15', icon: '🔴' },
+                   'Ilık': { color: 'text-[#F5A623]', bg: 'bg-[#F5A623]/15', icon: '🟡' },
+                   'Soğuk': { color: 'text-[#3B82F6]', bg: 'bg-[#3B82F6]/15', icon: '🔵' }
+                 };
+                 const currentStatus = statusData[status];
+                 const filteredLeads = leads.filter(l => l.label === status);
+                 
+                 return (
+                   <div 
+                     key={status}
+                     className="flex-1 min-w-[280px] flex flex-col bg-[#0F1012] overflow-hidden"
+                     onDragOver={handleDragOver}
+                     onDrop={(e) => handleDrop(e, status)}
+                   >
+                     <div className="pb-3 flex items-center gap-2 shrink-0">
+                       <span className="text-sm">{currentStatus.icon}</span>
+                       <h3 className={`font-medium text-[13px] ${currentStatus.color}`}>{status}</h3>
+                       <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${currentStatus.bg} ${currentStatus.color}`}>
+                         {filteredLeads.length}
+                       </span>
+                     </div>
+                     <div className="flex-1 overflow-y-auto space-y-3 custom-scrollbar h-[calc(100vh-280px)]">
+                       {filteredLeads.map(lead => (
+                         <div
+                           key={lead.id}
+                           draggable
+                           onDragStart={(e) => handleDragStart(e, lead.id)}
+                           onClick={() => setSelectedLeadId(lead.id)}
+                         >
+                           <LeadCard lead={lead} />
+                         </div>
+                       ))}
+                       {filteredLeads.length === 0 && status === 'Sıcak' && (
+                         <div className="h-full flex flex-col items-center justify-center text-[#7C8090] text-center px-4 space-y-2 opacity-60 mt-10">
+                           <span className="material-symbols-outlined text-[32px] mb-2">whatshot</span>
+                           <p className="text-[13px] font-medium text-[#F1F2F4]">Henüz Sıcak lead yok</p>
+                           <p className="text-[12px] leading-relaxed">Yeni mesaj analiz ettiğinizde<br/>sıcak leadler burada görünecek.</p>
+                         </div>
+                       )}
+                     </div>
+                   </div>
+                 );
+               })}
+             </div>
+             
+             {/* Ajanda (flex:1) */}
+             <div className="flex-1 max-w-[320px] h-full flex flex-col">
+                <AgendaView leads={leads} />
+             </div>
           </div>
         </div>
       </div>
@@ -473,23 +446,7 @@ const AgentDashboard = () => {
         </>
       )}
 
-      {/* Floating Action Buttons */}
-      <div className="fixed bottom-8 right-8 flex flex-col gap-4 z-40">
-        <button 
-          onClick={() => setIsVoiceModalOpen(true)} 
-          className="w-14 h-14 bg-[#1C1E24] border border-[#2A2D35] rounded-full shadow-[0_8px_16px_rgba(0,0,0,0.4)] flex items-center justify-center hover:scale-110 hover:border-[#3B82F6] hover:text-[#3B82F6] text-[#F1F2F4] transition-all group"
-          title="Sesli Not Ekle"
-        >
-          <span className="material-symbols-outlined text-[24px]">mic</span>
-        </button>
-        <button 
-          onClick={handleNewLeadClick} 
-          className="w-14 h-14 bg-gradient-to-br from-[#F5A623] to-[#d48c1a] rounded-full shadow-[0_8px_16px_rgba(245,166,35,0.3)] flex items-center justify-center hover:scale-110 hover:shadow-[0_12px_24px_rgba(245,166,35,0.5)] transition-all"
-          title="Yeni Lead Ekle"
-        >
-          <span className="material-symbols-outlined text-black font-bold text-[28px]">add</span>
-        </button>
-      </div>
+      {/* Floating Action Buttons KALDIRILDI */}
 
       {/* Slide-over Drawer for New Lead */}
       {isNewLeadDrawerOpen && (

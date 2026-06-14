@@ -70,19 +70,22 @@ const Sidebar = () => {
       {/* Footer Navigation Tabs */}
       <ul className="mt-auto border-t border-outline-variant pt-stack-sm flex flex-col gap-unit">
         
-        {/* Upgrade Plan Button */}
-        {user?.plan === 'free' && (
-          <li className="mb-2">
+        {/* Plan Info (Minimal) */}
+        <li className="mt-2 pt-3 border-t border-[#2A2D35] px-2">
+          <div className="flex items-center gap-2 text-[11px] text-[#7C8090]">
+            <span className="material-symbols-outlined text-[14px]">hexagon</span>
+            <span className="uppercase tracking-wider font-semibold">{user?.plan === 'free' ? 'ÜCRETSİZ' : user?.plan || 'FREE'}</span>
+          </div>
+          {user?.plan !== 'proplus' && (
             <NavLink
               to="/plans"
               onClick={() => closeSidebar()}
-              className="w-full flex items-center justify-center gap-2 p-2 bg-[#F5A623] hover:bg-[#d9921e] text-[#0A0B0D] font-bold rounded-lg transition-colors shadow-[0_0_15px_rgba(245,166,35,0.2)]"
+              className="block ml-6 mt-0.5 text-[11px] text-[#7C8090] hover:text-[#F1F2F4] transition-colors"
             >
-              <span className="text-[16px]">🚀</span>
-              <span className="text-[13px] uppercase tracking-wider">Planı Yükselt</span>
+              Yenile
             </NavLink>
-          </li>
-        )}
+          )}
+        </li>
 
         <li className="group">
           <NavLink
