@@ -1,4 +1,5 @@
 import React, { useState, useContext } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AuthContext } from '../contexts/AuthContext';
@@ -271,159 +272,18 @@ const AgentDashboard = () => {
               <AgendaView leads={leads} />
             </div>
           </div>
-
-          {/* Mobile Tabs */}
-          <div className="md:hidden flex gap-2 overflow-x-auto shrink-0 pb-2 border-b border-outline-variant">
-            {['Sıcak', 'Ilık', 'Soğuk'].map(status => (
-              <button 
-                key={status} 
-                onClick={() => setActiveTab(status)} 
-                className={clsx(
-                  "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors", 
-                  activeTab === status ? getStatusBgColor(status) : 'bg-surface-container text-on-surface-variant border border-outline-variant'
-                )}
-              >
-                {status} ({leads.filter(l => l.label === status).length})
-              </button>
-            ))}
+          
+          {/* Lead Yönetimi CTA */}
+          <div className="w-full bg-[#16181D] border border-[#2A2D35] rounded-xl p-8 flex flex-col items-center justify-center text-center mt-4 shadow-sm">
+             <div className="w-16 h-16 rounded-full bg-[#1E2028] flex items-center justify-center mb-4">
+                <span className="material-symbols-outlined text-[#F5A623] text-3xl">group</span>
+             </div>
+             <h2 className="text-xl font-bold text-[#F1F2F4] mb-2">Lead Yönetimi Taşındı</h2>
+             <p className="text-[#7C8090] mb-6 max-w-md">Müşteri adaylarınızı yönetmek, filtrelemek ve AI analizlerini daha detaylı incelemek için yeni Leadler sayfasına gidin.</p>
+             <Link to="/leads" className="bg-[#F5A623] hover:bg-[#d9921e] text-[#0A0B0D] font-bold px-6 py-3 rounded-lg text-sm transition-colors shadow-[0_0_15px_rgba(245,166,35,0.2)] flex items-center gap-2">
+                Lead Sayfasına Git <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+             </Link>
           </div>
-
-          {/* Kanban Board Container (Drag and Drop) */}
-          <DragDropContext onDragEnd={(result) => {
-            const { destination, source, draggableId } = result;
-            if (!destination) return;
-            if (destination.droppableId === source.droppableId && destination.index === source.index) return;
-            
-            const newStatus = destination.droppableId;
-            const leadId = draggableId;
-            
-            const previousLeads = queryClient.getQueryData(['leads']);
-            const targetLead = previousLeads.find(l => l.id === leadId);
-            if (!targetLead || targetLead.label === newStatus) return;
-
-            // Optimistic Update
-            queryClient.setQueryData(['leads'], old => {
-               const newLeads = Array.from(old);
-               const idx = newLeads.findIndex(l => l.id === leadId);
-               newLeads[idx] = { ...newLeads[idx], label: newStatus };
-               return newLeads;
-            });
-            
-            setShowSuccessTick(true);
-            setTimeout(() => setShowSuccessTick(false), 1500);
-
-            axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/${leadId}`, { label: newStatus }, {
-              headers: { Authorization: `Bearer ${token}` }
-            }).catch(() => {
-              queryClient.setQueryData(['leads'], previousLeads);
-            });
-          }}>
-            <div className="flex-1 overflow-x-auto overflow-y-hidden flex gap-6 pb-4">
-               {['Sıcak', 'Ilık', 'Soğuk'].map(status => (
-                  <div 
-                    key={status} 
-                    className={clsx(
-                      "w-full md:w-[340px] shrink-0 flex flex-col bg-surface-container-low rounded-xl border border-outline-variant h-full shadow-2xl",
-                      "md:flex",
-                      activeTab === status ? "flex" : "hidden"
-                    )} 
-                  >
-                    {/* Column Header */}
-                    <div className="p-4 border-b border-outline-variant flex items-center justify-between shrink-0 bg-surface-container/50 rounded-t-xl">
-                       <h3 className="font-semibold text-on-surface flex items-center gap-2">
-                          <span className="w-2.5 h-2.5 rounded-full shadow-[0_0_8px_currentColor]" style={{backgroundColor: getStatusColor(status), color: getStatusColor(status)}}></span>
-                          {status}
-                       </h3>
-                       <span className="text-xs font-bold text-on-surface-variant bg-surface-container-high px-2.5 py-1 rounded-full border border-outline">
-                         {leads.filter(l => l.label === status).length}
-                       </span>
-                    </div>
-                    
-                    {/* Column Body (Cards) */}
-                    <Droppable droppableId={status}>
-                      {(provided, snapshot) => (
-                        <div 
-                          ref={provided.innerRef}
-                          {...provided.droppableProps}
-                          className={clsx(
-                            "p-3 flex-1 overflow-y-auto flex flex-col gap-3 custom-scrollbar transition-colors",
-                            snapshot.isDraggingOver ? "bg-primary/5" : ""
-                          )}
-                        >
-                           {loading && <p className="text-on-surface-variant text-sm text-center mt-4">Yükleniyor...</p>}
-                           {!loading && leads.filter(l => l.label === status).length === 0 && (
-                             <div className="flex flex-col items-center justify-center h-32 opacity-50 border border-dashed border-outline rounded-lg mt-2">
-                               <span className="material-symbols-outlined text-on-surface-variant text-2xl mb-1">inbox</span>
-                               <p className="text-on-surface-variant text-sm text-center">Lead yok</p>
-                             </div>
-                           )}
-                           
-                           {leads.filter(l => l.label === status).map((lead, index) => (
-                              <Draggable key={lead.id} draggableId={lead.id} index={index}>
-                                {(provided, snapshot) => (
-                                  <div 
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                    className={clsx(
-                                      "transition-all relative group",
-                                      snapshot.isDragging ? "z-50 scale-105" : "",
-                                      selectedLeadId === lead.id && !snapshot.isDragging ? "ring-2 ring-primary/50 rounded-xl" : ""
-                                    )}
-                                  >
-                                    <LeadCard 
-                                      name={lead.name === '[İsim Belirtilmedi]' ? 'İsimsiz Lead' : lead.name}
-                                      phone={lead.phone === '[Telefon Belirtilmedi]' ? 'Telefon Yok' : lead.phone}
-                                      score={lead.score ? lead.score * 10 : 50} 
-                                      urgency={lead.score >= 8 ? 'high' : lead.score >= 5 ? 'medium' : 'low'}
-                                      summary={lead.reasoning || lead.whatsapp_draft || 'Özet bekleniyor...'}
-                                      onClick={() => setSelectedLeadId(lead.id)}
-                                      redFlag={(() => {
-                                        try {
-                                          const p = typeof lead.properties === 'string' ? JSON.parse(lead.properties) : lead.properties;
-                                          return p?.potential_risks && p.potential_risks.length > 0;
-                                        } catch(e) { return false; }
-                                      })()}
-                                      redFlagReason={(() => {
-                                        try {
-                                          const p = typeof lead.properties === 'string' ? JSON.parse(lead.properties) : lead.properties;
-                                          return p?.potential_risks?.join(', ') || null;
-                                        } catch(e) { return null; }
-                                      })()}
-                                      actionType={(() => {
-                                        try {
-                                          const p = typeof lead.properties === 'string' ? JSON.parse(lead.properties) : lead.properties;
-                                          return p?.customer_intent === 'buyer' || p?.customer_intent === 'investor' ? 'sale' : 'rent';
-                                        } catch(e) { return 'unknown'; }
-                                      })()}
-                                      budgetStr={(() => {
-                                        try {
-                                          const p = typeof lead.properties === 'string' ? JSON.parse(lead.properties) : lead.properties;
-                                          return p?.budget?.max ? `${p.budget.min || 0} - ${p.budget.max} ${p.budget.currency || 'TRY'}` : 'Bütçe Belirsiz';
-                                        } catch(e) { return 'Bütçe Belirsiz'; }
-                                      })()}
-                                      roomCount={(() => {
-                                        try {
-                                          const p = typeof lead.properties === 'string' ? JSON.parse(lead.properties) : lead.properties;
-                                          if (p?.room_count?.min) return `${p.room_count.min}${p.room_count.max ? '-'+p.room_count.max : ''} Oda`;
-                                          return 'Bilinmiyor';
-                                        } catch(e) { return 'Bilinmiyor'; }
-                                      })()}
-                                      whatsappDraft={lead.whatsapp_draft}
-                                      onWakeUp={() => handleWakeUp(lead.id)}
-                                    />
-                                  </div>
-                                )}
-                              </Draggable>
-                           ))}
-                           {provided.placeholder}
-                        </div>
-                      )}
-                    </Droppable>
-                  </div>
-               ))}
-            </div>
-          </DragDropContext>
 
         </div>
       </div>
