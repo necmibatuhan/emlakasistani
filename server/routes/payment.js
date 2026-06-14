@@ -179,12 +179,17 @@ router.post('/mock-callback', authMiddleware, async (req, res) => {
 // IYZICO CHECKOUT
 router.post('/iyzico-checkout', authMiddleware, async (req, res) => {
   try {
-    const { plan } = req.body;
+    const { plan, billingCycle = 'monthly' } = req.body;
     if (!['pro', 'proplus'].includes(plan)) {
       return res.status(400).json({ message: 'Geçersiz plan seçimi' });
     }
 
-    const price = plan === 'pro' ? '299.0' : '599.0';
+    let price = '0.0';
+    if (plan === 'pro') {
+      price = billingCycle === 'yearly' ? '1490.0' : '149.0';
+    } else if (plan === 'proplus') {
+      price = billingCycle === 'yearly' ? '2490.0' : '249.0';
+    }
     const user = req.user;
     
     const userRes = await db.query('SELECT * FROM users WHERE id = $1', [user.id]);
