@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import Sidebar from '../components/Sidebar';
+import { UIContext } from '../contexts/UIContext';
 
 const MOCK_LEADS = [
   {
@@ -87,6 +88,7 @@ const getLabelStyle = (label) => {
 };
 
 const Leads = () => {
+  const { toggleSidebar } = useContext(UIContext);
   const [activeTab, setActiveTab] = useState('Tümü');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLead, setSelectedLead] = useState(null);
@@ -118,13 +120,19 @@ const Leads = () => {
     <div className="flex h-screen bg-[#0A0B0D] text-[#F1F2F4] font-sans overflow-hidden">
       <Sidebar />
       
-      <main className="flex-1 flex flex-col min-w-0">
+      <main className="lg:ml-[240px] flex-1 flex flex-col h-screen w-full overflow-hidden">
         
         {/* PAGE HEADER */}
-        <header className="h-[72px] flex-shrink-0 border-b border-[#2A2D35] px-6 flex items-center justify-between">
+        <header className="h-[72px] flex-shrink-0 border-b border-[#2A2D35] px-4 lg:px-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
+            <button 
+              onClick={toggleSidebar} 
+              className="lg:hidden p-1 mr-1 text-[#F1F2F4] hover:bg-[#1E2028] rounded-md transition-colors"
+            >
+              <span className="material-symbols-outlined text-[24px]">menu</span>
+            </button>
             <h1 className="text-[18px] font-medium text-[#F1F2F4]">Leadler</h1>
-            <span className="text-[13px] text-[#7C8090]">24 lead</span>
+            <span className="text-[13px] text-[#7C8090] hidden sm:inline">24 lead</span>
           </div>
           
           <div className="flex-1 max-w-[280px] mx-8">
