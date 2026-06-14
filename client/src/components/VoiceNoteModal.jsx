@@ -20,6 +20,10 @@ const VoiceNoteModal = ({ isOpen, onClose, onRecordingComplete }) => {
 
   const startRecording = async () => {
     try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert('Tarayıcınız mikrofonu desteklemiyor veya güvenli bağlantı (HTTPS/localhost) gerektiriyor.');
+        return;
+      }
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
       const mediaRecorder = new MediaRecorder(stream, { mimeType });
