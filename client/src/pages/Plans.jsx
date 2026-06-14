@@ -18,12 +18,16 @@ const Plans = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/payment/mock-checkout`, { plan }, {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/payment/iyzico-checkout`, { plan }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      if (res.data.success) {
-        navigate('/mock-checkout', { state: res.data.data });
+      if (res.data.success && res.data.data.paymentPageUrl) {
+        window.location.href = res.data.data.paymentPageUrl + '&iframe=false';
+      } else if (res.data.success && res.data.data.htmlContent) {
+        // Fallback for direct form rendering if paymentPageUrl is missing
+        const newWindow = window.open('', '_self');
+        newWindow.document.write(res.data.data.htmlContent);
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Ödeme sistemi başlatılamadı.');

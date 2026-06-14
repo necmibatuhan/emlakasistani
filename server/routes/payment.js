@@ -3,6 +3,13 @@ const router = express.Router();
 const crypto = require('crypto');
 const db = require('../db');
 const { authMiddleware } = require('../middleware/auth');
+const Iyzipay = require('iyzipay');
+
+const iyzipay = new Iyzipay({
+  apiKey: process.env.IYZICO_API_KEY || 'sandbox-12345',
+  secretKey: process.env.IYZICO_SECRET_KEY || 'sandbox-secret-12345',
+  uri: process.env.IYZICO_BASE_URL || 'https://sandbox-api.iyzipay.com'
+});
 
 // Shopier Checkout (Ödeme Formunu Başlatma)
 router.post('/shopier-checkout', authMiddleware, async (req, res) => {
@@ -29,7 +36,7 @@ router.post('/shopier-checkout', authMiddleware, async (req, res) => {
 
     const API_KEY = process.env.SHOPIER_API_KEY || 'TEST_API_KEY';
     const API_SECRET = process.env.SHOPIER_API_SECRET || 'TEST_API_SECRET';
-    const CALLBACK_URL = `${process.env.VITE_API_URL || 'http://localhost:5001'}/api/payment/shopier-callback`;
+    const CALLBACK_URL = `${process.env.API_URL || 'http://localhost:5001'}/api/payment/shopier-callback`;
 
     // Shopier variables
     const random_nr = Math.floor(Math.random() * 1000000).toString();
@@ -166,6 +173,133 @@ router.post('/mock-callback', authMiddleware, async (req, res) => {
     console.error('Mock Callback error:', err);
     res.status(500).json({ message: 'Callback Error' });
   }
+});
+
+
+// IYZICO CHECKOUT
+router.post('/iyzico-checkout', authMiddleware, async (req, res) => {
+  try {
+    const { plan } = req.body;
+    if (!['pro', 'proplus'].includes(plan)) {
+      return res.status(400).json({ message: 'Geçersiz plan seçimi' });
+    }
+
+    const price = plan === 'pro' ? '299.0' : '599.0';
+    const user = req.user;
+    
+    const userRes = await db.query('SELECT * FROM users WHERE id = $1', [user.id]);
+    if (userRes.rows.length === 0) return res.status(404).json({ message: 'Kullanıcı bulunamadı' });
+    const dbUser = userRes.rows[0];
+
+    const userNameParts = dbUser.name ? dbUser.name.split(' ') : ['İsimsiz', 'Kullanıcı'];
+    const buyerName = userNameParts[0] || 'Müşteri';
+    const buyerSurname = userNameParts.slice(1).join(' ') || 'Soyadı';
+
+    const conversationId = `CONV_${Date.now()}_${dbUser.id}`;
+    // Encode plan and userId into basketId so we can retrieve them in callback
+    const basketId = `${plan}|${dbUser.id}`;
+
+    const request = {
+      locale: Iyzipay.LOCALE.TR,
+      conversationId: conversationId,
+      price: price,
+      paidPrice: price,
+      currency: Iyzipay.CURRENCY.TRY,
+      basketId: basketId,
+      paymentGroup: Iyzipay.PAYMENT_GROUP.SUBSCRIPTION,
+      callbackUrl: `${process.env.API_URL || 'http://localhost:5001'}/api/payment/iyzico-callback`,
+      enabledInstallments: [2, 3, 6, 9],
+      buyer: {
+        id: dbUser.id,
+        name: buyerName,
+        surname: buyerSurname,
+        gsmNumber: '+905555555555',
+        email: dbUser.email,
+        identityNumber: '11111111111',
+        lastLoginDate: '2023-01-01 10:00:00',
+        registrationDate: '2023-01-01 10:00:00',
+        registrationAddress: 'Nidakule Göztepe, Merdivenköy Mah. Bora Sok. No:1',
+        ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress || '85.34.78.112',
+        city: 'Istanbul',
+        country: 'Turkey',
+        zipCode: '34732'
+      },
+      shippingAddress: {
+        contactName: dbUser.name || 'Müşteri',
+        city: 'Istanbul',
+        country: 'Turkey',
+        address: 'Nidakule Göztepe, Merdivenköy Mah. Bora Sok. No:1',
+        zipCode: '34732'
+      },
+      billingAddress: {
+        contactName: dbUser.name || 'Müşteri',
+        city: 'Istanbul',
+        country: 'Turkey',
+        address: 'Nidakule Göztepe, Merdivenköy Mah. Bora Sok. No:1',
+        zipCode: '34732'
+      },
+      basketItems: [
+        {
+          id: basketId,
+          name: plan === 'pro' ? 'Emlak Asistanı PRO Abonelik' : 'Emlak Asistanı PRO+ Abonelik',
+          category1: 'Subscription',
+          itemType: Iyzipay.BASKET_ITEM_TYPE.VIRTUAL,
+          price: price
+        }
+      ]
+    };
+
+    iyzipay.checkoutFormInitialize.create(request, function (err, result) {
+      if (err || result.status !== 'success') {
+        console.error('Iyzico Init Error:', err || result);
+        return res.status(500).json({ message: 'Ödeme formu başlatılamadı.', error: result?.errorMessage || err });
+      }
+
+      res.json({
+        success: true,
+        data: {
+          paymentPageUrl: result.paymentPageUrl,
+          token: result.token,
+          htmlContent: result.checkoutFormContent
+        }
+      });
+    });
+
+  } catch (err) {
+    console.error('Checkout error:', err);
+    res.status(500).json({ message: 'Ödeme başlatılamadı.' });
+  }
+});
+
+// IYZICO CALLBACK
+router.post('/iyzico-callback', async (req, res) => {
+  const token = req.body.token;
+  
+  if (!token) {
+    return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/payment-result?status=fail`);
+  }
+
+  iyzipay.checkoutForm.retrieve({
+    locale: Iyzipay.LOCALE.TR,
+    token: token
+  }, async function (err, result) {
+    if (err || result.paymentStatus !== 'SUCCESS') {
+      console.error('Iyzico retrieve error:', err || result);
+      return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/payment-result?status=fail`);
+    }
+
+    // result.basketId contains 'plan|userId'
+    const basketId = result.basketId || '';
+    const [plan, userId] = basketId.split('|');
+
+    if (userId && plan) {
+      await db.query('UPDATE users SET plan = $1 WHERE id = $2', [plan, userId]);
+      console.log(`Iyzico: User ${userId} upgraded to ${plan}`);
+      return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/payment-result?status=success`);
+    } else {
+      return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/payment-result?status=fail`);
+    }
+  });
 });
 
 module.exports = router;
