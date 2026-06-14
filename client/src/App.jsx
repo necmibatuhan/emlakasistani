@@ -11,6 +11,7 @@ import CompanyDashboard from './pages/CompanyDashboard';
 import OfficeDashboard from './pages/OfficeDashboard';
 import AgentDashboard from './pages/AgentDashboard';
 import Leads from './pages/Leads';
+import Integrations from './pages/Integrations';
 import WhatsApp from './pages/WhatsApp';
 import Stats from './pages/Stats';
 import Plans from './pages/Plans';
@@ -62,6 +63,7 @@ const AppRoutes = () => {
       <Route path="/gizlilik-politikasi" element={<GizlilikPolitikasi />} />
       <Route path="/dashboard" element={<ProtectedRoute><RoleBasedDashboard /></ProtectedRoute>} />
       <Route path="/leads" element={<ProtectedRoute><Leads /></ProtectedRoute>} />
+      <Route path="/integrations" element={<ProtectedRoute><Integrations /></ProtectedRoute>} />
       <Route path="/whatsapp" element={<ProtectedRoute><WhatsApp /></ProtectedRoute>} />
       <Route path="/properties" element={<ProtectedRoute><Properties /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
