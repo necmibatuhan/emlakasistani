@@ -1,4 +1,6 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useRef, useEffect } from 'react';
+import axios from 'axios';
+import { AuthContext } from '../contexts/AuthContext';
 import Sidebar from '../components/Sidebar';
 import { UIContext } from '../contexts/UIContext';
 
@@ -89,10 +91,86 @@ const getLabelStyle = (label) => {
 
 const Leads = () => {
   const { toggleSidebar } = useContext(UIContext);
+  const { token } = useContext(AuthContext);
   const [activeTab, setActiveTab] = useState('Tümü');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLead, setSelectedLead] = useState(null);
   const [isNewLeadModalOpen, setIsNewLeadModalOpen] = useState(false);
+  const [newLeadMessage, setNewLeadMessage] = useState('');
+
+  // Voice Recording States
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const timerRef = useRef(null);
+
+  useEffect(() => {
+    return () => clearInterval(timerRef.current);
+  }, []);
+
+  const handleStartVoice = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+      const mediaRecorder = new MediaRecorder(stream, { mimeType });
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
+      };
+
+      mediaRecorder.onstop = async () => {
+        stream.getTracks().forEach(track => track.stop());
+        clearInterval(timerRef.current);
+        
+        if (audioChunksRef.current.length === 0) return;
+        
+        const blob = new Blob(audioChunksRef.current, { type: mimeType });
+        await transcribeAudio(blob, mimeType);
+      };
+
+      mediaRecorder.start(100);
+      setIsRecording(true);
+      setRecordingTime(0);
+      
+      timerRef.current = setInterval(() => {
+        setRecordingTime(prev => prev + 1);
+      }, 1000);
+    } catch (err) {
+      alert('Mikrofona erişilemedi.');
+    }
+  };
+
+  const handleStopVoice = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const transcribeAudio = async (blob, mimeType) => {
+    setIsTranscribing(true);
+    try {
+      const extension = mimeType?.includes('mp4') ? 'm4a' : 'webm';
+      const formData = new FormData();
+      formData.append('audio', blob, `voicenote.${extension}`);
+      
+      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/voice/transcribe`, formData, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (res.data && res.data.text) {
+        setNewLeadMessage(prev => prev ? prev + ' ' + res.data.text : res.data.text);
+      }
+    } catch (err) {
+      alert('Ses metne dönüştürülürken hata oluştu.');
+    } finally {
+      setIsTranscribing(false);
+    }
+  };
 
   // Tab filtering
   const tabs = [
@@ -485,10 +563,25 @@ const Leads = () => {
                 <input type="tel" className="w-full bg-[#0A0B0D] border border-[#2A2D35] rounded-[6px] px-4 py-2.5 text-[14px] text-[#F1F2F4] focus:outline-none focus:border-[#F5A623]" />
               </div>
               <div>
-                <label className="block text-[13px] text-[#7C8090] mb-1.5">Mesaj (Müşteri Talebi)</label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-[13px] text-[#7C8090]">Mesaj (Müşteri Talebi)</label>
+                  {isRecording ? (
+                    <button onClick={handleStopVoice} className="flex items-center gap-1.5 text-xs text-[#EF4444] bg-[#EF4444]/10 px-2 py-1 rounded">
+                      <span className="material-symbols-outlined text-[14px]">stop_circle</span> 
+                      Durdur ({Math.floor(recordingTime/60)}:{(recordingTime%60).toString().padStart(2, '0')})
+                    </button>
+                  ) : (
+                    <button onClick={handleStartVoice} disabled={isTranscribing} className="flex items-center gap-1.5 text-xs text-[#F5A623] hover:text-[#d9921e] disabled:opacity-50">
+                      {isTranscribing ? <span className="material-symbols-outlined text-[14px] animate-spin">hourglass_empty</span> : <span className="material-symbols-outlined text-[14px]">mic</span>}
+                      {isTranscribing ? 'Çevriliyor...' : 'Sesle Yazdır'}
+                    </button>
+                  )}
+                </div>
                 <textarea 
                   rows={5}
                   placeholder="Örn: Kadıköy'de 3+1 arıyorum, bütçem 5M TL..."
+                  value={newLeadMessage}
+                  onChange={(e) => setNewLeadMessage(e.target.value)}
                   className="w-full bg-[#0A0B0D] border border-[#2A2D35] rounded-[6px] px-4 py-2.5 text-[14px] text-[#F1F2F4] placeholder-[#7C8090] focus:outline-none focus:border-[#F5A623] resize-none"
                 />
               </div>
