@@ -18,8 +18,8 @@ const Sidebar = () => {
     { to: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
     { to: '/leads', label: 'Leadler', icon: 'group' },
     { to: '/properties', label: 'Portföy', icon: 'home_work' },
-    { to: '/stats', label: 'İstatistikler', icon: 'analytics' },
     { to: '/integrations', label: 'Entegrasyonlar', icon: 'sync' },
+    { to: '/stats', label: 'İstatistikler', icon: 'analytics', badge: 'Beta' },
   ];
 
   return (
@@ -60,6 +60,11 @@ const Sidebar = () => {
                     {item.icon}
                   </span>
                   <span>{item.label}</span>
+                  {item.badge && (
+                    <span className="ml-auto text-[11px] bg-[#2A2D35] text-[#7C8090] px-1.5 py-0.5 rounded font-medium">
+                      {item.badge}
+                    </span>
+                  )}
                 </>
               )}
             </NavLink>

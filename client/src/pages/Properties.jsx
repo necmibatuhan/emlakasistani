@@ -103,6 +103,28 @@ const Properties = () => {
                         <span>{prop.sqm}m²</span>
                       </div>
                     </div>
+                    
+                    {/* Eşleşme Bildirimi */}
+                    {(() => {
+                       const matchCount = (prop.id % 4) === 0 ? 0 : (prop.id % 4); 
+                       if (matchCount === 0) return null;
+
+                       const isHighMatch = matchCount >= 3;
+                       return (
+                         <div className="mt-4 pt-4 border-t border-[#2A2D35] flex flex-col gap-2">
+                           <div className={`text-[12px] font-medium flex items-center gap-1.5 ${isHighMatch ? 'text-[#EF4444]' : 'text-[#F5A623]'}`}>
+                             {isHighMatch && <span>🔥</span>}
+                             {matchCount} aktif müşteri eşleşiyor
+                           </div>
+                           <button 
+                             onClick={() => alert('Eşleşen lead modalı açılacak (mock)')}
+                             className="w-full text-left text-[11px] font-medium text-[#7C8090] hover:text-[#F1F2F4] transition-colors"
+                           >
+                             [Eşleşmeleri Gör →]
+                           </button>
+                         </div>
+                       );
+                    })()}
                   </div>
                 </div>
               ))}

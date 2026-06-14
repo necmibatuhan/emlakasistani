@@ -15,6 +15,7 @@ import { format, isToday } from 'date-fns';
 import { tr } from 'date-fns/locale';
 import ActionCenter from '../components/ActionCenter';
 import AgendaView from '../components/AgendaView';
+import MorningSummary from '../components/MorningSummary';
 import PricingModal from '../components/PricingModal';
 
 const AgentDashboard = () => {
@@ -238,83 +239,36 @@ const AgentDashboard = () => {
           {/* STAT BANTI */}
           <div className="w-full flex items-center bg-transparent border-b border-[#2A2D35] pb-4 shrink-0">
              <div className="flex-1 flex flex-col items-start px-4 border-r border-[#2A2D35]">
-                 <span className="text-[#7C8090] text-[11px] uppercase tracking-wider mb-1">Toplam Lead</span>
-                 <span className="font-mono text-[24px] text-[#F1F2F4] leading-none font-bold">{leads.length}</span>
+                 <span className="text-[#7C8090] text-[11px] uppercase tracking-wider mb-1">Aktivite Skoru</span>
+                 <span className="font-mono text-[24px] text-[#F1F2F4] leading-none font-bold">84</span>
              </div>
              <div className="flex-1 flex flex-col items-start px-4 border-r border-[#2A2D35]">
-                 <span className="text-[#7C8090] text-[11px] uppercase tracking-wider mb-1">Sıcak Fırsatlar</span>
-                 <span className="font-mono text-[24px] text-[#EF4444] leading-none font-bold">{hotLeads}</span>
+                 <span className="text-[#7C8090] text-[11px] uppercase tracking-wider mb-1">Ciro Potansiyeli</span>
+                 <span className="font-mono text-[24px] text-[#EF4444] leading-none font-bold">₺4.2M</span>
              </div>
              <div className="flex-1 flex flex-col items-start px-4 border-r border-[#2A2D35]">
-                 <span className="text-[#7C8090] text-[11px] uppercase tracking-wider mb-1">Bugünkü Takipler</span>
-                 <span className="font-mono text-[24px] text-[#F5A623] leading-none font-bold">{remindersToday.length}</span>
+                 <span className="text-[#7C8090] text-[11px] uppercase tracking-wider mb-1">Dönüşüm Oranı</span>
+                 <span className="font-mono text-[24px] text-[#10B981] leading-none font-bold">%28</span>
              </div>
              <div className="flex-1 flex flex-col items-start px-4">
-                 <span className="text-[#7C8090] text-[11px] uppercase tracking-wider mb-1">Bu Ay Satış</span>
-                 <span className="font-mono text-[24px] text-[#10B981] leading-none font-bold">2</span>
+                 <span className="text-[#7C8090] text-[11px] uppercase tracking-wider mb-1">Bekleyen İşler</span>
+                 <span className="font-mono text-[24px] text-[#F5A623] leading-none font-bold">{remindersToday.length}</span>
              </div>
           </div>
 
-          {/* GÜNÜN ÖNERİSİ */}
-          <div className="shrink-0">
-            <ActionCenter leads={leads} onActionClick={(action) => {
-              if (action.actionName === 'wakeup' && action.leadId) {
-                handleWakeUp(action.leadId);
-              } else if (action.leadId) {
-                setSelectedLeadId(action.leadId);
-              }
-            }} />
-          </div>
-          
-          {/* LEAD KANBAN & AJANDA */}
-          <div className="flex-1 flex gap-6 overflow-hidden min-h-[400px]">
-             {/* Kanban (flex:3) */}
-             <div className="flex-[3] flex gap-4 overflow-x-auto">
-               {['Sıcak', 'Ilık', 'Soğuk'].map(status => {
-                 const statusData = {
-                   'Sıcak': { color: 'text-[#EF4444]', bg: 'bg-[#EF4444]/15', icon: '🔴' },
-                   'Ilık': { color: 'text-[#F5A623]', bg: 'bg-[#F5A623]/15', icon: '🟡' },
-                   'Soğuk': { color: 'text-[#3B82F6]', bg: 'bg-[#3B82F6]/15', icon: '🔵' }
-                 };
-                 const currentStatus = statusData[status];
-                 const filteredLeads = leads.filter(l => l.label === status);
-                 
-                 return (
-                   <div 
-                     key={status}
-                     className="flex-1 min-w-[280px] flex flex-col bg-[#0F1012] overflow-hidden"
-                     onDragOver={handleDragOver}
-                     onDrop={(e) => handleDrop(e, status)}
-                   >
-                     <div className="pb-3 flex items-center gap-2 shrink-0">
-                       <span className="text-sm">{currentStatus.icon}</span>
-                       <h3 className={`font-medium text-[13px] ${currentStatus.color}`}>{status}</h3>
-                       <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${currentStatus.bg} ${currentStatus.color}`}>
-                         {filteredLeads.length}
-                       </span>
-                     </div>
-                     <div className="flex-1 overflow-y-auto space-y-3 custom-scrollbar h-[calc(100vh-280px)]">
-                       {filteredLeads.map(lead => (
-                         <div
-                           key={lead.id}
-                           draggable
-                           onDragStart={(e) => handleDragStart(e, lead.id)}
-                           onClick={() => setSelectedLeadId(lead.id)}
-                         >
-                           <LeadCard lead={lead} />
-                         </div>
-                       ))}
-                       {filteredLeads.length === 0 && status === 'Sıcak' && (
-                         <div className="h-full flex flex-col items-center justify-center text-[#7C8090] text-center px-4 space-y-2 opacity-60 mt-10">
-                           <span className="material-symbols-outlined text-[32px] mb-2">whatshot</span>
-                           <p className="text-[13px] font-medium text-[#F1F2F4]">Henüz Sıcak lead yok</p>
-                           <p className="text-[12px] leading-relaxed">Yeni mesaj analiz ettiğinizde<br/>sıcak leadler burada görünecek.</p>
-                         </div>
-                       )}
-                     </div>
-                   </div>
-                 );
-               })}
+          <div className="flex-1 flex gap-8 overflow-hidden min-h-[400px]">
+             
+             {/* LEFT COLUMN: Actions & Tasks */}
+             <div className="flex-[3] flex flex-col gap-6 overflow-y-auto custom-scrollbar pb-10 pr-2">
+                <MorningSummary leads={leads} />
+
+                <ActionCenter leads={leads} onActionClick={(action) => {
+                  if (action.actionName === 'wakeup' && action.leadId) {
+                    handleWakeUp(action.leadId);
+                  } else if (action.leadId) {
+                    setSelectedLeadId(action.leadId);
+                  }
+                }} />
              </div>
              
              {/* Ajanda (flex:1) */}
@@ -427,20 +381,77 @@ const AgentDashboard = () => {
                 </div>
               </div>
 
-              {/* External Matches (Ters Eşleşme) */}
-              {externalMatches && externalMatches.length > 0 && (
-                <div className="mb-8">
-                  <h4 className="text-[11px] font-bold text-emerald-400 tracking-wider uppercase mb-3 border-b border-outline-variant pb-2 flex items-center gap-1">
-                    <span className="material-symbols-outlined text-[14px]">radar</span>
-                    Dış Havuz Eşleşmeleri (Ters Eşleşme)
-                  </h4>
-                  <div className="flex flex-col gap-3">
-                    {externalMatches.map(match => (
-                      <ExternalListingCard key={match.id} listing={match} />
-                    ))}
+              {/* Portföy Eşleşmeleri Motoru */}
+              <div className="mb-8">
+                <div className="bg-[#16181D] rounded-[8px] border-l-[3px] border-l-[#10B981] border-y border-r border-[#2A2D35] p-5 shadow-lg flex flex-col gap-4">
+                  <div>
+                    <h4 className="text-[13px] font-bold text-[#7C8090] uppercase tracking-wider flex items-center gap-2">
+                      <span>🎯</span> Portföy Eşleşmeleri
+                    </h4>
+                    <p className="text-[13px] text-[#F1F2F4] mt-1">Bu müşteriye uygun 4 portföy bulundu</p>
                   </div>
+                  
+                  <div className="h-[1px] w-full bg-[#2A2D35]" />
+                  
+                  <div className="flex flex-col gap-3">
+                    {/* Mock Item 1 */}
+                    <div className="flex items-center justify-between text-[13px]">
+                      <div className="flex items-center gap-2">
+                        <span>📍</span>
+                        <span className="font-bold text-[#F1F2F4]">Acıbadem 3+1</span>
+                      </div>
+                      <span className="font-mono text-[#F1F2F4]">11.5M ₺</span>
+                      <span className="text-[#F5A623] text-[12px] font-medium w-[90px]">Bütçeye yakın</span>
+                      <button className="border border-[#2A2D35] hover:bg-[#2A2D35] text-[#F1F2F4] px-2 py-1 rounded text-[11px] transition-colors">
+                        Gör →
+                      </button>
+                    </div>
+
+                    {/* Mock Item 2 */}
+                    <div className="flex items-center justify-between text-[13px]">
+                      <div className="flex items-center gap-2">
+                        <span>📍</span>
+                        <span className="font-bold text-[#F1F2F4]">Kadıköy Merkez</span>
+                      </div>
+                      <span className="font-mono text-[#F1F2F4]">9.8M ₺</span>
+                      <span className="text-[#10B981] text-[12px] font-medium w-[90px]">✓ Bütçe uygun</span>
+                      <button className="border border-[#2A2D35] hover:bg-[#2A2D35] text-[#F1F2F4] px-2 py-1 rounded text-[11px] transition-colors">
+                        Gör →
+                      </button>
+                    </div>
+
+                    {/* Mock Item 3 */}
+                    <div className="flex items-center justify-between text-[13px]">
+                      <div className="flex items-center gap-2">
+                        <span>📍</span>
+                        <span className="font-bold text-[#F1F2F4]">Moda Deniz Manz.</span>
+                      </div>
+                      <span className="font-mono text-[#F1F2F4]">6.2M ₺</span>
+                      <span className="text-[#10B981] text-[12px] font-medium w-[90px]">✓ Tam uyum</span>
+                      <button className="border border-[#2A2D35] hover:bg-[#2A2D35] text-[#F1F2F4] px-2 py-1 rounded text-[11px] transition-colors">
+                        Gör →
+                      </button>
+                    </div>
+
+                    {/* Mock Item 4 */}
+                    <div className="flex items-center justify-between text-[13px]">
+                      <div className="flex items-center gap-2">
+                        <span>📍</span>
+                        <span className="font-bold text-[#F1F2F4]">Fenerbahçe 3+1</span>
+                      </div>
+                      <span className="font-mono text-[#F1F2F4]">5.9M ₺</span>
+                      <span className="text-[#10B981] text-[12px] font-medium w-[90px]">✓ Tam uyum</span>
+                      <button className="border border-[#2A2D35] hover:bg-[#2A2D35] text-[#F1F2F4] px-2 py-1 rounded text-[11px] transition-colors">
+                        Gör →
+                      </button>
+                    </div>
+                  </div>
+
+                  <button className="w-full mt-2 pt-3 border-t border-[#2A2D35] text-center text-[12px] font-medium text-[#7C8090] hover:text-[#F1F2F4] transition-colors">
+                    Tüm Eşleşmeleri Gör (4)
+                  </button>
                 </div>
-              )}
+              </div>
             </div>
           </div>
         </>
