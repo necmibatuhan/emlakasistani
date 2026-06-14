@@ -24,7 +24,7 @@ router.post('/transcribe', authMiddleware, upload.single('audio'), async (req, r
     }
 
     try {
-      const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
       const result = await model.generateContent([
         {
           inlineData: {
@@ -150,7 +150,7 @@ Danışmanın sesli notu:
       analysis = getMockAnalysis();
     } else {
       try {
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash', generationConfig: { responseMimeType: "application/json", temperature: 0.1 } });
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash', generationConfig: { responseMimeType: "application/json", temperature: 0.1 } });
         const result = await model.generateContent([
           { text: VOICE_SYSTEM_PROMPT },
           { text: userPrompt }
@@ -299,7 +299,7 @@ router.post('/create-lead', authMiddleware, upload.single('audio'), async (req, 
       transcript = "Ahmet Bey aradı, 0532 123 45 67, Kadıköy'den 5 milyona ev bakıyor.";
     } else {
       try {
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
         const result = await model.generateContent([
           { inlineData: { mimeType, data: audioBase64 } },
           { text: "Bu ses kaydını Türkçe olarak tam ve doğru şekilde metne çevir. Sadece konuşulan metni yaz." }
@@ -337,7 +337,7 @@ ${transcript}
       parsedResult = getMockNewLead();
     } else {
       try {
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash', generationConfig: { responseMimeType: "application/json" } });
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash', generationConfig: { responseMimeType: "application/json" } });
         const aiResult = await model.generateContent(prompt);
         parsedResult = JSON.parse(aiResult.response.text());
       } catch (err) {

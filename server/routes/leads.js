@@ -219,7 +219,7 @@ Sadece aşağıdaki JSON formatında yanıt dön:
 
     let parsedResult;
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { responseMimeType: "application/json", temperature: 0.2 } });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash", generationConfig: { responseMimeType: "application/json", temperature: 0.2 } });
       const aiResult = await model.generateContent(prompt);
       let respText = aiResult.response.text().trim();
       if (respText.startsWith('```json')) respText = respText.replace('```json', '').replace('```', '').trim();
@@ -288,7 +288,7 @@ router.put('/:id/analyze', authMiddleware, async (req, res) => {
     }
     
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { responseMimeType: "application/json", temperature: 0.2 } });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash", generationConfig: { responseMimeType: "application/json", temperature: 0.2 } });
       const aiResult = await model.generateContent(prompt);
       let respText = aiResult.response.text().trim();
       if (respText.startsWith('```json')) respText = respText.replace('```json', '').replace('```', '').trim();
@@ -373,7 +373,7 @@ SADECE AŞAĞIDAKİ JSON ARRAY FORMATINDA YANIT DÖN:
     try {
       const { GoogleGenerativeAI } = require('@google/generative-ai');
       const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { responseMimeType: "application/json", temperature: 0.4 } });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash", generationConfig: { responseMimeType: "application/json", temperature: 0.4 } });
       const aiResult = await model.generateContent(aiPrompt);
       let respText = aiResult.response.text().trim();
       if (respText.startsWith('\`\`\`json')) respText = respText.replace('\`\`\`json', '').replace('\`\`\`', '').trim();
@@ -415,7 +415,7 @@ Geçmiş Notları/İhtiyacı: ${lead.message} | ${notesStr}
       generatedMessage = `Merhaba ${lead.name} Bey, [Emlakçı Adı] ben. Rehberimde tam sizin kriterlerinize uygun, güncel piyasa koşullarında satılabilir fiyat öngörüsü çok doğru olan bir yer yakaladım. Kısa sürede satışa dönecek bir fırsat. Detaylar için arıyorum.`;
     } else {
       try {
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { temperature: 0.7 } });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash", generationConfig: { temperature: 0.7 } });
         const aiResult = await model.generateContent(prompt);
         generatedMessage = aiResult.response.text().trim();
       } catch (err) {
