@@ -235,29 +235,63 @@ const AgentDashboard = () => {
 
         <div className="flex-1 flex flex-col p-6 gap-6 overflow-hidden">
           
-          {/* Top Banner for Plan */}
-          <div className="w-full bg-[#16181D] border border-[#2A2D35] rounded-xl px-6 py-4 flex items-center justify-between shrink-0 shadow-sm">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
-                <span className="material-symbols-outlined text-white text-[20px]">diamond</span>
-              </div>
+          {/* KPI Widgets & Plan Banner Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 shrink-0">
+            {/* KPI 1: Toplam Lead */}
+            <div className="bg-[#16181D] border border-[#2A2D35] rounded-xl p-4 flex items-center justify-between shadow-sm">
               <div>
-                <h3 className="text-[#F1F2F4] font-bold text-sm">Mevcut Planınız: <span className="text-[#F5A623] uppercase tracking-wider ml-1">{currentPlan === 'free' ? 'ÜCRETSİZ BAŞLANGIÇ' : currentPlan}</span></h3>
-                <p className="text-[#7C8090] text-xs mt-0.5">Daha fazla özellik için planınızı yükseltin.</p>
+                <p className="text-[#7C8090] text-xs font-medium mb-1">Toplam Lead</p>
+                <h4 className="text-2xl font-bold text-[#F1F2F4]">{leads.length}</h4>
+              </div>
+              <div className="w-10 h-10 rounded-full bg-[#3B82F6]/10 flex items-center justify-center text-[#3B82F6]">
+                <span className="material-symbols-outlined">group</span>
               </div>
             </div>
-            {currentPlan !== 'proplus' && (
-              <button 
-                onClick={() => setIsPricingModalOpen(true)}
-                className="bg-[#F5A623] hover:bg-[#d9921e] text-[#0A0B0D] font-bold px-4 py-2 rounded-lg text-sm transition-colors shadow-[0_0_15px_rgba(245,166,35,0.2)]"
-              >
-                Planı Yükselt
-              </button>
-            )}
+            
+            {/* KPI 2: Sıcak Fırsatlar */}
+            <div className="bg-[#16181D] border border-[#2A2D35] rounded-xl p-4 flex items-center justify-between shadow-sm">
+              <div>
+                <p className="text-[#7C8090] text-xs font-medium mb-1">Sıcak Fırsatlar</p>
+                <h4 className="text-2xl font-bold text-[#10B981]">{hotLeads}</h4>
+              </div>
+              <div className="w-10 h-10 rounded-full bg-[#10B981]/10 flex items-center justify-center text-[#10B981]">
+                <span className="material-symbols-outlined">local_fire_department</span>
+              </div>
+            </div>
+
+            {/* KPI 3: Bugünkü Takipler */}
+            <div className="bg-[#16181D] border border-[#2A2D35] rounded-xl p-4 flex items-center justify-between shadow-sm">
+              <div>
+                <p className="text-[#7C8090] text-xs font-medium mb-1">Bugünkü Takipler</p>
+                <h4 className="text-2xl font-bold text-[#F5A623]">{remindersToday.length}</h4>
+              </div>
+              <div className="w-10 h-10 rounded-full bg-[#F5A623]/10 flex items-center justify-center text-[#F5A623]">
+                <span className="material-symbols-outlined">alarm</span>
+              </div>
+            </div>
+
+            {/* Plan Banner */}
+            <div className="bg-gradient-to-br from-[#1E2025] to-[#16181D] border border-[#2A2D35] rounded-xl p-4 flex flex-col justify-center shadow-sm relative overflow-hidden">
+              <div className="absolute -top-2 -right-2 p-2 opacity-[0.03]">
+                 <span className="material-symbols-outlined text-[80px] text-white">diamond</span>
+              </div>
+              <p className="text-[#7C8090] text-xs font-medium mb-1 z-10">Mevcut Planınız</p>
+              <div className="flex items-center justify-between z-10 mt-1">
+                <h4 className="text-sm font-bold text-[#F5A623] uppercase tracking-wider">{currentPlan === 'free' ? 'ÜCRETSİZ' : currentPlan}</h4>
+                {currentPlan !== 'proplus' && (
+                  <button 
+                    onClick={() => setIsPricingModalOpen(true)}
+                    className="text-xs font-bold text-[#F1F2F4] bg-[#2A2D35] hover:bg-[#3A3D45] px-2.5 py-1.5 rounded transition-colors shadow-sm"
+                  >
+                    Yükselt
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 shrink-0">
-            <div className="lg:col-span-2">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-[360px]">
+            <div className="lg:col-span-2 h-full">
               {/* AI Action Center (Günün Komutları) */}
               <ActionCenter leads={leads} onActionClick={(action) => {
                 if (action.actionName === 'wakeup' && action.leadId) {
@@ -267,24 +301,27 @@ const AgentDashboard = () => {
                 }
               }} />
             </div>
-            <div className="h-[280px]">
+            <div className="h-full">
               {/* AI Takvim Görevleri / Hatırlatıcılar */}
               <AgendaView leads={leads} />
             </div>
           </div>
           
-          {/* Lead Yönetimi CTA */}
-          <div className="w-full bg-[#16181D] border border-[#2A2D35] rounded-xl p-8 flex flex-col items-center justify-center text-center mt-4 shadow-sm">
-             <div className="w-16 h-16 rounded-full bg-[#1E2028] flex items-center justify-center mb-4">
-                <span className="material-symbols-outlined text-[#F5A623] text-3xl">group</span>
+          {/* Lead Yönetimi CTA (Küçültüldü) */}
+          <div className="w-full bg-gradient-to-r from-[#16181D] to-[#1E2025] border border-[#2A2D35] rounded-xl p-5 flex items-center justify-between shrink-0 shadow-sm relative overflow-hidden">
+             <div className="flex items-center gap-5 z-10">
+               <div className="w-12 h-12 rounded-full bg-[#F5A623]/10 flex items-center justify-center border border-[#F5A623]/20">
+                  <span className="material-symbols-outlined text-[#F5A623] text-2xl">group</span>
+               </div>
+               <div>
+                 <h2 className="text-base font-bold text-[#F1F2F4]">Tüm Leadleriniz Artık Tek Bir Sayfada</h2>
+                 <p className="text-[#7C8090] text-sm mt-0.5">Adayları listelemek, filtrelemek ve daha detaylı yönetmek için Lead sayfasına göz atın.</p>
+               </div>
              </div>
-             <h2 className="text-xl font-bold text-[#F1F2F4] mb-2">Lead Yönetimi Taşındı</h2>
-             <p className="text-[#7C8090] mb-6 max-w-md">Müşteri adaylarınızı yönetmek, filtrelemek ve AI analizlerini daha detaylı incelemek için yeni Leadler sayfasına gidin.</p>
-             <Link to="/leads" className="bg-[#F5A623] hover:bg-[#d9921e] text-[#0A0B0D] font-bold px-6 py-3 rounded-lg text-sm transition-colors shadow-[0_0_15px_rgba(245,166,35,0.2)] flex items-center gap-2">
-                Lead Sayfasına Git <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+             <Link to="/leads" className="z-10 bg-[#F5A623] hover:bg-[#d9921e] text-[#0A0B0D] font-bold px-6 py-2.5 rounded-lg text-sm transition-colors shadow-[0_0_15px_rgba(245,166,35,0.2)] flex items-center gap-2 whitespace-nowrap">
+                Sayfaya Git <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
              </Link>
           </div>
-
         </div>
       </div>
 
