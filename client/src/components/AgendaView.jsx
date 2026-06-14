@@ -31,7 +31,8 @@ const AgendaView = ({ leads }) => {
 
 
   // Demo hesabı ise ve hiç etkinlik yoksa sahte etkinlikler göster
-  const isDemoAccount = user?.email?.toLowerCase().includes('demo') || user?.email?.toLowerCase() === 'agent@c21.com';
+  const userEmail = user?.email || '';
+  const isDemoAccount = userEmail.toLowerCase().includes('demo') || userEmail.toLowerCase() === 'agent@c21.com';
   if (events.length === 0 && isDemoAccount) {
     const today = new Date();
     const tomorrow = new Date(today);

@@ -290,7 +290,7 @@ const AgentDashboard = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-[360px]">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 shrink-0 h-[280px]">
             <div className="lg:col-span-2 h-full">
               {/* AI Action Center (Günün Komutları) */}
               <ActionCenter leads={leads} onActionClick={(action) => {
