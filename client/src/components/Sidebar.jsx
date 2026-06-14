@@ -69,6 +69,21 @@ const Sidebar = () => {
 
       {/* Footer Navigation Tabs */}
       <ul className="mt-auto border-t border-outline-variant pt-stack-sm flex flex-col gap-unit">
+        
+        {/* Upgrade Plan Button */}
+        {user?.plan === 'free' && (
+          <li className="mb-2">
+            <NavLink
+              to="/plans"
+              onClick={() => closeSidebar()}
+              className="w-full flex items-center justify-center gap-2 p-2 bg-[#F5A623] hover:bg-[#d9921e] text-[#0A0B0D] font-bold rounded-lg transition-colors shadow-[0_0_15px_rgba(245,166,35,0.2)]"
+            >
+              <span className="text-[16px]">🚀</span>
+              <span className="text-[13px] uppercase tracking-wider">Planı Yükselt</span>
+            </NavLink>
+          </li>
+        )}
+
         <li className="group">
           <NavLink
             to="/profile"
