@@ -1,8 +1,9 @@
 import React, { useState, useContext, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
-import Sidebar from '../components/Sidebar';
 import { UIContext } from '../contexts/UIContext';
+import Sidebar from '../components/Sidebar';
+import { format, isToday } from 'date-fns';
 
 // MOCK_LEADS removed, will fetch from backend
 
@@ -128,11 +129,11 @@ const Leads = () => {
 
   // Tab filtering
   const tabs = [
-    { id: 'Tümü', label: 'Tümü', count: 24 },
-    { id: 'Sıcak', label: '🔴 Sıcak', count: 8 },
-    { id: 'Ilık', label: '🟡 Ilık', count: 11 },
-    { id: 'Soğuk', label: '🔵 Soğuk', count: 5 },
-    { id: 'Bugün', label: '⏰ Bugün Aranacak', count: 3 }
+    { id: 'Tümü', label: 'Tümü', count: leads.length },
+    { id: 'Sıcak', label: '🔴 Sıcak', count: leads.filter(l => l.label === 'Sıcak').length },
+    { id: 'Ilık', label: '🟡 Ilık', count: leads.filter(l => l.label === 'Ilık').length },
+    { id: 'Soğuk', label: '🔵 Soğuk', count: leads.filter(l => l.label === 'Soğuk').length },
+    { id: 'Bugün', label: '⏰ Bugün Aranacak', count: leads.filter(l => l.isReminder || (l.reminder_date && isToday(new Date(l.reminder_date)))).length }
   ];
 
   const filteredLeads = leads.filter(lead => {
@@ -164,7 +165,7 @@ const Leads = () => {
               <span className="material-symbols-outlined text-[24px]">menu</span>
             </button>
             <h1 className="text-[18px] font-medium text-[#F1F2F4]">Leadler</h1>
-            <span className="text-[13px] text-[#7C8090] hidden sm:inline">24 lead</span>
+            <span className="text-[13px] text-[#7C8090] hidden sm:inline">{leads.length} lead</span>
           </div>
           
           <div className="flex-1 max-w-[280px] mx-8">

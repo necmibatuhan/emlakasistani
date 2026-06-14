@@ -43,7 +43,7 @@ CREATE TABLE users (
   password_hash TEXT NOT NULL,
   role TEXT NOT NULL CHECK (role IN
     ('super_admin','company_admin','office_manager','agent','viewer')),
-  plan TEXT DEFAULT 'proplus',
+  plan TEXT DEFAULT 'free',
   verification_token TEXT,
   is_verified BOOLEAN DEFAULT false,
   created_at TIMESTAMPTZ DEFAULT NOW()
