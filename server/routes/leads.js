@@ -138,78 +138,44 @@ router.post('/analyze', authMiddleware, async (req, res) => {
     
     const maskedText = pipeline.mask(message, customReplacements);
 
-    const prompt = `Sen profesyonel bir emlak danışmanlığı AI asistanısın. 10+ yıllık tecrübeye sahip, detaycı, gerçekçi ve Türkiye'deki emlak piyasasını çok iyi bilen bir uzmansın.
+    const prompt = `Sen dünyanın en iyi emlak satış koçu ve CRM analiz motorusun.
 
-Görevin: Kullanıcı mesajı veya sesli not transkriptini analiz edip aşağıdaki JSON formatında yapılandırılmış çıktı üretmek.
+Görevin yalnızca lead'i puanlamak değil, danışmanın bugün hangi lead'e odaklanması gerektiğini belirlemektir.
 
-KURALLAR (Çok Önemli):# Privacy & Security Guidelines (MUST FOLLOW)
-1. Sadece gerçek metinde geçen bilgileri kullan. Bilmiyorsan null veya boş array koy.
-2. Halüsinasyon yapma! Tahmin etme, varsayımda bulundurma.
-3. Bütçe analizi yaparken Türkiye'deki gerçekçi piyasa koşullarını göz önünde bulundur.
-4. Aciliyet ve ciddiyet skorunu sadece metindeki dil, tekrarlar ve vurguya göre ver.
-5. Overall lead score = (Bütçe skoru × 0.35) + (Ciddiyet skoru × 0.40) + (Aciliyet skoru × 0.25) formülüyle hesapla.
-6. DATA ISOLATION & ANONYMIZATION: PII tespit edersen analiz et ama "Müşteri" olarak kullan. İşlem bitince unut.
+Aşağıdaki müşteri verilerini analiz et:
+* İsim, Bütçe, Lokasyon tercihi, Oda sayısı tercihi
+* Son iletişim tarihi, Toplam görüşme sayısı, WhatsApp mesajları
+* Arama notları, Sesli not dökümleri, Lead kaynağı, Son etkileşimler
+* Gösterilen portföyler, İtirazlar, Satın alma/kiralama zamanı
+* Medeni durum, Yatırım veya oturum amacı, Lead oluşturulma tarihi
 
-# Input
-Müşteri Mesajı: ${maskedText}
-
-# Output Format
-Sadece aşağıdaki JSON formatında yanıt dön:
-{
-  "customer_intent": "buyer" | "seller" | "investor" | "renter" | "unknown", (DİKKAT: Eğer kişi 'kiralık' arıyorsa kesinlikle 'renter' yap. 'satın almak' istiyorsa 'buyer' yap.)
-  "budget": {
-    "min": "number | null",
-    "max": "number | null",
-    "currency": "TRY" | "USD" | "EUR",
-    "confidence": "high" | "medium" | "low"
-  },
-  "location_preferences": ["semt1", "semt2"],
-  "property_type": ["daire", "villa", "rezidans", "ofis"],
-  "room_count": {
-    "min": "number | null",
-    "max": "number | null"
-  },
-  "urgency": "very_urgent" | "urgent" | "moderate" | "exploring" | "low",
-  "seriousness_score": "1-10 arası",
-  "budget_score": "1-10 arası",
-  "overall_lead_score": "1-100 arası",
-  
-7. INTENT CLASSIFICATION: 
-   - 'renter': Eğer kullanıcı 'kiralık', 'kira', 'kiralamak' gibi ifadeler kullanıyorsa kesinlikle 'renter' seç.
-   - 'buyer': Eğer kullanıcı 'satılık', 'satın almak', 'yatırım', 'mülk sahibi olmak' gibi ifadeler kullanıyorsa kesinlikle 'buyer' seç.
+Analiz sonucunda aşağıdaki çıktıyı üret:
+1. LEAD SICAKLIK SKORU: 0-100 arasında puan ver.
+2. SATIN ALMA OLASILIĞI: Yüzde olarak tahmin et.
+3. ACİLİYET SKORU: 0-100 arasında hesapla.
+4. TAKİP RİSKİ: Bu müşteri unutulursa kaybedilme ihtimalini 0-100 arasında hesapla.
+5. ÖNCELİK SKORU: (Satın Alma Olasılığı × 0.35) + (Aciliyet × 0.30) + (Bütçe Potansiyeli × 0.20) + (Etkileşim Seviyesi × 0.15) formülüyle hesapla.
+6. KATEGORİ: "🔥 Hemen Ara", "⚡ Bugün Ulaş", "📅 Bu Hafta Takip Et", "🌱 Nurture Sürecine Al", "❌ Şimdilik Beklet" seçeneklerinden sadece birini seç.
+7. NEDEN: Kararı maksimum 3 cümlede açıkla.
+8. SONRAKİ AKSİYON: Danışmanın uygulaması gereken tek aksiyonu belirt.
+9. WHATSAPP MESAJI: Müşteriye gönderilecek kişiselleştirilmiş mesaj oluştur.
+10. AI İÇGÖRÜSÜ: CRM ekranında gösterilecek kısa özet üret.
 
 # Input
 Müşteri Mesajı: ${maskedText}
 
-# Output Format
-Sadece aşağıdaki JSON formatında yanıt dön:
+JSON formatında çıktı ver:
 {
-  "customer_intent": "buyer" | "seller" | "investor" | "renter" | "unknown",
-  "budget": {
-    "min": "number | null",
-    "max": "number | null",
-    "currency": "TRY" | "USD" | "EUR",
-    "confidence": "high" | "medium" | "low"
-  },
-  "location_preferences": ["semt1", "semt2"],
-  "property_type": ["daire", "villa", "rezidans", "ofis"],
-  "room_count": {
-    "min": "number | null",
-    "max": "number | null"
-  },
-  "urgency": "very_urgent" | "urgent" | "moderate" | "exploring" | "low",
-  "seriousness_score": "number (integer 1-10)",
-  "budget_score": "number (integer 1-10)",
-  "overall_lead_score": "number (integer 1-100)",
-  
-  "skor": "number (integer 1-10, overall_lead_score/10 yuvarlanmış hali)",
-  "etiket": "Sıcak (overall 75+ ise) | Ilık (40-74 arası) | Soğuk (0-39 arası)",
-  
-  "key_motivations": ["sebep1", "sebep2"],
-  "potential_risks": ["risk1", "risk2"],
-  "recommended_next_action": "Bugün ara | Bu hafta ara | Takip listesine ekle",
-  "suggested_whatsapp_reply": "hazır mesaj taslağı (en fazla 2-3 cümle, samimi ve profesyonel)",
-  "extracted_raw_quotes": ["müşterinin tam söylediği önemli cümleler"]
+"lead_score":0,
+"buy_probability":0,
+"urgency_score":0,
+"followup_risk":0,
+"priority_score":0,
+"category":"",
+"reason":"",
+"next_action":"",
+"whatsapp_message":"",
+"ai_insight":""
 }
 `;
 
@@ -230,16 +196,23 @@ Sadece aşağıdaki JSON formatında yanıt dön:
     }
 
     // 2. Restore PII into the AI's response before saving to database
-    // PrivacyPipeline handles the entire JSON structure and clears the vault automatically
     parsedResult = pipeline.unmask(parsedResult);
 
     const finalName = name?.trim() ? name.trim() : '[İsim Belirtilmedi]';
     const finalPhone = phone?.trim() ? phone.trim() : '[Telefon Belirtilmedi]';
 
-    const reasoningText = `Motivasyon: ${(parsedResult.key_motivations || []).join(', ')}. Riskler: ${(parsedResult.potential_risks || []).join(', ')}. Intent: ${parsedResult.customer_intent}`;
+    const reasoningText = parsedResult.reason || parsedResult.ai_insight || 'Belirtilmedi';
 
-    const rawScore = parsedResult.skor || Math.ceil((parsedResult.overall_lead_score || 50) / 10);
-    const finalScore = Math.max(1, Math.min(10, Math.round(Number(rawScore)) || 5));
+    const rawScore = parsedResult.priority_score || parsedResult.lead_score || 50;
+    const finalScore = Math.max(1, Math.min(10, Math.round(Number(rawScore) / 10) || 5));
+
+    let mappedLabel = 'Soğuk';
+    const cat = parsedResult.category || '';
+    if (cat.includes('Hemen Ara') || cat.includes('Bugün Ulaş')) {
+       mappedLabel = 'Sıcak';
+    } else if (cat.includes('Bu Hafta Takip Et')) {
+       mappedLabel = 'Ilık';
+    }
 
     const leadInsert = await db.query(
       `INSERT INTO leads (company_id, office_id, assigned_to, source, name, phone, message, score, label, reasoning, recommended_action, whatsapp_draft, properties) 
@@ -247,10 +220,10 @@ Sadece aşağıdaki JSON formatında yanıt dön:
       [
         req.user.company_id, req.user.office_id, req.user.id, 'manual', finalName, finalPhone, message, 
         finalScore, 
-        parsedResult.etiket, 
+        mappedLabel, 
         reasoningText, 
-        parsedResult.recommended_next_action, 
-        parsedResult.suggested_whatsapp_reply, 
+        parsedResult.next_action, 
+        parsedResult.whatsapp_message, 
         JSON.stringify(parsedResult)
       ]
     );
@@ -283,77 +256,52 @@ router.put('/:id/analyze', authMiddleware, async (req, res) => {
     if (phone) customReplacements.push({ originalValue: phone.trim(), type: 'PHONE' });
     
     const maskedText = pipeline.mask(message, customReplacements);
-    const prompt = `Sen profesyonel bir emlak danışmanlığı AI asistanısın. 10+ yıllık tecrübeye sahip, detaycı, gerçekçi ve Türkiye'deki emlak piyasasını çok iyi bilen bir uzmansın.\n\nGörevin: Kullanıcı mesajı veya sesli not transkriptini analiz edip aşağıdaki JSON formatında yapılandırılmış çıktı üretmek.\n\nKURALLAR (Çok Önemli):# Privacy & Security Guidelines (MUST FOLLOW)\n1. Sadece gerçek metinde geçen bilgileri kullan. Bilmiyorsan null veya boş array koy.\n2. Halüsinasyon yapma! Tahmin etme, varsayımda bulundurma.\n3. Bütçe analizi yaparken Türkiye'deki gerçekçi piyasa koşullarını göz önünde bulundur.\n4. Aciliyet ve ciddiyet skorunu sadece metindeki dil, tekrarlar ve vurguya göre ver.\n5. Overall lead score = (Bütçe skoru × 0.35) + (Ciddiyet skoru × 0.40) + (Aciliyet skoru × 0.25) formülüyle hesapla.\n6. DATA ISOLATION & ANONYMIZATION: PII tespit edersen analiz et ama "Müşteri" olarak kullan. İşlem bitince unut.\n7. INTENT CLASSIFICATION:\n   - 'renter': Eğer kullanıcı 'kiralık', 'kira', 'kiralamak' gibi ifadeler kullanıyorsa kesinlikle 'renter' seç.\n   - 'buyer': Eğer kullanıcı 'satılık', 'satın almak', 'yatırım', 'mülk sahibi olmak' gibi ifadeler kullanıyorsa kesinlikle 'buyer' seç.\n\n# Input\nMüşteri Mesajı: ${maskedText}\n\n# Output Format\nSadece aşağıdaki JSON formatında yanıt dön:\n{\n  "customer_intent": "buyer" | "seller" | "investor" | "renter" | "unknown", (DİKKAT: Eğer kişi 'kiralık' arıyorsa kesinlikle 'renter' yap. 'satın almak' istiyorsa 'buyer' yap.)\n  "budget": {\n    "min": "number | null",\n    "max": "number | null",\n    "currency": "TRY" | "USD" | "EUR",\n    "confidence": "high" | "medium" | "low"\n  },\n  "location_preferences": ["semt1", "semt2"],\n  "property_type": ["daire", "villa", "rezidans", "ofis"],\n  "room_count": {\n    "min": "number | null",\n    "max": "number | null"\n  },\n  "urgency": "very_urgent" | "urgent" | "moderate" | "exploring" | "low",\n  "seriousness_score": "1-10 arası",\n  "budget_score": "1-10 arası",\n  "overall_lead_score": "1-100 arası",\n  \n  "skor": "1-10 arası (overall_lead_score/10 yuvarlanmış hali)",\n  "etiket": "Sıcak (overall 75+ ise) | Ilık (40-74 arası) | Soğuk (0-39 arası)",\n  \n  "key_motivations": ["sebep1", "sebep2"],\n  "potential_risks": ["risk1", "risk2"],\n  "recommended_next_action": "Bugün ara | Bu hafta ara | Takip listesine ekle",\n  "suggested_whatsapp_reply": "hazır mesaj taslağı (en fazla 2-3 cümle, samimi ve profesyonel)",\n  "extracted_raw_quotes": ["müşterinin tam söylediği önemli cümleler"]\n}\n`;
+    const prompt = `Sen dünyanın en iyi emlak satış koçu ve CRM analiz motorusun.
 
-    let parsedResult;
-    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'mock') {
-      return res.status(500).json({ message: 'Yapay zeka (GEMINI_API_KEY) yapılandırması eksik.' });
-    }
-    
-    try {
-      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash", generationConfig: { responseMimeType: "application/json", temperature: 0.2 } });
-      const aiResult = await model.generateContent(prompt);
-      let respText = aiResult.response.text().trim();
-      if (respText.startsWith('```json')) respText = respText.replace('```json', '').replace('```', '').trim();
-      parsedResult = JSON.parse(respText);
-    } catch (apiErr) {
-      console.error('Gemini Analyze API Error:', apiErr.message);
-      return res.status(500).json({ message: 'Yapay zeka analizi başarısız oldu' });
-    }
+Görevin yalnızca lead'i puanlamak değil, danışmanın bugün hangi lead'e odaklanması gerektiğini belirlemektir.
 
-    const prompt = `Sen profesyonel bir emlak danışmanlığı AI asistanısın. 10+ yıllık tecrübeye sahip, detaycı, gerçekçi ve Türkiye'deki emlak piyasasını çok iyi bilen bir uzmansın.
+Aşağıdaki müşteri verilerini analiz et:
+* İsim, Bütçe, Lokasyon tercihi, Oda sayısı tercihi
+* Son iletişim tarihi, Toplam görüşme sayısı, WhatsApp mesajları
+* Arama notları, Sesli not dökümleri, Lead kaynağı, Son etkileşimler
+* Gösterilen portföyler, İtirazlar, Satın alma/kiralama zamanı
+* Medeni durum, Yatırım veya oturum amacı, Lead oluşturulma tarihi
 
-Görevin: Kullanıcı mesajı veya sesli not transkriptini analiz edip aşağıdaki JSON formatında yapılandırılmış çıktı üretmek.
-
-KURALLAR (Çok Önemli):# Privacy & Security Guidelines (MUST FOLLOW)
-1. Sadece gerçek metinde geçen bilgileri kullan. Bilmiyorsan null veya boş array koy.
-2. Halüsinasyon yapma! Tahmin etme, varsayımda bulundurma.
-3. Bütçe analizi yaparken Türkiye'deki gerçekçi piyasa koşullarını göz önünde bulundur.
-4. Aciliyet ve ciddiyet skorunu sadece metindeki dil, tekrarlar ve vurguya göre ver.
-5. Overall lead score = (Bütçe skoru × 0.35) + (Ciddiyet skoru × 0.40) + (Aciliyet skoru × 0.25) formülüyle hesapla.
-6. DATA ISOLATION & ANONYMIZATION: PII tespit edersen analiz et ama "Müşteri" olarak kullan. İşlem bitince unut.
-7. INTENT CLASSIFICATION:
-   - 'renter': Eğer kullanıcı 'kiralık', 'kira', 'kiralamak' gibi ifadeler kullanıyorsa kesinlikle 'renter' seç.
-   - 'buyer': Eğer kullanıcı 'satılık', 'satın almak', 'yatırım', 'mülk sahibi olmak' gibi ifadeler kullanıyorsa kesinlikle 'buyer' seç.
+Analiz sonucunda aşağıdaki çıktıyı üret:
+1. LEAD SICAKLIK SKORU: 0-100 arasında puan ver.
+2. SATIN ALMA OLASILIĞI: Yüzde olarak tahmin et.
+3. ACİLİYET SKORU: 0-100 arasında hesapla.
+4. TAKİP RİSKİ: Bu müşteri unutulursa kaybedilme ihtimalini 0-100 arasında hesapla.
+5. ÖNCELİK SKORU: (Satın Alma Olasılığı × 0.35) + (Aciliyet × 0.30) + (Bütçe Potansiyeli × 0.20) + (Etkileşim Seviyesi × 0.15) formülüyle hesapla.
+6. KATEGORİ: "🔥 Hemen Ara", "⚡ Bugün Ulaş", "📅 Bu Hafta Takip Et", "🌱 Nurture Sürecine Al", "❌ Şimdilik Beklet" seçeneklerinden sadece birini seç.
+7. NEDEN: Kararı maksimum 3 cümlede açıkla.
+8. SONRAKİ AKSİYON: Danışmanın uygulaması gereken tek aksiyonu belirt.
+9. WHATSAPP MESAJI: Müşteriye gönderilecek kişiselleştirilmiş mesaj oluştur.
+10. AI İÇGÖRÜSÜ: CRM ekranında gösterilecek kısa özet üret.
 
 # Input
 Müşteri Mesajı: ${maskedText}
 
-# Output Format
-Sadece aşağıdaki JSON formatında yanıt dön:
+JSON formatında çıktı ver:
 {
-  "customer_intent": "buyer" | "seller" | "investor" | "renter" | "unknown",
-  "budget": {
-    "min": "number | null",
-    "max": "number | null",
-    "currency": "TRY" | "USD" | "EUR",
-    "confidence": "high" | "medium" | "low"
-  },
-  "location_preferences": ["semt1", "semt2"],
-  "property_type": ["daire", "villa", "rezidans", "ofis"],
-  "room_count": {
-    "min": "number | null",
-    "max": "number | null"
-  },
-  "urgency": "very_urgent" | "urgent" | "moderate" | "exploring" | "low",
-  "seriousness_score": "number (integer 1-10)",
-  "budget_score": "number (integer 1-10)",
-  "overall_lead_score": "number (integer 1-100)",
-  "skor": "number (integer 1-10, overall_lead_score/10 yuvarlanmış hali)",
-  "etiket": "Sıcak (overall 75+ ise) | Ilık (40-74 arası) | Soğuk (0-39 arası)",
-  "key_motivations": ["sebep1", "sebep2"],
-  "potential_risks": ["risk1", "risk2"],
-  "recommended_next_action": "Bugün ara | Bu hafta ara | Takip listesine ekle",
-  "suggested_whatsapp_reply": "hazır mesaj taslağı (en fazla 2-3 cümle, samimi ve profesyonel)",
-  "extracted_raw_quotes": ["müşterinin tam söylediği önemli cümleler"]
+"lead_score":0,
+"buy_probability":0,
+"urgency_score":0,
+"followup_risk":0,
+"priority_score":0,
+"category":"",
+"reason":"",
+"next_action":"",
+"whatsapp_message":"",
+"ai_insight":""
 }
 `;
 
-    let parsedResult;
     if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'mock') {
       return res.status(500).json({ message: 'Yapay zeka (GEMINI_API_KEY) yapılandırması eksik.' });
     }
     
+    let parsedResult;
     try {
       const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash", generationConfig: { responseMimeType: "application/json", temperature: 0.2 } });
       const aiResult = await model.generateContent(prompt);
@@ -368,10 +316,18 @@ Sadece aşağıdaki JSON formatında yanıt dön:
     parsedResult = pipeline.unmask(parsedResult);
     const finalName = name?.trim() ? name.trim() : '[İsim Belirtilmedi]';
     const finalPhone = phone?.trim() ? phone.trim() : '[Telefon Belirtilmedi]';
-    const reasoningText = `Motivasyon: ${(parsedResult.key_motivations || []).join(', ')}. Riskler: ${(parsedResult.potential_risks || []).join(', ')}. Intent: ${parsedResult.customer_intent}`;
+    const reasoningText = parsedResult.reason || parsedResult.ai_insight || 'Belirtilmedi';
 
-    const rawScore = parsedResult.skor || Math.ceil((parsedResult.overall_lead_score || 50) / 10);
-    const finalScore = Math.max(1, Math.min(10, Math.round(Number(rawScore)) || 5));
+    const rawScore = parsedResult.priority_score || parsedResult.lead_score || 50;
+    const finalScore = Math.max(1, Math.min(10, Math.round(Number(rawScore) / 10) || 5));
+
+    let mappedLabel = 'Soğuk';
+    const cat = parsedResult.category || '';
+    if (cat.includes('Hemen Ara') || cat.includes('Bugün Ulaş')) {
+       mappedLabel = 'Sıcak';
+    } else if (cat.includes('Bu Hafta Takip Et')) {
+       mappedLabel = 'Ilık';
+    }
 
     const updateRes = await db.query(
       `UPDATE leads 
@@ -380,8 +336,8 @@ Sadece aşağıdaki JSON formatında yanıt dön:
       [
         finalName, finalPhone, message, 
         finalScore, 
-        parsedResult.etiket, reasoningText, parsedResult.recommended_next_action, 
-        parsedResult.suggested_whatsapp_reply, JSON.stringify(parsedResult),
+        mappedLabel, reasoningText, parsedResult.next_action, 
+        parsedResult.whatsapp_message, JSON.stringify(parsedResult),
         req.params.id, req.user.company_id
       ]
     );

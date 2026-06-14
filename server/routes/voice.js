@@ -50,64 +50,51 @@ router.post('/transcribe', authMiddleware, upload.single('audio'), async (req, r
 });
 
 const VOICE_SYSTEM_PROMPT = `
-Sen profesyonel bir emlak danışmanlığı AI asistanısın. 10+ yıllık tecrübeye sahip, detaycı, gerçekçi ve Türkiye'deki emlak piyasasını çok iyi bilen bir uzmansın.
-Görevin: Müşteri sesli notunu analiz edip müşterinin sistemdeki mevcut durumunu güncellemek, gizli riskleri tespit etmek ve JSON çıktısı üretmek.
+Sen dünyanın en iyi emlak satış koçu ve CRM analiz motorusun.
 
-KURALLAR:
-1. Sadece gerçek metinde geçen bilgileri kullan. Bilmiyorsan null veya boş array koy.
-2. Halüsinasyon yapma! Tahmin etme.
-3. Bütçe analizi yaparken Türkiye'deki gerçekçi piyasa koşullarını göz önünde bulundur.
-4. Aciliyet ve ciddiyet skorunu sese/metne göre ver.
-5. Overall lead score = (Bütçe skoru × 0.35) + (Ciddiyet skoru × 0.40) + (Aciliyet skoru × 0.25) formülüyle hesapla.
-6. RISK ANALİZİ (RED FLAGS): Metni okurken şu risk faktörlerini tara:
-   - "Piyasa gerçeklerinden uzak bütçe" (Örn: Lüks semtte çok düşük fiyata ev aramak)
-   - "Kararsızlık / Net olmama" (Örn: Hem satılık hem kiralık, her yer olur demek)
-   - "Güvenilirlik / İletişim riski" (Örn: Emlakçıyı aradan çıkarmaya çalışmak, tutarsız konuşmak)
-   Eğer risk varsa risk_score'u 1-5 arası belirle (5 en riskli) ve Türkçe açıkla. Risk yoksa has_red_flag: false yap.
-7. TAKVİM & GÖREV ANALİZİ: Danışman "Yarın Ahmet Bey'e evi göstereceğim", "Pazartesi günü sözleşme var" gibi geleceğe yönelik bir eylemden bahsediyorsa, verilen güncel sistem saatini kullanarak bunu YYYY-MM-DD formatına çevir ve 'calendar_event' objesini doldur. Eğer hiçbir görev/randevu yoksa null yap.
+Görevin yalnızca lead'i puanlamak değil, danışmanın bugün hangi lead'e odaklanması gerektiğini belirlemektir. Ayrıca danışmanın sesli notundaki takvim/etkinlik planlamalarını çıkarmalısın.
 
-# Output Format
-SADECE aşağıdaki JSON şemasında yanıt dön:
+Aşağıdaki müşteri verilerini analiz et:
+* İsim, Bütçe, Lokasyon tercihi, Oda sayısı tercihi
+* Son iletişim tarihi, Toplam görüşme sayısı, WhatsApp mesajları
+* Arama notları, Sesli not dökümleri, Lead kaynağı, Son etkileşimler
+* Gösterilen portföyler, İtirazlar, Satın alma/kiralama zamanı
+* Medeni durum, Yatırım veya oturum amacı, Lead oluşturulma tarihi
+
+Analiz sonucunda aşağıdaki çıktıyı üret:
+1. LEAD SICAKLIK SKORU: 0-100 arasında puan ver.
+2. SATIN ALMA OLASILIĞI: Yüzde olarak tahmin et.
+3. ACİLİYET SKORU: 0-100 arasında hesapla.
+4. TAKİP RİSKİ: Bu müşteri unutulursa kaybedilme ihtimalini 0-100 arasında hesapla.
+5. ÖNCELİK SKORU: (Satın Alma Olasılığı × 0.35) + (Aciliyet × 0.30) + (Bütçe Potansiyeli × 0.20) + (Etkileşim Seviyesi × 0.15) formülüyle hesapla.
+6. KATEGORİ: "🔥 Hemen Ara", "⚡ Bugün Ulaş", "📅 Bu Hafta Takip Et", "🌱 Nurture Sürecine Al", "❌ Şimdilik Beklet" seçeneklerinden sadece birini seç.
+7. NEDEN: Kararı maksimum 3 cümlede açıkla.
+8. SONRAKİ AKSİYON: Danışmanın uygulaması gereken tek aksiyonu belirt.
+9. WHATSAPP MESAJI: Müşteriye gönderilecek kişiselleştirilmiş mesaj oluştur.
+10. AI İÇGÖRÜSÜ: CRM ekranında gösterilecek kısa özet üret.
+11. TAKVİM & GÖREV ANALİZİ: Danışman "Yarın Ahmet Bey'e evi göstereceğim", "Pazartesi günü sözleşme var" gibi geleceğe yönelik bir eylemden bahsediyorsa, verilen güncel sistem saatini kullanarak bunu YYYY-MM-DD formatına çevir ve 'calendar_event' objesini doldur. Eğer hiçbir görev/randevu yoksa null yap.
+12. YENİ DURUM: Danışman durumu belirtiyorsa "Takipte | Arandı | Randevu Alındı | Teklif Verildi | Sözleşme Aşamasında | Satış Tamamlandı | İptal" arasından uygun olanı yaz. (Durum değişmiyorsa null bırak)
+
+JSON formatında çıktı ver:
 {
-  "customer_intent": "buyer" | "seller" | "investor" | "renter" | "unknown",
-  "budget": {
-    "min": "number | null",
-    "max": "number | null",
-    "currency": "TRY" | "USD" | "EUR",
-    "confidence": "high" | "medium" | "low"
-  },
-  "location_preferences": ["semt1", "semt2"],
-  "property_type": ["daire", "villa", "rezidans", "ofis"],
-  "room_count": { "min": "number | null", "max": "number | null" },
-  "urgency": "very_urgent" | "urgent" | "moderate" | "exploring" | "low",
-  "seriousness_score": "number (integer 1-10)",
-  "budget_score": "number (integer 1-10)",
-  "overall_lead_score": "number (integer 1-100)",
-  
-  "skor": "number (integer 1-10, overall_lead_score'un 10'a bölünmüş hali)",
-  "etiket": "Sıcak (overall 75+ ise) | Ilık (40-74 arası) | Soğuk (0-39 arası)",
-  "yeni_durum": "Takipte | Arandı | Randevu Alındı | Teklif Verildi | Sözleşme Aşamasında | Satış Tamamlandı | İptal (Durum değişmiyorsa mevcut durumu koru)",
-
-  "risk_analysis": {
-    "has_red_flag": "boolean",
-    "risk_score": "1-5 arası number veya null",
-    "risk_reason": "string (Eğer has_red_flag true ise Türkçe açıklama, false ise null)"
-  },
-
+  "lead_score": 0,
+  "buy_probability": 0,
+  "urgency_score": 0,
+  "followup_risk": 0,
+  "priority_score": 0,
+  "category": "",
+  "reason": "",
+  "next_action": "",
+  "whatsapp_message": "",
+  "ai_insight": "",
   "calendar_event": {
-    "title": "string (Görevin kısa özeti)",
-    "description": "string (Görevin detayı)",
+    "title": "string",
+    "description": "string",
     "start_date": "YYYY-MM-DD",
     "start_time": "HH:MM:SS",
-    "is_task": "boolean"
+    "is_task": true
   },
-  "has_calendar_event": "boolean (Eğer bir takvim etkinliği varsa true, yoksa false yap ve calendar_event içini boş bırakabilirsin)",
-
-  "key_motivations": ["sebep1", "sebep2"],
-  "potential_risks": ["risk1", "risk2"],
-  "recommended_next_action": "Bugün ara | Bu hafta ara | Takip listesine ekle",
-  "suggested_whatsapp_reply": "hazır mesaj taslağı (en fazla 2-3 cümle)",
-  "extracted_raw_quotes": ["tam cümleler"]
+  "yeni_durum": ""
 }
 `;
 
@@ -193,7 +180,7 @@ Danışmanın sesli notu:
 
     // Restore names in summary and draft
     analysis = pipeline.unmask(analysis);
-    const ozetStr = `Niyet: ${analysis.customer_intent}. Riskler: ${(analysis.potential_risks || []).join(', ')}`;
+    const ozetStr = `İçgörü: ${analysis.ai_insight || analysis.reason || ''}`;
     analysis.ozet = ozetStr;
 
     await db.query('BEGIN');
@@ -210,23 +197,30 @@ Danışmanın sesli notu:
     let setClause = [];
     let idx = 1;
 
-    const rawScore = analysis.skor || Math.ceil((analysis.overall_lead_score || 50) / 10);
-    const finalScore = Math.max(1, Math.min(10, Math.round(Number(rawScore)) || 5));
+    const rawScore = analysis.priority_score || analysis.lead_score || 50;
+    const finalScore = Math.max(1, Math.min(10, Math.round(Number(rawScore) / 10) || 5));
     
     setClause.push(`score = $${idx++}`);
     values.push(finalScore);
 
-    if (analysis.etiket) {
-      setClause.push(`label = $${idx++}`);
-      values.push(analysis.etiket);
+    let mappedLabel = 'Soğuk';
+    const cat = analysis.category || '';
+    if (cat.includes('Hemen Ara') || cat.includes('Bugün Ulaş')) {
+       mappedLabel = 'Sıcak';
+    } else if (cat.includes('Bu Hafta Takip Et')) {
+       mappedLabel = 'Ilık';
     }
+
+    setClause.push(`label = $${idx++}`);
+    values.push(mappedLabel);
+
     if (analysis.yeni_durum) {
       setClause.push(`status = $${idx++}`);
       values.push(analysis.yeni_durum);
     }
-    if (analysis.suggested_whatsapp_reply) {
+    if (analysis.whatsapp_message) {
       setClause.push(`whatsapp_draft = $${idx++}`);
-      values.push(analysis.suggested_whatsapp_reply);
+      values.push(analysis.whatsapp_message);
     }
 
     // Property preferences updates (storing them in the leads table since we don't have lead_properties table logic active)
