@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { CheckCircle, XCircle } from 'lucide-react';
+import { AuthContext } from '../contexts/AuthContext';
 
 const VerifyEmail = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const navigate = useNavigate();
+  const { setUser } = useContext(AuthContext);
   const [status, setStatus] = useState('loading'); // loading, success, error
   const [message, setMessage] = useState('');
 
@@ -22,9 +24,15 @@ const VerifyEmail = () => {
         const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/auth/verify-email`, { token });
         setStatus('success');
         setMessage(res.data.message);
+        
+        if (res.data.token && res.data.user) {
+          localStorage.setItem('token', res.data.token);
+          setUser(res.data.user);
+        }
+
         setTimeout(() => {
-          navigate('/auth');
-        }, 4000);
+          navigate('/dashboard');
+        }, 3000);
       } catch (err) {
         setStatus('error');
         setMessage(err.response?.data?.message || 'Doğrulama başarısız oldu.');
@@ -52,7 +60,7 @@ const VerifyEmail = () => {
             </div>
             <h2 className="text-[20px] font-medium text-[#F1F2F4] mb-2">Başarılı!</h2>
             <p className="text-[13px] text-[#7C8090] mb-8">{message}</p>
-            <p className="text-[11px] font-medium text-[#F5A623] uppercase tracking-wider animate-pulse">Giriş sayfasına yönlendiriliyorsunuz...</p>
+            <p className="text-[11px] font-medium text-[#F5A623] uppercase tracking-wider animate-pulse">Ana panele yönlendiriliyorsunuz...</p>
           </div>
         )}
 

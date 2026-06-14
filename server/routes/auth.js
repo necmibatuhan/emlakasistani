@@ -22,14 +22,7 @@ const sendVerificationEmail = async (email, token, name) => {
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px; background-color: #ffffff; border-radius: 12px; border: 1px solid #e5e7eb;">
       <h3 style="color: #111827; font-size: 24px; font-weight: bold; margin-bottom: 24px;">Kapora'ya Hoş Geldiniz!</h3>
       <p style="color: #374151; font-size: 16px; margin-bottom: 16px;">Merhaba,</p>
-      <p style="color: #374151; font-size: 16px; margin-bottom: 32px; line-height: 1.5;">Kapora AI platformuna yaptığınız giriş veya kayıt talebini onaylamak için aşağıdaki 6 haneli doğrulama kodunu kullanabilir veya doğrudan onay bağlantısına tıklayabilirsiniz.</p>
-      
-      <div style="text-align: center; margin-bottom: 16px;">
-        <h2 style="font-size: 40px; font-weight: bold; letter-spacing: 8px; color: #111827; margin: 0;">${token}</h2>
-      </div>
-      <p style="color: #111827; font-size: 14px; font-weight: bold; text-align: center; margin-bottom: 32px;">Bu kod güvenlik nedeniyle önümüzdeki 10 dakika boyunca geçerlidir.</p>
-      
-      <p style="color: #374151; font-size: 16px; margin-bottom: 16px;">Alternatif olarak, aşağıdaki bağlantıya tıklayarak da hesabınızı anında doğrulayabilirsiniz:</p>
+      <p style="color: #374151; font-size: 16px; margin-bottom: 32px; line-height: 1.5;">Kapora AI platformuna yaptığınız kayıt talebini onaylamak için aşağıdaki bağlantıya tıklayabilirsiniz.</p>
       
       <div style="text-align: center; margin-bottom: 40px;">
         <a href="${verificationUrl}" style="display: inline-block; background-color: #111827; color: #ffffff; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px;">Hesabımı Doğrula ve Sahaya Dön</a>
@@ -218,7 +211,19 @@ router.post('/verify-email', async (req, res) => {
     }
 
     await db.query('UPDATE users SET is_verified = true, verification_token = null WHERE id = $1', [userRes.rows[0].id]);
-    res.json({ message: 'E-postanız başarıyla doğrulandı. Artık giriş yapabilirsiniz.' });
+    
+    const user = userRes.rows[0];
+    const jwtToken = jwt.sign(
+      { id: user.id, role: user.role, company_id: user.company_id, office_id: user.office_id, plan: user.plan },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.json({ 
+      message: 'E-postanız başarıyla doğrulandı. Yönlendiriliyorsunuz...',
+      token: jwtToken,
+      user: { id: user.id, role: user.role, email: user.email, name: user.name, plan: user.plan }
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Sunucu hatası' });

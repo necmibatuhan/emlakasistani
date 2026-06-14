@@ -4,81 +4,7 @@ import { AuthContext } from '../contexts/AuthContext';
 import Sidebar from '../components/Sidebar';
 import { UIContext } from '../contexts/UIContext';
 
-const MOCK_LEADS = [
-  {
-    id: 1,
-    name: "Ayşe Kaya",
-    phone: "+90 532 111 22 33",
-    label: "Sıcak",
-    score: 8,
-    region: "Kadıköy",
-    type: "3+1",
-    time: "Bugün",
-    isReminder: true,
-    message: "Kadıköy'de 3+1 arıyorum, bütçem 5M TL. Peşin ödeyeceğim, acil.",
-    aiReason: "Bütçe net (4-5M TL), aciliyet yüksek, peşin.",
-    history: [
-      { id: 1, icon: "✦", text: "Lead oluşturuldu", date: "14 Haz 2026, 09:12", iconColor: "text-[#7C8090]" },
-      { id: 2, icon: "●", text: "Durum: Arandı", date: "14 Haz 2026, 14:30", iconColor: "text-blue-500" },
-      { id: 3, icon: "🎙️", text: "Sesli not eklendi", date: "14 Haz 2026, 14:32", iconColor: "text-[#F1F2F4]" },
-      { id: 4, icon: "📅", text: "Randevu: 20 Haz", date: "14 Haz 2026, 14:33", iconColor: "text-[#10B981]" }
-    ],
-    notes: [
-      { id: 1, type: "voice", time: "Bugün 14:32", content: "Az önce aradım, Cuma sabah müsait...", aiSummary: "Randevu Cuma, sabah saatleri." },
-      { id: 2, type: "text", time: "Dün 11:15", content: "Bütçesini 5.5M'ye çıkarabilirmiş." }
-    ],
-    preferences: [
-      { label: "Bölge", value: "Kadıköy" },
-      { label: "Tip", value: "Satılık" },
-      { label: "Oda", value: "3+1" },
-      { label: "Bütçe", value: "4-5M₺" },
-      { label: "Aciliyet", value: "Acil" }
-    ]
-  },
-  {
-    id: 2,
-    name: "Mehmet Demir",
-    phone: "+90 533 222 55 66",
-    label: "Ilık",
-    score: 5,
-    region: "Şişli",
-    type: "2+1",
-    time: "2 gün",
-    isReminder: false,
-    message: "Şişli'de yatırım amaçlı 2+1 bakıyorum. Krediye uygun olmalı.",
-    aiReason: "Yatırım amaçlı, bütçe tam netleşmemiş, kredi süreci var.",
-    history: [
-      { id: 1, icon: "✦", text: "Lead oluşturuldu", date: "12 Haz 2026, 10:00", iconColor: "text-[#7C8090]" }
-    ],
-    notes: [],
-    preferences: [
-      { label: "Bölge", value: "Şişli" },
-      { label: "Tip", value: "Satılık" },
-      { label: "Oda", value: "2+1" },
-      { label: "Amac", value: "Yatırım" }
-    ]
-  },
-  {
-    id: 3,
-    name: "Ali Yıldız",
-    phone: "+90 530 999 00 11",
-    label: "Soğuk",
-    score: 2,
-    region: "Belirsiz",
-    type: "",
-    time: "1 hafta",
-    isReminder: false,
-    message: "Merhabalar, piyasa araştırması yapıyorum, henüz karar vermedim.",
-    aiReason: "Araştırma aşamasında, aciliyet yok, spesifik talep yok.",
-    history: [
-      { id: 1, icon: "✦", text: "Lead oluşturuldu", date: "07 Haz 2026, 16:45", iconColor: "text-[#7C8090]" }
-    ],
-    notes: [],
-    preferences: [
-      { label: "Durum", value: "Araştırma" }
-    ]
-  }
-];
+// MOCK_LEADS removed, will fetch from backend
 
 const getLabelStyle = (label) => {
   switch (label) {
@@ -102,6 +28,8 @@ const Leads = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [isTranscribing, setIsTranscribing] = useState(false);
+  const [leads, setLeads] = useState([]);
+  const [loading, setLoading] = useState(true);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const timerRef = useRef(null);
@@ -109,6 +37,32 @@ const Leads = () => {
   useEffect(() => {
     return () => clearInterval(timerRef.current);
   }, []);
+
+  useEffect(() => {
+    const fetchLeads = async () => {
+      try {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        const formattedLeads = res.data.map(lead => ({
+          ...lead,
+          time: new Date(lead.created_at).toLocaleDateString('tr-TR'),
+          history: lead.history || [],
+          notes: lead.notes || [],
+          preferences: lead.preferences || []
+        }));
+        
+        setLeads(formattedLeads);
+      } catch (err) {
+        console.error('Lead verileri alınamadı:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    if (token) fetchLeads();
+  }, [token]);
 
   const handleStartVoice = async () => {
     try {
@@ -181,9 +135,9 @@ const Leads = () => {
     { id: 'Bugün', label: '⏰ Bugün Aranacak', count: 3 }
   ];
 
-  const filteredLeads = MOCK_LEADS.filter(lead => {
-    if (activeTab === 'Sıcak' && lead.label !== 'Sıcak') return false;
-    if (activeTab === 'Ilık' && lead.label !== 'Ilık') return false;
+  const filteredLeads = leads.filter(lead => {
+    if (activeTab === 'Sıcak') return lead.label === 'Sıcak';
+    if (activeTab === 'Ilık') return lead.label === 'Ilık';
     if (activeTab === 'Soğuk' && lead.label !== 'Soğuk') return false;
     if (activeTab === 'Bugün' && !lead.isReminder) return false;
     
@@ -272,15 +226,15 @@ const Leads = () => {
           <div className={`flex flex-col border-r border-[#2A2D35] transition-all duration-300 ${selectedLead ? 'w-[55%]' : 'w-full'}`}>
             <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
               
-              {filteredLeads.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full text-center">
-                  <div className="w-16 h-16 rounded-full bg-[#2A2D35] flex items-center justify-center mb-4">
-                    <span className="material-symbols-outlined text-[32px] text-[#7C8090]">group</span>
+              {loading ? (
+                <div className="flex items-center justify-center p-8 text-[#7C8090] text-[13px]">Yükleniyor...</div>
+              ) : filteredLeads.length === 0 ? (
+                <div className="flex flex-col items-center justify-center p-16 text-center">
+                  <div className="w-16 h-16 rounded-full bg-[#1E2028] flex items-center justify-center mb-4">
+                    <span className="material-symbols-outlined text-[32px] text-[#7C8090]">group_off</span>
                   </div>
-                  <h3 className="text-[14px] font-medium text-[#F1F2F4] mb-1">Henüz lead yok</h3>
-                  <p className="text-[13px] text-[#7C8090] max-w-[240px]">
-                    İlk müşteri mesajını analiz etmek için "+ Yeni Lead" butonuna tıklayın.
-                  </p>
+                  <h3 className="text-[#F1F2F4] font-medium text-[15px] mb-2">Henüz Lead Bulunmuyor</h3>
+                  <p className="text-[#7C8090] text-[13px] max-w-[280px]">Yeni bir lead eklemek için sağ üstteki "Yeni Lead" butonunu kullanın veya ilan sitelerinden mesaj bekleyin.</p>
                 </div>
               ) : (
                 <div className="flex flex-col">

@@ -56,7 +56,7 @@ router.get('/:id', authMiddleware, async (req, res) => {
     const lead = await db.query('SELECT * FROM leads WHERE id = $1 AND company_id = $2', [req.params.id, req.user.company_id]);
     if (lead.rows.length === 0) return res.status(404).json({ message: 'Lead bulunamadı veya yetkisiz.' });
 
-    const notes = await db.query('SELECT * FROM notes WHERE lead_id = $1 ORDER BY created_at DESC', [req.params.id]);
+    const notes = await db.query('SELECT * FROM lead_notes WHERE lead_id = $1 ORDER BY created_at DESC', [req.params.id]);
     
     // Fetch property matches
     const matches = await db.query(`
@@ -92,7 +92,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
     );
 
     if (status && status !== lead.rows[0].status) {
-      await db.query('INSERT INTO notes (lead_id, content) VALUES ($1, $2)', [req.params.id, `Sistem: Durum güncellendi -> ${status}`]);
+      await db.query('INSERT INTO lead_notes (lead_id, content) VALUES ($1, $2)', [req.params.id, `Sistem: Durum güncellendi -> ${status}`]);
     }
 
     res.json(updatedLead.rows[0]);
@@ -110,7 +110,7 @@ router.post('/:id/notes', authMiddleware, async (req, res) => {
     if (lead.rows.length === 0) return res.status(404).json({ message: 'Lead bulunamadı' });
 
     const newNote = await db.query(
-      'INSERT INTO notes (lead_id, content) VALUES ($1, $2) RETURNING *',
+      'INSERT INTO lead_notes (lead_id, content) VALUES ($1, $2) RETURNING *',
       [req.params.id, content]
     );
 
@@ -398,7 +398,7 @@ router.post('/:id/wakeup', authMiddleware, async (req, res) => {
     if (leadRes.rows.length === 0) return res.status(404).json({ message: 'Lead bulunamadı' });
     const lead = leadRes.rows[0];
 
-    const notesRes = await db.query('SELECT content, created_at FROM notes WHERE lead_id = $1 ORDER BY created_at ASC', [leadId]);
+    const notesRes = await db.query('SELECT content, created_at FROM lead_notes WHERE lead_id = $1 ORDER BY created_at ASC', [leadId]);
     const notesStr = notesRes.rows.map(n => n.content).join(' | ');
 
     const { MASTER_AGENT_PROMPT } = require('../utils/promptLibrary');
