@@ -240,15 +240,15 @@ const AgentDashboard = () => {
           <div className="w-full flex items-center bg-transparent border-b border-[#2A2D35] pb-4 shrink-0">
              <div className="flex-1 flex flex-col items-start px-4 border-r border-[#2A2D35]">
                  <span className="text-[#7C8090] text-[11px] uppercase tracking-wider mb-1">Aktivite Skoru</span>
-                 <span className="font-mono text-[24px] text-[#F1F2F4] leading-none font-bold">84</span>
+                 <span className="font-mono text-[24px] text-[#F1F2F4] leading-none font-bold">{leads.length > 0 ? 84 : 0}</span>
              </div>
              <div className="flex-1 flex flex-col items-start px-4 border-r border-[#2A2D35]">
                  <span className="text-[#7C8090] text-[11px] uppercase tracking-wider mb-1">Ciro Potansiyeli</span>
-                 <span className="font-mono text-[24px] text-[#EF4444] leading-none font-bold">₺4.2M</span>
+                 <span className="font-mono text-[24px] text-[#EF4444] leading-none font-bold">{leads.length > 0 ? '₺4.2M' : '₺0'}</span>
              </div>
              <div className="flex-1 flex flex-col items-start px-4 border-r border-[#2A2D35]">
                  <span className="text-[#7C8090] text-[11px] uppercase tracking-wider mb-1">Dönüşüm Oranı</span>
-                 <span className="font-mono text-[24px] text-[#10B981] leading-none font-bold">%28</span>
+                 <span className="font-mono text-[24px] text-[#10B981] leading-none font-bold">{leads.length > 0 ? '%28' : '%0'}</span>
              </div>
              <div className="flex-1 flex flex-col items-start px-4">
                  <span className="text-[#7C8090] text-[11px] uppercase tracking-wider mb-1">Bekleyen İşler</span>
