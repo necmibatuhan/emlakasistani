@@ -1,5 +1,6 @@
 import React, { useState, useContext, useRef, useEffect } from 'react';
 import axios from 'axios';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { AuthContext } from '../contexts/AuthContext';
 import { UIContext } from '../contexts/UIContext';
 import Sidebar from '../components/Sidebar';
@@ -33,41 +34,31 @@ const Leads = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [isTranscribing, setIsTranscribing] = useState(false);
-  const [leads, setLeads] = useState([]);
-  const [loading, setLoading] = useState(true);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const timerRef = useRef(null);
 
+  const queryClient = useQueryClient();
+  const { data: leads = [], isLoading: loading } = useQuery({
+    queryKey: ['leads'],
+    queryFn: async () => {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return res.data.map(lead => ({
+        ...lead,
+        time: new Date(lead.created_at).toLocaleDateString('tr-TR'),
+        history: lead.history || [],
+        notes: lead.notes || [],
+        preferences: lead.preferences || []
+      }));
+    },
+    enabled: !!token
+  });
+
   useEffect(() => {
     return () => clearInterval(timerRef.current);
   }, []);
-
-  useEffect(() => {
-    const fetchLeads = async () => {
-      try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        
-        const formattedLeads = res.data.map(lead => ({
-          ...lead,
-          time: new Date(lead.created_at).toLocaleDateString('tr-TR'),
-          history: lead.history || [],
-          notes: lead.notes || [],
-          preferences: lead.preferences || []
-        }));
-        
-        setLeads(formattedLeads);
-      } catch (err) {
-        console.error('Lead verileri alınamadı:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    if (token) fetchLeads();
-  }, [token]);
 
   const handleStartVoice = async () => {
     try {
@@ -147,15 +138,7 @@ const Leads = () => {
         message: newLeadMessage
       }, { headers: { Authorization: `Bearer ${token}` } });
       
-      const formattedLead = {
-        ...res.data,
-        time: new Date(res.data.created_at).toLocaleDateString('tr-TR'),
-        history: res.data.history || [],
-        notes: res.data.notes || [],
-        preferences: res.data.preferences || []
-      };
-      
-      setLeads(prev => [formattedLead, ...prev]);
+      await queryClient.invalidateQueries(['leads']);
       setNewLeadName(''); setNewLeadPhone(''); setNewLeadMessage('');
       setIsNewLeadModalOpen(false);
     } catch (err) {
