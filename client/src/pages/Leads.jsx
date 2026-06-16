@@ -103,20 +103,23 @@ const Leads = () => {
 
   const transcribeAudio = async (blob, mimeType) => {
     setIsTranscribing(true);
+    setAnalyzeError('');
     try {
       const extension = mimeType?.includes('mp4') ? 'm4a' : 'webm';
       const formData = new FormData();
       formData.append('audio', blob, `voicenote.${extension}`);
+      if (newLeadName) formData.append('name', newLeadName);
+      if (newLeadPhone) formData.append('phone', newLeadPhone);
       
-      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/voice/transcribe`, formData, {
+      await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/analyze-voice`, formData, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
-      if (res.data && res.data.transcript) {
-        setNewLeadMessage(prev => prev ? prev + ' ' + res.data.transcript : res.data.transcript);
-      }
+      await queryClient.invalidateQueries(['leads']);
+      setNewLeadName(''); setNewLeadPhone(''); setNewLeadMessage('');
+      setIsNewLeadModalOpen(false);
     } catch (err) {
-      alert('Ses metne dönüştürülürken hata oluştu.');
+      setAnalyzeError(err.response?.data?.error || err.response?.data?.message || 'Ses analiz edilirken hata oluştu.');
     } finally {
       setIsTranscribing(false);
     }

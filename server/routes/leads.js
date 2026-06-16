@@ -1,10 +1,12 @@
 const express = require('express');
+const multer = require('multer');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const db = require('../db');
 const { authMiddleware } = require('../middleware/auth');
 const PrivacyPipeline = require('../utils/PrivacyPipeline');
 
 const router = express.Router();
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } }); // 10MB limit
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || 'mock');
 
@@ -115,6 +117,110 @@ router.post('/:id/notes', authMiddleware, async (req, res) => {
     );
 
     res.json(newNote.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Sunucu hatası' });
+  }
+});
+
+// Direct Voice-to-CRM Analyze Endpoint
+router.post('/analyze-voice', authMiddleware, upload.single('audio'), async (req, res) => {
+  try {
+    const { name, phone } = req.body;
+    const audioFile = req.file;
+
+    if (!audioFile) return res.status(400).json({ message: 'Ses dosyası eksik.' });
+
+    if (!checkRateLimit(req.user.id)) {
+      return res.status(429).json({ message: 'Rate limit aşıldı.' });
+    }
+
+    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'mock') {
+      return res.status(500).json({ message: 'Yapay zeka yapılandırması eksik.' });
+    }
+
+    const audioBase64 = audioFile.buffer.toString('base64');
+    let mimeType = audioFile.mimetype.split(';')[0];
+    if (mimeType === 'application/octet-stream' || !mimeType.startsWith('audio/')) {
+        mimeType = 'audio/webm';
+    }
+
+    const promptText = `Sen dünyanın en iyi emlak satış koçu ve CRM analiz motorusun.
+Bu ses kaydı, bir emlak danışmanının müşteriyle yaptığı görüşme sonrası bıraktığı sesli nottur.
+Aşağıdaki müşteri verilerini doğrudan ses kaydından çıkar ve SADECE JSON formatında yanıt ver:
+
+1. LEAD SICAKLIK SKORU (lead_score): 0-100 arasında puan ver.
+2. Müşteri Niyeti (customer_intent): "Alıcı", "Satıcı", veya "Kiracı"
+3. Bütçe (budget): { "min": 0, "max": 0, "currency": "TRY" } (Eğer tek fiyat verilmişse max'a yaz. Rakam olarak ver)
+4. Lokasyon Tercihleri (location_preferences): ["Şehir/İlçe"]
+5. Emlak Tipi (property_type): ["Konut", "İşyeri", "Arsa" vb.]
+6. Oda Sayısı (rooms): "3+1", "2+1" gibi (varsa)
+7. ACİLİYET SKORU (urgency_score): 0-100 arasında hesapla.
+8. KATEGORİ (category): "🔥 Hemen Ara", "⚡ Bugün Ulaş", "📅 Bu Hafta Takip Et", "🌱 Nurture Sürecine Al", "❌ Şimdilik Beklet"
+9. NEDEN (reason): Kararı maksimum 3 cümlede açıkla.
+10. SONRAKİ AKSİYON (next_action): Danışmanın uygulaması gereken tek aksiyonu belirt.
+11. WHATSAPP MESAJI (whatsapp_message): Müşteriye gönderilecek kişiselleştirilmiş mesaj oluştur.
+12. TAKVİM & GÖREV ANALİZİ (calendar_event): Eğer geleceğe yönelik bir eylemden bahsediliyorsa (Örn: Yarın Ahmet Bey'e evi göstereceğim), bunu doldur: { "title": "...", "description": "...", "start_date": "YYYY-MM-DD" } Yoksa null yap.
+
+Lütfen çıktını başka hiçbir metin olmadan sadece geçerli bir JSON olarak ver.`;
+
+    let parsedResult;
+    try {
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash", generationConfig: { responseMimeType: "application/json", temperature: 0.2 } });
+      const aiResult = await model.generateContent([
+        {
+          inlineData: {
+            mimeType,
+            data: audioBase64
+          }
+        },
+        { text: promptText }
+      ]);
+      
+      let respText = aiResult.response.text().trim();
+      if (respText.startsWith('\`\`\`json')) respText = respText.replace('\`\`\`json', '').replace('\`\`\`', '').trim();
+      parsedResult = JSON.parse(respText);
+    } catch (apiErr) {
+      console.error('Gemini Analyze-Voice API Error:', apiErr.message);
+      return res.status(500).json({ message: 'Ses analizi başarısız oldu' });
+    }
+
+    const finalName = name?.trim() ? name.trim() : '[İsim Belirtilmedi]';
+    const finalPhone = phone?.trim() ? phone.trim() : '[Telefon Belirtilmedi]';
+    const reasoningText = parsedResult.reason || 'Belirtilmedi';
+    const rawScore = parsedResult.lead_score || 50;
+    const finalScore = Math.max(1, Math.min(10, Math.round(Number(rawScore) / 10) || 5));
+
+    let mappedLabel = 'Soğuk';
+    const cat = parsedResult.category || '';
+    if (cat.includes('Hemen Ara') || cat.includes('Bugün Ulaş')) {
+       mappedLabel = 'Sıcak';
+    } else if (cat.includes('Bu Hafta Takip Et')) {
+       mappedLabel = 'Ilık';
+    }
+
+    const message = "Sesli not üzerinden sisteme eklendi.";
+
+    const leadInsert = await db.query(
+      `INSERT INTO leads (company_id, office_id, assigned_to, source, name, phone, message, score, label, reasoning, recommended_action, whatsapp_draft, properties) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`,
+      [
+        req.user.company_id, req.user.office_id, req.user.id, 'voice', finalName, finalPhone, message, 
+        finalScore, 
+        mappedLabel, 
+        reasoningText, 
+        parsedResult.next_action || '', 
+        parsedResult.whatsapp_message || '', 
+        JSON.stringify(parsedResult)
+      ]
+    );
+
+    const newLead = leadInsert.rows[0];
+
+    const queue = require('../services/queue');
+    queue.add('MATCH_PROPERTIES', { leadId: newLead.id });
+
+    res.status(201).json(newLead);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Sunucu hatası' });

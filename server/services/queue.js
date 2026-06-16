@@ -16,46 +16,83 @@ setInterval(async () => {
         if (leadRes.rows.length === 0) return;
         const lead = leadRes.rows[0];
 
-        // Fetch properties for that office
-        const propertiesRes = await db.query("SELECT * FROM properties WHERE office_id = $1 AND status = 'Aktif'", [lead.office_id]);
-        if (propertiesRes.rows.length === 0) {
-            console.log("No active properties found for matching.");
-            return;
-        }
-
-        const prompt = `Emlak AI Eşleştirme Motoru
-Aşağıdaki Lead tercihleri ile Portföy listesindeki mülkleri eşleştir.
-
-Lead Tercihleri:
-${JSON.stringify(lead.properties)}
-
-Aktif Portföy Listesi:
-${JSON.stringify(propertiesRes.rows.map(p => ({id: p.id, title: p.title, type: p.type, city: p.city, price: p.price, features: p.features})))}
-
-Lütfen en uygun olan maksimum 3 mülkü puanlayarak eşleştir.
-Yanıtını JSON dizisi olarak ver. Örnek: [{"property_id": "...", "match_score": 85, "ai_reasoning": "Bütçeye ve bölgeye tam uyuyor."}]`;
-
-        let matches = [];
-        if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'mock') {
-            // Mock match
-            matches = [{
-                property_id: propertiesRes.rows[0].id,
-                match_score: 90,
-                ai_reasoning: "Lead bütçesi ve lokasyon isteği ile tamamen örtüşüyor."
-            }];
+        let propsObj = {};
+        if (typeof lead.properties === 'string') {
+          try { propsObj = JSON.parse(lead.properties); } catch(e){}
         } else {
-            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { responseMimeType: "application/json" } });
-            const aiResult = await model.generateContent(prompt);
-            matches = JSON.parse(aiResult.response.text());
+          propsObj = lead.properties || {};
         }
 
-        for (const match of matches) {
+        // 1. Type Casting & Normalization
+        let maxBudget = null;
+        if (propsObj.budget) {
+          if (typeof propsObj.budget === 'object' && propsObj.budget.max) {
+             maxBudget = Number(String(propsObj.budget.max).replace(/\D/g, ''));
+          } else if (typeof propsObj.budget === 'string' || typeof propsObj.budget === 'number') {
+             maxBudget = Number(String(propsObj.budget).replace(/\D/g, ''));
+          }
+        }
+
+        let requiredType = null;
+        const intent = String(propsObj.customer_intent || propsObj.intent || '').toLowerCase();
+        if (intent.includes('alıcı') || intent.includes('satici') || intent.includes('sat') || intent.includes('buyer')) requiredType = 'Satılık';
+        if (intent.includes('kira') || intent.includes('renter')) requiredType = 'Kiralık';
+
+        let locationQuery = null;
+        let locations = propsObj.location_preferences || propsObj.locations || [];
+        if (Array.isArray(locations) && locations.length > 0) {
+           locationQuery = `%${locations[0].trim()}%`;
+        } else if (typeof locations === 'string' && locations.trim()) {
+           locationQuery = `%${locations.trim()}%`;
+        }
+
+        let rooms = null;
+        let r = propsObj.rooms || propsObj.room_preference || propsObj.property_type;
+        if (Array.isArray(r) && r.length > 0) rooms = String(r[0]);
+        else if (typeof r === 'string') rooms = r;
+
+        // Build SQL Query dynamically
+        let query = "SELECT id, title, price, district, rooms FROM properties WHERE office_id = $1";
+        let values = [lead.office_id];
+        let idx = 2;
+
+        if (maxBudget && maxBudget > 0) {
+            query += ` AND price <= $${idx}`;
+            values.push(maxBudget);
+            idx++;
+        }
+
+        if (requiredType) {
+            query += ` AND type = $${idx}`;
+            values.push(requiredType);
+            idx++;
+        }
+
+        if (locationQuery && locationQuery !== '%%') {
+            query += ` AND (district ILIKE $${idx} OR city ILIKE $${idx})`;
+            values.push(locationQuery);
+            idx++;
+        }
+
+        if (rooms && rooms.includes('+')) {
+            query += ` AND rooms ILIKE $${idx}`;
+            values.push(`%${rooms}%`);
+            idx++;
+        }
+
+        query += " ORDER BY created_at DESC LIMIT 3";
+
+        const matchedProps = await db.query(query, values);
+
+        for (const match of matchedProps.rows) {
+            // Calculate a score out of 100
+            let score = 95;
             await db.query(
                 'INSERT INTO lead_property_matches (lead_id, property_id, match_score, ai_reasoning) VALUES ($1, $2, $3, $4)',
-                [lead.id, match.property_id, match.match_score, match.ai_reasoning]
+                [lead.id, match.id, score, `Sistem Eşleşmesi: Bütçeye uygun (${match.price} ₺), Lokasyon: ${match.district}, Oda: ${match.rooms}`]
             );
         }
-        console.log(`Matched ${matches.length} properties for lead ${lead.id}`);
+        console.log(`Matched ${matchedProps.rows.length} properties for lead ${lead.id} via SQL.`);
 
       } catch (err) {
         console.error("Queue matching error:", err);

@@ -139,15 +139,14 @@ const AgentDashboard = () => {
     try {
       const formData = new FormData();
       formData.append('audio', audioBlob, 'voicenote.webm');
-      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/voice/transcribe`, formData, {
+      await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/analyze-voice`, formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setMessage(prev => prev ? prev + '\n' + res.data.transcript : res.data.transcript);
+      await queryClient.invalidateQueries(['leads']);
       setIsVoiceModalOpen(false);
-      setIsNewLeadDrawerOpen(true);
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.error || 'Ses metne çevrilemedi.');
+      alert(err.response?.data?.error || err.response?.data?.message || 'Ses metne çevrilemedi veya analiz edilemedi.');
     }
   };
 
