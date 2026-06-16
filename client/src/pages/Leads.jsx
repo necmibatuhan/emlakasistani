@@ -117,8 +117,8 @@ const Leads = () => {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
-      if (res.data && res.data.text) {
-        setNewLeadMessage(prev => prev ? prev + ' ' + res.data.text : res.data.text);
+      if (res.data && res.data.transcript) {
+        setNewLeadMessage(prev => prev ? prev + ' ' + res.data.transcript : res.data.transcript);
       }
     } catch (err) {
       alert('Ses metne dönüştürülürken hata oluştu.');
