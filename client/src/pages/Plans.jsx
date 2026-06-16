@@ -112,7 +112,7 @@ const Plans = () => {
             </div>
 
             {/* Pricing Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 items-start">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16 items-start">
               
               {/* FREE CARD */}
               <div className="bg-[#16181D] border border-[#2A2D35] rounded-[10px] p-8 flex flex-col">
@@ -204,6 +204,32 @@ const Plans = () => {
                 </button>
               </div>
 
+              {/* KURUMSAL CARD */}
+              <div className="bg-[#16181D] border border-[#2A2D35] rounded-[10px] p-8 flex flex-col">
+                <h3 className="text-[14px] font-medium text-[#F1F2F4] mb-4">Kurumsal</h3>
+                <div className="flex items-baseline mb-2">
+                  <span className="text-[36px] font-medium text-[#F1F2F4]">Özel</span>
+                </div>
+                <p className="text-[11px] text-[#7C8090] mb-1 opacity-0 pointer-events-none select-none">Boşluk</p>
+                <p className="text-[12px] text-[#7C8090] mb-8">Kendi sistemine entegre etmek isteyen brokerlar için</p>
+                
+                <ul className="space-y-4 mb-8 flex-1">
+                  <li className="flex items-center gap-2 text-[13px] text-[#F1F2F4]"><Check className="w-4 h-4 text-[#10B981]" /> Sınırsız Danışman Hesabı</li>
+                  <li className="flex items-center gap-2 text-[13px] text-[#F1F2F4]"><Check className="w-4 h-4 text-[#10B981]" /> Özel API & CRM Entegrasyonu</li>
+                  <li className="flex items-center gap-2 text-[13px] text-[#F1F2F4]"><Check className="w-4 h-4 text-[#10B981]" /> WhatsApp Business API Bağlantısı</li>
+                  <li className="flex items-center gap-2 text-[13px] text-[#F1F2F4]"><Check className="w-4 h-4 text-[#10B981]" /> Özel Eğitilmiş Yapay Zeka Modeliniz</li>
+                </ul>
+                
+                <a 
+                  href="https://wa.me/905555555555?text=Merhaba,%20Emlak%20Asistanı%20Kurumsal%20plan%20hakkında%20bilgi%20almak%20istiyorum." 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-full py-2.5 text-center text-[13px] font-medium text-[#F1F2F4] border border-[#2A2D35] rounded-[6px] hover:bg-[#1E2028] transition-colors block"
+                >
+                  Satışla İletişime Geç
+                </a>
+              </div>
+
             </div>
 
             {/* Compare Table */}
@@ -225,6 +251,7 @@ const Plans = () => {
                         <th className="py-4 px-4 text-[#7C8090] font-medium text-[13px] text-center">Ücretsiz</th>
                         <th className="py-4 px-4 text-[#F5A623] font-medium text-[13px] text-center bg-[#1A1200] rounded-t-[8px]">Pro</th>
                         <th className="py-4 px-4 text-[#3B82F6] font-medium text-[13px] text-center">Pro+</th>
+                        <th className="py-4 px-4 text-[#F1F2F4] font-medium text-[13px] text-center">Kurumsal</th>
                       </tr>
                     </thead>
                     <tbody className="text-[13px] text-[#F1F2F4]">
@@ -233,11 +260,13 @@ const Plans = () => {
                         <td className="py-3 px-4 text-center">20/ay</td>
                         <td className="py-3 px-4 text-center bg-[#1A1200]">Sınırsız</td>
                         <td className="py-3 px-4 text-center">Sınırsız</td>
+                        <td className="py-3 px-4 text-center text-[#10B981]">Sınırsız (API)</td>
                       </tr>
                       <tr className="border-b border-[#2A2D35] hover:bg-[#1E2028] transition-colors">
                         <td className="py-3 px-4">AI skorlama</td>
                         <td className="py-3 px-4 text-center"><Check className="w-4 h-4 text-[#10B981] mx-auto" /></td>
                         <td className="py-3 px-4 text-center bg-[#1A1200]"><Check className="w-4 h-4 text-[#10B981] mx-auto" /></td>
+                        <td className="py-3 px-4 text-center"><Check className="w-4 h-4 text-[#10B981] mx-auto" /></td>
                         <td className="py-3 px-4 text-center"><Check className="w-4 h-4 text-[#10B981] mx-auto" /></td>
                       </tr>
                       <tr className="border-b border-[#2A2D35] hover:bg-[#1E2028] transition-colors">
@@ -245,11 +274,13 @@ const Plans = () => {
                         <td className="py-3 px-4 text-center"><Check className="w-4 h-4 text-[#10B981] mx-auto" /></td>
                         <td className="py-3 px-4 text-center bg-[#1A1200]"><Check className="w-4 h-4 text-[#10B981] mx-auto" /></td>
                         <td className="py-3 px-4 text-center"><Check className="w-4 h-4 text-[#10B981] mx-auto" /></td>
+                        <td className="py-3 px-4 text-center"><Check className="w-4 h-4 text-[#10B981] mx-auto" /></td>
                       </tr>
                       <tr className="border-b border-[#2A2D35] hover:bg-[#1E2028] transition-colors">
                         <td className="py-3 px-4">Durum takibi</td>
                         <td className="py-3 px-4 text-center"><Check className="w-4 h-4 text-[#10B981] mx-auto" /></td>
                         <td className="py-3 px-4 text-center bg-[#1A1200]"><Check className="w-4 h-4 text-[#10B981] mx-auto" /></td>
+                        <td className="py-3 px-4 text-center"><Check className="w-4 h-4 text-[#10B981] mx-auto" /></td>
                         <td className="py-3 px-4 text-center"><Check className="w-4 h-4 text-[#10B981] mx-auto" /></td>
                       </tr>
                       <tr className="border-b border-[#2A2D35] hover:bg-[#1E2028] transition-colors">
@@ -257,11 +288,13 @@ const Plans = () => {
                         <td className="py-3 px-4 text-center"><X className="w-4 h-4 text-[#2A2D35] mx-auto" /></td>
                         <td className="py-3 px-4 text-center bg-[#1A1200]"><Check className="w-4 h-4 text-[#10B981] mx-auto" /></td>
                         <td className="py-3 px-4 text-center"><Check className="w-4 h-4 text-[#10B981] mx-auto" /></td>
+                        <td className="py-3 px-4 text-center"><Check className="w-4 h-4 text-[#10B981] mx-auto" /></td>
                       </tr>
                       <tr className="border-b border-[#2A2D35] hover:bg-[#1E2028] transition-colors">
                         <td className="py-3 px-4">Not & hatırlatıcı</td>
                         <td className="py-3 px-4 text-center"><X className="w-4 h-4 text-[#2A2D35] mx-auto" /></td>
                         <td className="py-3 px-4 text-center bg-[#1A1200]"><Check className="w-4 h-4 text-[#10B981] mx-auto" /></td>
+                        <td className="py-3 px-4 text-center"><Check className="w-4 h-4 text-[#10B981] mx-auto" /></td>
                         <td className="py-3 px-4 text-center"><Check className="w-4 h-4 text-[#10B981] mx-auto" /></td>
                       </tr>
                       <tr className="border-b border-[#2A2D35] hover:bg-[#1E2028] transition-colors">
@@ -269,11 +302,13 @@ const Plans = () => {
                         <td className="py-3 px-4 text-center"><X className="w-4 h-4 text-[#2A2D35] mx-auto" /></td>
                         <td className="py-3 px-4 text-center bg-[#1A1200]"><Check className="w-4 h-4 text-[#10B981] mx-auto" /></td>
                         <td className="py-3 px-4 text-center"><Check className="w-4 h-4 text-[#10B981] mx-auto" /></td>
+                        <td className="py-3 px-4 text-center"><Check className="w-4 h-4 text-[#10B981] mx-auto" /></td>
                       </tr>
                       <tr className="border-b border-[#2A2D35] hover:bg-[#1E2028] transition-colors">
                         <td className="py-3 px-4">İstatistikler</td>
                         <td className="py-3 px-4 text-center"><X className="w-4 h-4 text-[#2A2D35] mx-auto" /></td>
                         <td className="py-3 px-4 text-center bg-[#1A1200]"><X className="w-4 h-4 text-[#2A2D35] mx-auto" /></td>
+                        <td className="py-3 px-4 text-center"><Check className="w-4 h-4 text-[#10B981] mx-auto" /></td>
                         <td className="py-3 px-4 text-center"><Check className="w-4 h-4 text-[#10B981] mx-auto" /></td>
                       </tr>
                       <tr className="border-b border-[#2A2D35] hover:bg-[#1E2028] transition-colors">
@@ -281,11 +316,13 @@ const Plans = () => {
                         <td className="py-3 px-4 text-center"><X className="w-4 h-4 text-[#2A2D35] mx-auto" /></td>
                         <td className="py-3 px-4 text-center bg-[#1A1200]"><X className="w-4 h-4 text-[#2A2D35] mx-auto" /></td>
                         <td className="py-3 px-4 text-center"><Check className="w-4 h-4 text-[#10B981] mx-auto" /></td>
+                        <td className="py-3 px-4 text-center"><Check className="w-4 h-4 text-[#10B981] mx-auto" /></td>
                       </tr>
                       <tr className="border-b border-[#2A2D35] hover:bg-[#1E2028] transition-colors">
                         <td className="py-3 px-4">CSV export</td>
                         <td className="py-3 px-4 text-center"><X className="w-4 h-4 text-[#2A2D35] mx-auto" /></td>
                         <td className="py-3 px-4 text-center bg-[#1A1200]"><X className="w-4 h-4 text-[#2A2D35] mx-auto" /></td>
+                        <td className="py-3 px-4 text-center"><Check className="w-4 h-4 text-[#10B981] mx-auto" /></td>
                         <td className="py-3 px-4 text-center"><Check className="w-4 h-4 text-[#10B981] mx-auto" /></td>
                       </tr>
                       <tr className="border-b border-[#2A2D35] hover:bg-[#1E2028] transition-colors">
@@ -293,6 +330,7 @@ const Plans = () => {
                         <td className="py-3 px-4 text-center">Email</td>
                         <td className="py-3 px-4 text-center bg-[#1A1200] rounded-b-[8px]">Email</td>
                         <td className="py-3 px-4 text-center">Öncelikli</td>
+                        <td className="py-3 px-4 text-center">Özel Hesap Yöneticisi</td>
                       </tr>
                     </tbody>
                   </table>
