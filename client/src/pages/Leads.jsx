@@ -23,7 +23,11 @@ const Leads = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLead, setSelectedLead] = useState(null);
   const [isNewLeadModalOpen, setIsNewLeadModalOpen] = useState(false);
+  const [newLeadName, setNewLeadName] = useState('');
+  const [newLeadPhone, setNewLeadPhone] = useState('');
   const [newLeadMessage, setNewLeadMessage] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analyzeError, setAnalyzeError] = useState('');
 
   // Voice Recording States
   const [isRecording, setIsRecording] = useState(false);
@@ -124,6 +128,40 @@ const Leads = () => {
       alert('Ses metne dönüştürülürken hata oluştu.');
     } finally {
       setIsTranscribing(false);
+    }
+  };
+
+  const handleAddLead = async () => {
+    if (!newLeadName || !newLeadPhone) {
+      setAnalyzeError('Lütfen ad ve telefon alanlarını doldurun.');
+      return;
+    }
+    
+    setIsAnalyzing(true);
+    setAnalyzeError('');
+    
+    try {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/analyze`, {
+        name: newLeadName,
+        phone: newLeadPhone,
+        message: newLeadMessage
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      
+      const formattedLead = {
+        ...res.data,
+        time: new Date(res.data.created_at).toLocaleDateString('tr-TR'),
+        history: res.data.history || [],
+        notes: res.data.notes || [],
+        preferences: res.data.preferences || []
+      };
+      
+      setLeads(prev => [formattedLead, ...prev]);
+      setNewLeadName(''); setNewLeadPhone(''); setNewLeadMessage('');
+      setIsNewLeadModalOpen(false);
+    } catch (err) {
+      setAnalyzeError(err.response?.data?.error || err.response?.data?.message || 'Lead analiz edilirken hata oluştu.');
+    } finally {
+      setIsAnalyzing(false);
     }
   };
 
@@ -509,13 +547,14 @@ const Leads = () => {
             </div>
             
             <div className="p-6 space-y-4">
+              {analyzeError && <div className="p-4 bg-[#EF4444]/10 border border-[#EF4444]/30 text-[#EF4444] rounded-[6px] text-[13px]">{analyzeError}</div>}
               <div>
                 <label className="block text-[13px] text-[#7C8090] mb-1.5">Müşteri Adı <span className="text-[#EF4444]">*</span></label>
-                <input type="text" className="w-full bg-[#0A0B0D] border border-[#2A2D35] rounded-[6px] px-4 py-2.5 text-[14px] text-[#F1F2F4] focus:outline-none focus:border-[#F5A623]" />
+                <input type="text" value={newLeadName} onChange={e => setNewLeadName(e.target.value)} className="w-full bg-[#0A0B0D] border border-[#2A2D35] rounded-[6px] px-4 py-2.5 text-[14px] text-[#F1F2F4] focus:outline-none focus:border-[#F5A623]" />
               </div>
               <div>
                 <label className="block text-[13px] text-[#7C8090] mb-1.5">Telefon <span className="text-[#EF4444]">*</span></label>
-                <input type="tel" className="w-full bg-[#0A0B0D] border border-[#2A2D35] rounded-[6px] px-4 py-2.5 text-[14px] text-[#F1F2F4] focus:outline-none focus:border-[#F5A623]" />
+                <input type="tel" value={newLeadPhone} onChange={e => setNewLeadPhone(e.target.value)} className="w-full bg-[#0A0B0D] border border-[#2A2D35] rounded-[6px] px-4 py-2.5 text-[14px] text-[#F1F2F4] focus:outline-none focus:border-[#F5A623]" />
               </div>
               <div>
                 <div className="flex items-center justify-between mb-1.5">
@@ -549,8 +588,8 @@ const Leads = () => {
               >
                 İptal
               </button>
-              <button className="bg-[#F5A623] text-[#0A0B0D] text-[14px] font-medium rounded-[6px] px-8 py-2.5 hover:bg-[#d9921e] transition-colors">
-                Analiz Et
+              <button onClick={handleAddLead} disabled={isAnalyzing} className="bg-[#F5A623] text-[#0A0B0D] text-[14px] font-medium rounded-[6px] px-8 py-2.5 hover:bg-[#d9921e] transition-colors disabled:opacity-50">
+                {isAnalyzing ? 'Analiz Ediliyor...' : 'Analiz Et'}
               </button>
             </div>
           </div>
