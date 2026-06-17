@@ -8,6 +8,8 @@ import { Analytics } from "@vercel/analytics/react";
 import Landing from './pages/Landing';
 import Auth from './pages/Auth';
 import ResetPassword from './pages/ResetPassword';
+import BlogList from './pages/BlogList';
+import BlogPost from './pages/BlogPost';
 import CompanyDashboard from './pages/CompanyDashboard';
 import OfficeDashboard from './pages/OfficeDashboard';
 import AgentDashboard from './pages/AgentDashboard';
@@ -62,6 +64,8 @@ const AppRoutes = () => {
       <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/aydinlatma-metni" element={<AydinlatmaMetni />} />
       <Route path="/gizlilik-politikasi" element={<GizlilikPolitikasi />} />
+      <Route path="/blog" element={<BlogList />} />
+      <Route path="/blog/:slug" element={<BlogPost />} />
       <Route path="/dashboard" element={<ProtectedRoute><RoleBasedDashboard /></ProtectedRoute>} />
       <Route path="/leads" element={<ProtectedRoute><Leads /></ProtectedRoute>} />
       <Route path="/integrations" element={<ProtectedRoute><Integrations /></ProtectedRoute>} />

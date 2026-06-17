@@ -66,6 +66,7 @@ const Landing = () => {
           
           {/* Right Nav */}
           <div className="flex items-center gap-stack-lg">
+            <Link to="/blog" className="text-on-surface-variant hover:text-on-surface font-body-sm font-medium transition-colors">Blog</Link>
             <a href="#fiyatlar" className="text-on-surface-variant hover:text-on-surface font-body-sm font-medium transition-colors">Fiyatlar</a>
             <Link to="/auth" className="text-on-surface-variant hover:text-on-surface font-body-sm font-medium transition-colors">Giriş Yap</Link>
             <Link to="/auth" className="bg-primary hover:bg-primary/90 text-on-primary font-body-sm font-medium px-5 py-2 rounded-md transition-colors">
@@ -85,14 +86,14 @@ const Landing = () => {
             <span className="text-on-surface font-label-md font-medium">Türkiye'de 180.000 emlak danışmanı</span>
           </div>
 
-          <h1 className="font-display-lg text-[48px] lg:text-[56px] font-semibold leading-[1.1] tracking-tight text-on-surface mb-6">
-            Daha Fazla<br/>Portföy.<br/>
-            Daha Fazla<br/>Satış.<br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-[#818cf8]">Daha Fazla<br/>Komisyon.</span>
+          <h1 className="font-display-lg text-[42px] lg:text-[48px] font-semibold leading-[1.2] tracking-tight text-on-surface mb-6">
+            Yapay Zeka Destekli <br/>
+            Emlak Satış Asistanı ve CRM <br/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-[#818cf8]">- Kapora AI</span>
           </h1>
 
           <p className="font-body-lg text-on-surface-variant mt-4 mb-10 max-w-[480px] leading-relaxed">
-            WhatsApp, yapay zekâ ve otomatik takip sistemi ile hiçbir fırsatı kaçırmayın.
+            Emlak danışmanı müşteri takip programı (CRM). Sesli notlar ve gayrimenkul eşleştirme yazılımı ile hiçbir fırsatı kaçırmayın.
           </p>
 
           <div className="flex flex-wrap items-center gap-4 mb-8">
@@ -219,7 +220,7 @@ const Landing = () => {
         <div className="flex flex-col md:flex-row items-center gap-12 md:gap-20">
           {/* Sol: Adımlar */}
           <div className="w-full md:w-1/2 space-y-8">
-            <h2 className="font-headline-lg text-[32px] text-on-surface mb-8">Nasıl Çalışır?</h2>
+            <h2 className="font-headline-lg text-[32px] text-on-surface mb-8">Emlakçılar İçin Sesli Not ile Otomatik Veri Girişi</h2>
             
             <div className="relative pl-8 border-l-2 border-surface-container-high space-y-12">
               <div className="relative">
@@ -230,7 +231,7 @@ const Landing = () => {
 
               <div className="relative">
                 <div className="absolute -left-[41px] top-1 w-5 h-5 rounded-full bg-surface-container-highest ring-4 ring-background"></div>
-                <h3 className="font-headline-sm text-on-surface mb-2">2. Akıllı Portföy Eşleşmesi</h3>
+                <h3 className="font-headline-sm text-on-surface mb-2">2. Gayrimenkul Portföy Eşleştirme Motoru</h3>
                 <p className="font-body-md text-on-surface-variant">Sistem, müşteri kriterlerine uyan en iyi portföyleri veri tabanınızdan otomatik bulur ve listeler.</p>
               </div>
 
