@@ -354,7 +354,7 @@ const Landing = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Sol Panel: Bugün Aranacaklar */}
               <div className="bg-surface-container-high border border-outline-variant/60 rounded-xl p-6 relative">
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-6">
                   <h3 className="font-headline-sm text-on-surface flex items-center gap-2">
                     <span className="text-[20px]">🔥</span> Bugün Aranacaklar
                   </h3>
@@ -389,7 +389,7 @@ const Landing = () => {
 
               {/* Sağ Panel: Kayıp Riski Olanlar */}
               <div className="bg-surface-container-high border border-outline-variant/60 rounded-xl p-6 relative">
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-6">
                   <h3 className="font-headline-sm text-on-surface flex items-center gap-2">
                     <span className="text-[20px]">🚨</span> Kayıp Riski Olanlar
                   </h3>
