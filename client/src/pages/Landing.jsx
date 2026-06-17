@@ -449,19 +449,6 @@ const Landing = () => {
         <div className="max-w-[1200px] mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
           <div className="max-w-2xl w-full">
             <Logo className="mb-8" />
-            
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-8 mb-8">
-              <div>
-                <h4 className="font-semibold text-on-surface mb-3">İçerikler</h4>
-                <ul className="space-y-2">
-                  <li><Link to="/blog/emlak-danismanlari-icin-en-iyi-5-musteri-takip-crm-programi" className="text-on-surface-variant hover:text-primary transition-colors font-body-sm">En İyi 5 CRM Programı</Link></li>
-                  <li><Link to="/blog/gayrimenkul-satislarinda-yapay-zeka-donemi-sesli-crm-nedir" className="text-on-surface-variant hover:text-primary transition-colors font-body-sm">Sesli CRM Nedir?</Link></li>
-                  <li><Link to="/blog/emlak-ofislerinde-zaman-yonetimi-ve-manuel-veri-girisinden-kurtulma-yollari" className="text-on-surface-variant hover:text-primary transition-colors font-body-sm">Zaman Yönetimi</Link></li>
-                  <li><Link to="/blog" className="text-primary hover:text-primary/80 transition-colors font-body-sm font-medium mt-1 inline-block">Tüm Blog Yazıları &rarr;</Link></li>
-                </ul>
-              </div>
-            </div>
-
             <p className="font-body-sm text-on-surface-variant leading-relaxed mb-4 border-t border-outline-variant pt-8">
               Kullanıcı verilerinizin güvenliği Kapora için birinci önceliktir. Aydınlatma Metni ve Gizlilik Politikası'nı aşağıdan inceleyebilirsiniz.
             </p>
