@@ -593,7 +593,7 @@ const Landing = () => {
               else if (feat.type === 'star-blue') icon = <span className="material-symbols-outlined text-[18px] text-[#3B82F6] shrink-0">star</span>;
               
               return (
-                <li key={idx} className={`flex items-start gap-3 font-body-sm ${feat.type === 'cross' ? 'text-on-surface-variant/50' : 'text-on-surface'}`}>
+                <li key={idx} className={`flex items-start gap-3 font-body-sm ${feat.type === 'cross' ? 'text-zinc-500' : 'text-zinc-100'}`}>
                   {icon}
                   <span>{feat.text}</span>
                 </li>
@@ -609,11 +609,11 @@ const Landing = () => {
                   </div>
                   <h3 className="font-headline-sm text-[#FDE047] mb-6 mt-2">{curr.pricing.pro.name}</h3>
                   <div className="flex items-baseline mb-2">
-                    <span className="font-display-lg font-bold text-on-surface">{billingCycle === 'monthly' ? curr.pricing.pro.priceMonthly : curr.pricing.pro.priceYearly}</span>
-                    <span className="font-body-sm text-on-surface-variant ml-1">{curr.pricing.pro.period}</span>
+                    <span className="font-display-lg font-bold text-zinc-100">{billingCycle === 'monthly' ? curr.pricing.pro.priceMonthly : curr.pricing.pro.priceYearly}</span>
+                    <span className="font-body-sm text-zinc-400 ml-1">{curr.pricing.pro.period}</span>
                   </div>
-                  <div className="font-body-sm text-on-surface-variant mb-1">{curr.pricing.pro.yearlyText} {curr.pricing.pro.priceYearly}</div>
-                  <div className="font-body-sm text-on-surface-variant mb-8">{curr.pricing.pro.desc}</div>
+                  <div className="font-body-sm text-zinc-400 mb-1">{curr.pricing.pro.yearlyText} {curr.pricing.pro.priceYearly}</div>
+                  <div className="font-body-sm text-zinc-400 mb-8">{curr.pricing.pro.desc}</div>
                   
                   <ul className="space-y-4 mb-8 flex-1">
                     {curr.pricing.pro.features.map(renderFeature)}
@@ -622,7 +622,7 @@ const Landing = () => {
                   <Link to="/auth" className="w-full py-3 text-center font-label-md text-[#18181B] bg-[#FDE047] hover:bg-[#EAB308] rounded-lg transition-all mb-4">
                     {curr.pricing.pro.btn}
                   </Link>
-                  <div className="text-center font-body-xs text-on-surface-variant/70">
+                  <div className="text-center font-body-xs text-zinc-500">
                     {curr.pricing.pro.footer}
                   </div>
                 </div>
@@ -631,11 +631,11 @@ const Landing = () => {
                 <div className="bg-[#18181B] border border-[#27272A] rounded-2xl p-6 flex flex-col transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-2xl hover:border-[#3B82F6]/50 hover:z-20 relative">
                   <h3 className="font-headline-sm text-[#3B82F6] mb-6">{curr.pricing.proPlus.name}</h3>
                   <div className="flex items-baseline mb-2">
-                    <span className="font-display-lg font-bold text-on-surface">{billingCycle === 'monthly' ? curr.pricing.proPlus.priceMonthly : curr.pricing.proPlus.priceYearly}</span>
-                    <span className="font-body-sm text-on-surface-variant ml-1">{curr.pricing.proPlus.period}</span>
+                    <span className="font-display-lg font-bold text-zinc-100">{billingCycle === 'monthly' ? curr.pricing.proPlus.priceMonthly : curr.pricing.proPlus.priceYearly}</span>
+                    <span className="font-body-sm text-zinc-400 ml-1">{curr.pricing.proPlus.period}</span>
                   </div>
-                  <div className="font-body-sm text-on-surface-variant mb-1">{curr.pricing.proPlus.yearlyText} {curr.pricing.proPlus.priceYearly}</div>
-                  <div className="font-body-sm text-on-surface-variant mb-8 h-10">{curr.pricing.proPlus.desc}</div>
+                  <div className="font-body-sm text-zinc-400 mb-1">{curr.pricing.proPlus.yearlyText} {curr.pricing.proPlus.priceYearly}</div>
+                  <div className="font-body-sm text-zinc-400 mb-8 h-10">{curr.pricing.proPlus.desc}</div>
                   
                   <ul className="space-y-4 mb-8 flex-1">
                     {curr.pricing.proPlus.features.map(renderFeature)}
@@ -650,16 +650,16 @@ const Landing = () => {
                 <div className="bg-[#18181B] border border-[#27272A] rounded-2xl p-6 flex flex-col transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-2xl hover:border-[#E5E7EB]/50 hover:z-20 relative">
                   <h3 className="font-headline-sm text-[#E5E7EB] mb-6">{curr.pricing.enterprise.name}</h3>
                   <div className="flex items-baseline mb-2">
-                    <span className="font-display-lg font-bold text-on-surface">{curr.pricing.enterprise.price}</span>
+                    <span className="font-display-lg font-bold text-zinc-100">{curr.pricing.enterprise.price}</span>
                   </div>
-                  <div className="font-body-sm text-on-surface-variant mb-1">&nbsp;</div>
-                  <div className="font-body-sm text-on-surface-variant mb-8 h-10">{curr.pricing.enterprise.desc}</div>
+                  <div className="font-body-sm text-zinc-400 mb-1">&nbsp;</div>
+                  <div className="font-body-sm text-zinc-400 mb-8 h-10">{curr.pricing.enterprise.desc}</div>
                   
                   <ul className="space-y-4 mb-8 flex-1">
                     {curr.pricing.enterprise.features.map(renderFeature)}
                   </ul>
                   
-                  <a href="https://wa.me/905555555555?text=Merhaba" target="_blank" rel="noopener noreferrer" className="w-full py-3 text-center font-label-md text-on-surface bg-[#27272A] hover:bg-[#3F3F46] rounded-lg transition-all">
+                  <a href="https://wa.me/905555555555?text=Merhaba" target="_blank" rel="noopener noreferrer" className="w-full py-3 text-center font-label-md text-zinc-100 bg-[#27272A] hover:bg-[#3F3F46] rounded-lg transition-all">
                     {curr.pricing.enterprise.btn}
                   </a>
                 </div>
