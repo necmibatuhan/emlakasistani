@@ -46,11 +46,18 @@ const MOCK_LEADS = [
 const Landing = () => {
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [activeMockIndex, setActiveMockIndex] = React.useState(0);
+  const [activeFlowStep, setActiveFlowStep] = React.useState(0);
 
   React.useEffect(() => {
     const interval = setInterval(() => {
-      setActiveMockIndex((prev) => (prev + 1) % MOCK_LEADS.length);
-    }, 2000);
+      setActiveFlowStep((prevStep) => {
+        if (prevStep === 2) {
+          setActiveMockIndex((prevMock) => (prevMock + 1) % MOCK_LEADS.length);
+          return 0;
+        }
+        return prevStep + 1;
+      });
+    }, 2500);
     return () => clearInterval(interval);
   }, []);
 
@@ -228,20 +235,20 @@ const Landing = () => {
             <h2 className="font-headline-lg text-[32px] text-on-surface mb-8">Sesli Asistan ve Dijital Sekreter ile Hız Kazanın</h2>
             
             <div className="relative pl-8 border-l-2 border-surface-container-high space-y-12">
-              <div className="relative">
-                <div className="absolute -left-[41px] top-1 w-5 h-5 rounded-full bg-primary ring-4 ring-background shadow-[0_0_15px_rgba(217,167,74,0.5)]"></div>
+              <div className="relative transition-opacity duration-300" style={{ opacity: activeFlowStep >= 0 ? 1 : 0.4 }}>
+                <div className={`absolute -left-[41px] top-1 w-5 h-5 rounded-full ring-4 ring-background transition-colors duration-500 ${activeFlowStep === 0 ? 'bg-primary shadow-[0_0_15px_rgba(217,167,74,0.5)]' : 'bg-surface-container-highest'}`}></div>
                 <h3 className="font-headline-sm text-on-surface mb-2">1. Sesli Not Bırakın</h3>
                 <p className="font-body-md text-on-surface-variant">Sahadayken sadece konuşun. Sistem müşteri kriterlerini (bütçe, bölge, aciliyet) saniyeler içinde fişler ve ajandanıza işler.</p>
               </div>
 
-              <div className="relative">
-                <div className="absolute -left-[41px] top-1 w-5 h-5 rounded-full bg-surface-container-highest ring-4 ring-background"></div>
+              <div className="relative transition-opacity duration-300" style={{ opacity: activeFlowStep >= 1 ? 1 : 0.4 }}>
+                <div className={`absolute -left-[41px] top-1 w-5 h-5 rounded-full ring-4 ring-background transition-colors duration-500 ${activeFlowStep === 1 ? 'bg-primary shadow-[0_0_15px_rgba(217,167,74,0.5)]' : 'bg-surface-container-highest'}`}></div>
                 <h3 className="font-headline-sm text-on-surface mb-2">2. Akıllı Satış Koçu ile Eşleştirin</h3>
                 <p className="font-body-md text-on-surface-variant">Sistem, müşteri talebine uyan en karlı portföyleri veri tabanınızdan otomatik bulur ve komisyon ihtimalini hesaplar.</p>
               </div>
 
-              <div className="relative">
-                <div className="absolute -left-[41px] top-1 w-5 h-5 rounded-full bg-surface-container-highest ring-4 ring-background"></div>
+              <div className="relative transition-opacity duration-300" style={{ opacity: activeFlowStep >= 2 ? 1 : 0.4 }}>
+                <div className={`absolute -left-[41px] top-1 w-5 h-5 rounded-full ring-4 ring-background transition-colors duration-500 ${activeFlowStep === 2 ? 'bg-primary shadow-[0_0_15px_rgba(217,167,74,0.5)]' : 'bg-surface-container-highest'}`}></div>
                 <h3 className="font-headline-sm text-on-surface mb-2">3. Tek Tıkla Sunum Gönderin</h3>
                 <p className="font-body-md text-on-surface-variant">Eşleşen portföylerin profesyonel WhatsApp sunum taslağı hazır. Sadece gönder tuşuna basarak müşteriye ulaşın.</p>
               </div>
@@ -265,31 +272,35 @@ const Landing = () => {
                 </div>
               </div>
               
-              <div key={`flow-${mockLead.name}`} className="space-y-4 animate-fade-in-up">
-                <div className="bg-surface-container-highest/50 p-4 rounded-lg rounded-tl-none border border-outline-variant/30 max-w-[85%]">
+              <div key={`flow-${mockLead.name}`} className="space-y-4">
+                <div className="bg-surface-container-highest/50 p-4 rounded-lg rounded-tl-none border border-outline-variant/30 max-w-[85%] animate-fade-in-up">
                   <p className="font-body-sm text-on-surface-variant">
                     "{mockLead.incomingMsg}"
                   </p>
                 </div>
                 
-                <div className="flex flex-wrap gap-2 mt-4">
-                  {mockLead.tags.map((tag, i) => (
-                    <span key={i} className={`px-2 py-1 rounded font-mono text-[12px] border ${tag.style}`}>{tag.text}</span>
-                  ))}
-                </div>
-
-                <div className="mt-6 pt-4 border-t border-outline-variant/50">
-                  <div className="font-label-sm text-on-surface-variant mb-3 uppercase tracking-wider">Taslak Mesajınız Hazır</div>
-                  <div className="bg-surface-container-highest/30 p-4 rounded-lg border border-outline-variant/30 border-l-4 border-l-primary relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-2 opacity-30"><span className="material-symbols-outlined text-primary">send_to_mobile</span></div>
-                    <p className="font-body-sm text-on-surface">
-                      "{mockLead.aiReply}"
-                    </p>
+                {activeFlowStep >= 1 && (
+                  <div className="flex flex-wrap gap-2 mt-4 animate-fade-in-up">
+                    {mockLead.tags.map((tag, i) => (
+                      <span key={i} className={`px-2 py-1 rounded font-mono text-[12px] border ${tag.style}`}>{tag.text}</span>
+                    ))}
                   </div>
-                  <button className="w-full mt-4 bg-primary hover:bg-primary/90 text-on-primary font-label-md py-2.5 rounded transition-colors flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(255,195,0,0.3)]">
-                    <span className="material-symbols-outlined text-[18px]">send</span> Yanıtı Gönder
-                  </button>
-                </div>
+                )}
+
+                {activeFlowStep >= 2 && (
+                  <div className="mt-6 pt-4 border-t border-outline-variant/50 animate-fade-in-up">
+                    <div className="font-label-sm text-on-surface-variant mb-3 uppercase tracking-wider">Taslak Mesajınız Hazır</div>
+                    <div className="bg-surface-container-highest/30 p-4 rounded-lg border border-outline-variant/30 border-l-4 border-l-primary relative overflow-hidden">
+                      <div className="absolute top-0 right-0 p-2 opacity-30"><span className="material-symbols-outlined text-primary">send_to_mobile</span></div>
+                      <p className="font-body-sm text-on-surface">
+                        "{mockLead.aiReply}"
+                      </p>
+                    </div>
+                    <button className="w-full mt-4 bg-primary hover:bg-primary/90 text-on-primary font-label-md py-2.5 rounded transition-colors flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(255,195,0,0.3)]">
+                      <span className="material-symbols-outlined text-[18px]">send</span> Yanıtı Gönder
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
