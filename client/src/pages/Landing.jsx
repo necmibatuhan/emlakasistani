@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Play, X } from 'lucide-react';
+import { Play, X, Menu } from 'lucide-react';
 import { Logo } from '../components/Logo';
 import { BLOG_POSTS } from './BlogList';
 
@@ -45,6 +45,7 @@ const MOCK_LEADS = [
 
 const Landing = () => {
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeMockIndex, setActiveMockIndex] = React.useState(0);
   const [activeFlowStep, setActiveFlowStep] = React.useState(0);
 
@@ -72,8 +73,8 @@ const Landing = () => {
           {/* Logo */}
           <Logo />
           
-          {/* Right Nav */}
-          <div className="flex items-center gap-stack-lg">
+          {/* Desktop Nav */}
+          <div className="hidden md:flex items-center gap-6">
             <Link to="/blog" className="text-on-surface-variant hover:text-on-surface font-body-sm font-medium transition-colors">Blog</Link>
             <a href="#fiyatlar" className="text-on-surface-variant hover:text-on-surface font-body-sm font-medium transition-colors">Fiyatlar</a>
             <Link to="/auth" className="text-on-surface-variant hover:text-on-surface font-body-sm font-medium transition-colors">Giriş Yap</Link>
@@ -81,7 +82,27 @@ const Landing = () => {
               Ücretsiz Başla
             </Link>
           </div>
+
+          {/* Mobile Menu Button */}
+          <button 
+            className="md:hidden text-on-surface-variant hover:text-on-surface p-2"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
         </div>
+
+        {/* Mobile Nav Dropdown */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden bg-surface-container-lowest border-b border-outline-variant px-6 py-4 flex flex-col space-y-4">
+            <Link to="/blog" onClick={() => setIsMobileMenuOpen(false)} className="text-on-surface-variant hover:text-on-surface font-body-md font-medium transition-colors py-2">Blog</Link>
+            <a href="#fiyatlar" onClick={() => setIsMobileMenuOpen(false)} className="text-on-surface-variant hover:text-on-surface font-body-md font-medium transition-colors py-2">Fiyatlar</a>
+            <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)} className="text-on-surface-variant hover:text-on-surface font-body-md font-medium transition-colors py-2">Giriş Yap</Link>
+            <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)} className="bg-primary hover:bg-primary/90 text-on-primary font-body-md font-medium px-5 py-3 rounded-md transition-colors text-center mt-2">
+              Ücretsiz Başla
+            </Link>
+          </div>
+        )}
       </nav>
 
       {/* BÖLÜM 2 — HERO */}
@@ -94,7 +115,7 @@ const Landing = () => {
             <span className="text-on-surface font-label-md font-medium">Türkiye'de 180.000 emlak danışmanı</span>
           </div>
 
-          <h1 className="font-display-lg text-[48px] lg:text-[56px] font-semibold leading-[1.1] tracking-tight text-on-surface mb-6">
+          <h1 className="font-display-lg text-[40px] md:text-[48px] lg:text-[56px] font-semibold leading-[1.1] tracking-tight text-on-surface mb-6">
             Daha Fazla<br/>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-[#FDE047] to-primary bg-[length:200%_auto] animate-gradient-x">Portföy.</span><br/>
             Daha Fazla<br/>
@@ -107,12 +128,12 @@ const Landing = () => {
             Emlak danışmanı müşteri takip programı (CRM). Sesli asistan ve dijital sekreter ile hiçbir fırsatı kaçırmayın.
           </p>
 
-          <div className="flex flex-wrap items-center gap-4 mb-8">
-            <Link to="/auth" className="bg-primary hover:bg-[#C2933B] text-on-primary font-label-lg font-medium px-6 py-3 rounded-md transition-colors flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8 w-full sm:w-auto">
+            <Link to="/auth" className="bg-primary hover:bg-[#C2933B] text-on-primary font-label-lg font-medium px-6 py-3 rounded-md transition-colors flex items-center justify-center gap-2 w-full sm:w-auto">
               <span className="material-symbols-outlined text-[20px]">account_balance_wallet</span>
               Komisyonunu Artır
             </Link>
-            <button onClick={() => setIsVideoModalOpen(true)} className="text-on-surface-variant hover:text-on-surface font-label-lg font-medium transition-colors flex items-center gap-2">
+            <button onClick={() => setIsVideoModalOpen(true)} className="text-on-surface-variant hover:text-on-surface font-label-lg font-medium transition-colors flex items-center justify-center gap-2 w-full sm:w-auto py-2">
               <span className="material-symbols-outlined text-primary text-[20px]">play_circle</span>
               <span>Sistemi Gör</span>
             </button>
