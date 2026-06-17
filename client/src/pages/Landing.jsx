@@ -97,22 +97,23 @@ const Landing = () => {
           </h1>
 
           <p className="font-body-lg text-on-surface-variant mt-4 mb-10 max-w-[480px] leading-relaxed">
-            Emlak danışmanı müşteri takip programı (CRM). Sesli notlar ve gayrimenkul eşleştirme yazılımı ile hiçbir fırsatı kaçırmayın.
+            Emlak danışmanı müşteri takip programı (CRM). Sesli asistan ve dijital sekreter ile hiçbir fırsatı kaçırmayın.
           </p>
 
           <div className="flex flex-wrap items-center gap-4 mb-8">
-            <Link to="/auth" className="bg-primary hover:bg-primary/90 text-on-primary font-label-lg font-medium px-6 py-3 rounded-md transition-colors">
-              Ücretsiz Başla
+            <Link to="/auth" className="bg-primary hover:bg-[#C2933B] text-on-primary font-label-lg font-medium px-6 py-3 rounded-md transition-colors flex items-center gap-2">
+              <span className="material-symbols-outlined text-[20px]">account_balance_wallet</span>
+              Komisyonunu Artır
             </Link>
             <button onClick={() => setIsVideoModalOpen(true)} className="text-on-surface-variant hover:text-on-surface font-label-lg font-medium transition-colors flex items-center gap-2">
               <span className="material-symbols-outlined text-primary text-[20px]">play_circle</span>
-              <span>Demo izle</span>
+              <span>Sistemi Gör</span>
             </button>
           </div>
 
           <div className="flex items-center space-x-2 font-label-sm text-on-surface-variant">
-            <span className="material-symbols-outlined text-[16px] text-[#10B981]">check_circle</span>
-            <span>İstanbul · Ankara · İzmir'de aktif danışmanlar kullanıyor</span>
+            <span className="material-symbols-outlined text-[16px] text-[#10B981]">event</span>
+            <span>Günde 3 saat tasarruf eden binlerce danışman</span>
           </div>
 
         </div>
@@ -148,13 +149,13 @@ const Landing = () => {
                 </div>
               </div>
 
-              {/* AI Processing Step */}
+              {/* Processing Step */}
               <div key={`hero-ai-${mockLead.name}`} className="flex gap-4 items-start animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
                 <div className="w-10 h-10 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(255,195,0,0.2)]">
-                  <span className="material-symbols-outlined text-primary text-[20px]">auto_awesome</span>
+                  <span className="material-symbols-outlined text-primary text-[20px]">home_work</span>
                 </div>
                 <div className="flex-1 space-y-3">
-                  <div className="text-primary font-label-sm tracking-wider uppercase">AI Analizi Tamamlandı</div>
+                  <div className="text-primary font-label-sm tracking-wider uppercase">Portföy Eşleşmesi Bulundu</div>
                   <div className="flex gap-2">
                     {mockLead.tags.map((tag, i) => (
                       <span key={i} className={`px-2.5 py-1 rounded text-[12px] border ${tag.style}`}>{tag.text}</span>
@@ -224,25 +225,25 @@ const Landing = () => {
         <div className="flex flex-col md:flex-row items-center gap-12 md:gap-20">
           {/* Sol: Adımlar */}
           <div className="w-full md:w-1/2 space-y-8">
-            <h2 className="font-headline-lg text-[32px] text-on-surface mb-8">Emlakçılar İçin Sesli Not ile Otomatik Veri Girişi</h2>
+            <h2 className="font-headline-lg text-[32px] text-on-surface mb-8">Sesli Asistan ve Dijital Sekreter ile Hız Kazanın</h2>
             
             <div className="relative pl-8 border-l-2 border-surface-container-high space-y-12">
               <div className="relative">
-                <div className="absolute -left-[41px] top-1 w-5 h-5 rounded-full bg-primary ring-4 ring-background shadow-[0_0_15px_rgba(99,102,241,0.5)]"></div>
-                <h3 className="font-headline-sm text-on-surface mb-2">1. WhatsApp'tan Mesaj Gelir</h3>
-                <p className="font-body-md text-on-surface-variant">Müşteri kriterlerini yazar. Yapay zeka bütçe, bölge ve aciliyeti saniyeler içinde analiz eder.</p>
+                <div className="absolute -left-[41px] top-1 w-5 h-5 rounded-full bg-primary ring-4 ring-background shadow-[0_0_15px_rgba(217,167,74,0.5)]"></div>
+                <h3 className="font-headline-sm text-on-surface mb-2">1. Sesli Not Bırakın</h3>
+                <p className="font-body-md text-on-surface-variant">Sahadayken sadece konuşun. Sistem müşteri kriterlerini (bütçe, bölge, aciliyet) saniyeler içinde fişler ve ajandanıza işler.</p>
               </div>
 
               <div className="relative">
                 <div className="absolute -left-[41px] top-1 w-5 h-5 rounded-full bg-surface-container-highest ring-4 ring-background"></div>
-                <h3 className="font-headline-sm text-on-surface mb-2">2. Gayrimenkul Portföy Eşleştirme Motoru</h3>
-                <p className="font-body-md text-on-surface-variant">Sistem, müşteri kriterlerine uyan en iyi portföyleri veri tabanınızdan otomatik bulur ve listeler.</p>
+                <h3 className="font-headline-sm text-on-surface mb-2">2. Akıllı Satış Koçu ile Eşleştirin</h3>
+                <p className="font-body-md text-on-surface-variant">Sistem, müşteri talebine uyan en karlı portföyleri veri tabanınızdan otomatik bulur ve komisyon ihtimalini hesaplar.</p>
               </div>
 
               <div className="relative">
                 <div className="absolute -left-[41px] top-1 w-5 h-5 rounded-full bg-surface-container-highest ring-4 ring-background"></div>
-                <h3 className="font-headline-sm text-on-surface mb-2">3. Otopilot Yanıt</h3>
-                <p className="font-body-md text-on-surface-variant">Yapay zeka, portföy detaylarını içeren profesyonel bir WhatsApp taslağı hazırlar. Tek tıkla gönderin.</p>
+                <h3 className="font-headline-sm text-on-surface mb-2">3. Tek Tıkla Sunum Gönderin</h3>
+                <p className="font-body-md text-on-surface-variant">Eşleşen portföylerin profesyonel WhatsApp sunum taslağı hazır. Sadece gönder tuşuna basarak müşteriye ulaşın.</p>
               </div>
             </div>
           </div>
@@ -278,9 +279,9 @@ const Landing = () => {
                 </div>
 
                 <div className="mt-6 pt-4 border-t border-outline-variant/50">
-                  <div className="font-label-sm text-on-surface-variant mb-3 uppercase tracking-wider">AI Önerilen Yanıt</div>
+                  <div className="font-label-sm text-on-surface-variant mb-3 uppercase tracking-wider">Taslak Mesajınız Hazır</div>
                   <div className="bg-surface-container-highest/30 p-4 rounded-lg border border-outline-variant/30 border-l-4 border-l-primary relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-2 opacity-30"><span className="material-symbols-outlined text-primary">auto_awesome</span></div>
+                    <div className="absolute top-0 right-0 p-2 opacity-30"><span className="material-symbols-outlined text-primary">send_to_mobile</span></div>
                     <p className="font-body-sm text-on-surface">
                       "{mockLead.aiReply}"
                     </p>
@@ -412,10 +413,10 @@ const Landing = () => {
         <div className="max-w-[1200px] mx-auto">
           <div className="text-center mb-16">
             <h2 className="font-display-md text-[36px] lg:text-[42px] font-semibold text-on-surface mb-4">
-              Blog & Rehber
+              Akıllı Satış Koçundan İpuçları
             </h2>
             <p className="font-body-lg text-on-surface-variant max-w-[600px] mx-auto">
-              Gayrimenkul sektöründeki en son yapay zeka trendleri, CRM stratejileri ve satış artırma taktiklerini keşfedin.
+              Emlak sektöründe zaman yönetimi, komisyon artırma ve yeni nesil dijital satış taktiklerini keşfedin.
             </p>
           </div>
 
