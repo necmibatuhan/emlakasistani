@@ -34,6 +34,15 @@ export default function BlogPost() {
           <p>Uygun fiyatlı bir alternatiftir ancak Türkiye emlak pazarının dinamiklerine (sahadan sesli not girme gibi) hızlı adapte olamaz.</p>
           <h3>Sonuç</h3>
           <p>Eğer sahada sürekli hareket halindeyseniz, "Emlak danışmanı müşteri takip programı" arayışınızda sesli veri girişi ve akıllı eşleştirme sunan sistemleri tercih etmelisiniz.</p>
+          
+          <div className="mt-8 pt-8 border-t border-outline-variant">
+            <h4 className="text-lg font-semibold mb-4 text-on-surface">Referans Linkleri</h4>
+            <ul className="list-disc pl-5 space-y-2">
+              <li><a href="https://www.endeksa.com/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Endeksa CRM ve Emlak Çözümleri</a></li>
+              <li><a href="https://www.re-os.com/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">RE-OS Emlak Yönetim Sistemleri</a></li>
+              <li><a href="https://www.pipedrive.com/en/blog/real-estate-crm" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Pipedrive: Why Real Estate Agents Need a CRM</a></li>
+            </ul>
+          </div>
         </div>
       );
     }
@@ -46,6 +55,14 @@ export default function BlogPost() {
           <p>Siz sadece telefonunuza "Bugün Mehmet Bey aradı, Kadıköy'de 15 milyona kadar satılık 3+1 arıyor" şeklinde bir sesli not bırakırsınız. Yapay zeka bu sesi dinler, niyeti (Alıcı), lokasyonu (Kadıköy) ve bütçeyi (15.000.000 TL) otomatik olarak ayrıştırarak veritabanınıza kaydeder.</p>
           <h2>Manuel Veri Girişine Son</h2>
           <p>Sisteme klavyeyle veri girmek zorunda kalmadığınız için zamandan tasarruf edersiniz ve hiçbir müşteriyi unutmazsınız. Kapora AI gibi sistemler bu sesli notları dinleyerek size doğrudan eşleşen evleri önerir.</p>
+
+          <div className="mt-8 pt-8 border-t border-outline-variant">
+            <h4 className="text-lg font-semibold mb-4 text-on-surface">Referans Linkleri</h4>
+            <ul className="list-disc pl-5 space-y-2">
+              <li><a href="https://www.inman.com/technology/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Inman News: Real Estate Technology & AI Trends</a></li>
+              <li><a href="https://www.forbes.com/sites/forbestechcouncil/2021/08/17/how-voice-ai-is-transforming-the-real-estate-industry/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Forbes: How Voice AI Is Transforming The Real Estate Industry</a></li>
+            </ul>
+          </div>
         </div>
       );
     }
@@ -57,6 +74,14 @@ export default function BlogPost() {
         <p>Gelen çağrıları ve müşteri taleplerini otomatik olarak kategorize eden <strong>Gayrimenkul eşleştirme yazılımları</strong> kullanmalısınız. Bir müşteri sisteme düştüğünde, elinizdeki portföylerle saniyeler içinde eşleşip WhatsApp üzerinden müşteriye sunum gönderilebilir olmalıdır.</p>
         <h2>Yapay Zekanın Gücü</h2>
         <p>Manuel işleri yapay zekaya devrettiğinizde, haftada ortalama 15 saatlik bir zaman kazancı sağlarsınız. Bu da daha fazla müşteri görüşmesi ve daha yüksek komisyon demektir.</p>
+
+        <div className="mt-8 pt-8 border-t border-outline-variant">
+          <h4 className="text-lg font-semibold mb-4 text-on-surface">Referans Linkleri</h4>
+          <ul className="list-disc pl-5 space-y-2">
+            <li><a href="https://www.nar.realtor/research-and-statistics" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">National Association of Realtors (NAR) - Technology Impact Report</a></li>
+            <li><a href="https://hbr.org/2019/06/how-ai-will-change-sales" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Harvard Business Review: How AI Will Change Sales</a></li>
+          </ul>
+        </div>
       </div>
     );
   };

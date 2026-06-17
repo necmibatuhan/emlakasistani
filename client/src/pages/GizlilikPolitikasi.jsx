@@ -28,6 +28,13 @@ const GizlilikPolitikasi = () => {
           </div>
 
           <div className="space-y-8 text-[#A0A5B5] leading-relaxed text-[15px]">
+            <div className="bg-surface-container-high border border-outline p-6 rounded-lg mb-8">
+              <h2 className="text-lg font-semibold text-primary mb-2">Veri Gizliliği Bildirimi ("Privacy by Design")</h2>
+              <p className="text-on-surface-variant">
+                Kapora, KVKK uyumlu altyapısı ile tasarlanmıştır. Verileriniz, anonimleştirme teknolojileri ile korunur. Yapay zeka süreçlerimizde, müşteri bilgileriniz (ad, telefon, e-posta) analiz edilmeden önce maskelenir ve dış sistemlerde veya modellerin eğitiminde asla depolanmaz/kullanılmaz.
+              </p>
+            </div>
+
             <section>
               <h2 className="text-lg font-semibold text-[#F1F2F4] mb-3">1. Toplanan Veriler ve Kullanım Amacı</h2>
               <p>

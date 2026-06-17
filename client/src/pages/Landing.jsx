@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Play, X } from 'lucide-react';
 import { Logo } from '../components/Logo';
+import { BLOG_POSTS } from './BlogList';
 
 const MOCK_LEADS = [
   {
@@ -406,6 +407,43 @@ const Landing = () => {
         </div>
       )}
 
+      {/* BLOG SECTION */}
+      <section className="py-24 px-6 bg-background relative border-t border-outline-variant">
+        <div className="max-w-[1200px] mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="font-display-md text-[36px] lg:text-[42px] font-semibold text-on-surface mb-4">
+              Blog & Rehber
+            </h2>
+            <p className="font-body-lg text-on-surface-variant max-w-[600px] mx-auto">
+              Gayrimenkul sektöründeki en son yapay zeka trendleri, CRM stratejileri ve satış artırma taktiklerini keşfedin.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {BLOG_POSTS.map((post) => (
+              <div key={post.id} className="bg-surface-container border border-outline-variant rounded-xl p-6 flex flex-col hover:border-primary/50 transition-colors shadow-lg">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-[11px] font-bold text-primary uppercase tracking-wider bg-primary/10 px-2.5 py-1 rounded-full">
+                    {post.category}
+                  </span>
+                  <span className="text-[13px] text-on-surface-variant">{post.readTime} okuma</span>
+                </div>
+                <h3 className="font-headline-md text-on-surface text-xl mb-3 leading-snug">
+                  {post.title}
+                </h3>
+                <p className="font-body-sm text-on-surface-variant mb-6 flex-1 line-clamp-4">
+                  {post.excerpt}
+                </p>
+                <Link to={`/blog/${post.slug}`} className="text-primary font-medium text-sm flex items-center group/link mt-auto">
+                  Devamını Oku 
+                  <span className="material-symbols-outlined ml-1 text-[18px] group-hover/link:translate-x-1 transition-transform">arrow_forward</span>
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* FOOTER & PRIVACY NOTICE */}
       <footer className="border-t border-outline-variant bg-surface-container-lowest py-12 px-6 sm:px-12 lg:px-24">
         <div className="max-w-[1200px] mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
@@ -425,8 +463,7 @@ const Landing = () => {
             </div>
 
             <p className="font-body-sm text-on-surface-variant leading-relaxed mb-4 border-t border-outline-variant pt-8">
-              <strong className="text-on-surface font-medium block mb-1">Veri Gizliliği Bildirimi ("Privacy by Design"):</strong>
-              Kapora, KVKK uyumlu altyapısı ile tasarlanmıştır. Verileriniz, anonimleştirme teknolojileri ile korunur. Yapay zeka süreçlerimizde, müşteri bilgileriniz (ad, telefon, e-posta) analiz edilmeden önce maskelenir ve dış sistemlerde veya modellerin eğitiminde asla depolanmaz/kullanılmaz.
+              Kullanıcı verilerinizin güvenliği Kapora için birinci önceliktir. Aydınlatma Metni ve Gizlilik Politikası'nı aşağıdan inceleyebilirsiniz.
             </p>
             <div className="flex items-center space-x-4 font-body-sm">
               <a href="/aydinlatma-metni" className="text-primary hover:text-primary/80 transition-colors font-medium">Aydınlatma Metni</a>
