@@ -68,39 +68,75 @@ export const t = {
       }
     },
     pricing: {
-      title: "Size Uygun Planı Seçin",
-      desc: "Hiçbir gizli ücret yok. İhtiyacınıza göre ölçeklendirin.",
+      title: "Basit fiyatlandırma. Gizli ücret yok.",
+      desc1: "Her plan 14 gün ücretsiz deneme içerir.",
+      desc2: "Kredi kartı gerekmez.",
+      monthly: "Aylık",
+      yearly: "Yıllık — %17 indirim",
       free: {
-        name: "Ücretsiz",
+        name: "Başlangıç",
         desc: "Sistemi test etmek için ideal.",
-        price: "0 ₺",
+        priceMonthly: "0 ₺",
+        priceYearly: "0 ₺",
         period: "/ay",
-        features: ["Ayda 5 Lead Analizi", "Temel AI Skorlama", "Manuel WhatsApp Taslakları"],
+        yearlyText: "Ücretsiz",
+        features: [
+          { type: 'check', text: 'Ayda 5 Lead Analizi' },
+          { type: 'check', text: 'Temel AI Skorlama' },
+          { type: 'check', text: 'Manuel WhatsApp Taslakları' },
+          { type: 'cross', text: 'Sesli not' }
+        ],
         btn: "Hemen Başla"
       },
       pro: {
-        badge: "En Popüler",
+        badge: "EN POPÜLER",
         name: "Pro",
-        desc: "Aktif danışmanlar için eksiksiz otopilot.",
-        price: "299 ₺",
+        desc: "Aktif danışmanlar için",
+        priceMonthly: "149 ₺",
+        priceYearly: "1.490 ₺",
         period: "/ay",
-        features: ["Sınırsız Lead Analizi", "AI Sesli Not & Otomatik Kayıt", "Akıllı Hatırlatıcılar & Bildirimler", "Portföy Eşleştirme Motoru"],
-        btn: "Pro'ya Geç"
+        yearlyText: "Yıllık ödemede",
+        features: [
+          { type: 'check', text: 'Sınırsız lead' },
+          { type: 'check', text: 'AI skorlama' },
+          { type: 'check', text: 'WhatsApp taslağı' },
+          { type: 'check', text: 'Not & hatırlatıcı' },
+          { type: 'star-yellow', text: 'Sesli not' },
+          { type: 'check', text: 'Günlük özet' },
+          { type: 'check', text: 'Durum & timeline' },
+          { type: 'cross', text: 'İstatistikler & raporlar' }
+        ],
+        btn: "Pro'ya Geç",
+        footer: "14 gün ücretsiz dene — kredi kartı gerekmez"
       },
       proPlus: {
         name: "Pro+",
-        desc: "Yoğun ekipler ve ofis yöneticileri için.",
-        price: "599 ₺",
+        desc: "Performansını ölçmek isteyenler için",
+        priceMonthly: "249 ₺",
+        priceYearly: "2.490 ₺",
         period: "/ay",
-        features: ["Pro planındaki her şey", "Gelişmiş İstatistik ve Raporlama", "Müşteri Timeline Takibi", "7/24 Öncelikli Destek"],
+        yearlyText: "Yıllık ödemede",
+        features: [
+          { type: 'check', text: 'Tüm Pro özellikleri' },
+          { type: 'star-blue', text: 'İstatistik & raporlar' },
+          { type: 'star-blue', text: 'Ofis analitik paneli' },
+          { type: 'check', text: 'Portföy-lead eşleştirme' },
+          { type: 'check', text: 'CSV export' },
+          { type: 'check', text: 'Öncelikli destek' }
+        ],
         btn: "Pro+'ya Geç"
       },
       enterprise: {
         name: "Kurumsal",
-        desc: "Kendi sistemine entegre etmek isteyen brokerlar için.",
+        desc: "Kendi sistemine entegre etmek isteyen brokerlar için",
         price: "Özel",
         period: "",
-        features: ["Sınırsız Danışman Hesabı", "Özel API & CRM Entegrasyonu", "WhatsApp Business API Bağlantısı", "Özel Eğitilmiş Yapay Zeka Modeliniz"],
+        features: [
+          { type: 'check', text: 'Sınırsız Danışman Hesabı' },
+          { type: 'check', text: 'Özel API & CRM Entegrasyonu' },
+          { type: 'check', text: 'WhatsApp Business API Bağlantısı' },
+          { type: 'check', text: 'Özel Eğitilmiş Yapay Zeka Modeliniz' }
+        ],
         btn: "Satışla İletişime Geç"
       }
     },
@@ -187,39 +223,75 @@ export const t = {
       }
     },
     pricing: {
-      title: "Choose the Right Plan for You",
-      desc: "No hidden fees. Scale according to your needs.",
+      title: "Simple pricing. No hidden fees.",
+      desc1: "Every plan includes a 14-day free trial.",
+      desc2: "No credit card required.",
+      monthly: "Monthly",
+      yearly: "Yearly — 17% off",
       free: {
-        name: "Free",
+        name: "Starter",
         desc: "Ideal for testing the system.",
-        price: "0 ₺",
+        priceMonthly: "0 ₺",
+        priceYearly: "0 ₺",
         period: "/mo",
-        features: ["5 Lead Analyses per Month", "Basic AI Scoring", "Manual WhatsApp Drafts"],
+        yearlyText: "Free",
+        features: [
+          { type: 'check', text: '5 Lead Analyses / month' },
+          { type: 'check', text: 'Basic AI Scoring' },
+          { type: 'check', text: 'Manual WhatsApp Drafts' },
+          { type: 'cross', text: 'Voice Notes' }
+        ],
         btn: "Start Now"
       },
       pro: {
-        badge: "Most Popular",
+        badge: "MOST POPULAR",
         name: "Pro",
-        desc: "Complete autopilot for active agents.",
-        price: "299 ₺",
+        desc: "For active agents",
+        priceMonthly: "149 ₺",
+        priceYearly: "1,490 ₺",
         period: "/mo",
-        features: ["Unlimited Lead Analysis", "AI Voice Notes & Auto Save", "Smart Reminders & Notifications", "Listing Matching Engine"],
-        btn: "Upgrade to Pro"
+        yearlyText: "Billed annually",
+        features: [
+          { type: 'check', text: 'Unlimited leads' },
+          { type: 'check', text: 'AI scoring' },
+          { type: 'check', text: 'WhatsApp drafts' },
+          { type: 'check', text: 'Notes & reminders' },
+          { type: 'star-yellow', text: 'Voice notes' },
+          { type: 'check', text: 'Daily summary' },
+          { type: 'check', text: 'Status & timeline' },
+          { type: 'cross', text: 'Stats & reports' }
+        ],
+        btn: "Upgrade to Pro",
+        footer: "14-day free trial — no credit card required"
       },
       proPlus: {
         name: "Pro+",
-        desc: "For busy teams and office managers.",
-        price: "599 ₺",
+        desc: "For those who want to track performance",
+        priceMonthly: "249 ₺",
+        priceYearly: "2,490 ₺",
         period: "/mo",
-        features: ["Everything in Pro plan", "Advanced Stats & Reporting", "Client Timeline Tracking", "24/7 Priority Support"],
+        yearlyText: "Billed annually",
+        features: [
+          { type: 'check', text: 'All Pro features' },
+          { type: 'star-blue', text: 'Stats & reports' },
+          { type: 'star-blue', text: 'Office analytics dashboard' },
+          { type: 'check', text: 'Portfolio-lead matching' },
+          { type: 'check', text: 'CSV export' },
+          { type: 'check', text: 'Priority support' }
+        ],
         btn: "Upgrade to Pro+"
       },
       enterprise: {
         name: "Enterprise",
-        desc: "For brokers who want to integrate into their own system.",
+        desc: "For brokers integrating with their own system",
         price: "Custom",
         period: "",
-        features: ["Unlimited Agent Accounts", "Custom API & CRM Integration", "WhatsApp Business API", "Your Custom Trained AI Model"],
+        features: [
+          { type: 'check', text: 'Unlimited Agent Accounts' },
+          { type: 'check', text: 'Custom API & CRM Integration' },
+          { type: 'check', text: 'WhatsApp Business API' },
+          { type: 'check', text: 'Your Custom Trained AI Model' }
+        ],
         btn: "Contact Sales"
       }
     },

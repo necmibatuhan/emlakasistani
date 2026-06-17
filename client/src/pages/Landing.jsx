@@ -49,6 +49,7 @@ const Landing = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [theme, setTheme] = useState('dark');
   const [lang, setLang] = useState('tr');
+  const [billingCycle, setBillingCycle] = useState('monthly');
   const curr = t[lang];
 
   React.useEffect(() => {
@@ -554,90 +555,136 @@ const Landing = () => {
       </section>
 
       {/* BÖLÜM 6 — FİYATLANDIRMA */}
-      <section id="fiyatlar" className="py-24 px-6 max-w-[1200px] mx-auto relative">
+      <section id="fiyatlar" className="pt-24 pb-32 px-6 bg-surface-container-lowest relative overflow-hidden">
+        {/* Background Effects */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-primary/5 blur-[120px] rounded-full pointer-events-none"></div>
         
-        <div className="text-center mb-16 relative z-10">
-          <h2 className="font-display-lg text-[36px] text-on-surface font-semibold mb-4">{curr.pricing.title}</h2>
-          <p className="text-on-surface-variant max-w-2xl mx-auto font-body-lg">{curr.pricing.desc}</p>
+        <div className="text-center mb-12 relative z-10">
+          <h2 className="font-display-lg text-[32px] md:text-[40px] text-on-surface font-medium mb-3">{curr.pricing.title}</h2>
+          <p className="text-on-surface-variant font-body-md mb-1">{curr.pricing.desc1}</p>
+          <p className="text-on-surface-variant font-body-md mb-8">{curr.pricing.desc2}</p>
+
+          {/* Toggle */}
+          <div className="inline-flex items-center bg-surface-container-high rounded-lg p-1 mx-auto">
+            <button 
+              onClick={() => setBillingCycle('monthly')}
+              className={`px-6 py-2 rounded-md font-label-sm transition-colors ${billingCycle === 'monthly' ? 'bg-[#FDE047] text-[#1e1b4b] shadow-sm font-semibold' : 'text-on-surface-variant hover:text-on-surface'}`}
+            >
+              {curr.pricing.monthly}
+            </button>
+            <button 
+              onClick={() => setBillingCycle('yearly')}
+              className={`px-6 py-2 rounded-md font-label-sm transition-colors ${billingCycle === 'yearly' ? 'bg-[#surface-container-highest] text-on-surface shadow-sm font-semibold' : 'text-on-surface-variant hover:text-on-surface'}`}
+            >
+              {curr.pricing.yearly}
+            </button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10 group/pricing">
+        <div className="max-w-[1100px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
           
-          {/* Ücretsiz */}
-          <div className="bg-surface-container-low/50 backdrop-blur-lg border border-outline-variant/50 rounded-2xl p-8 flex flex-col shadow-lg transition-all duration-300 ease-out hover:-translate-y-3 hover:scale-105 hover:shadow-2xl hover:border-primary/40 hover:z-20">
-            <h3 className="font-headline-md text-on-surface mb-2 transition-colors duration-300">{curr.pricing.free.name}</h3>
-            <p className="text-on-surface-variant text-sm mb-6 h-10">{curr.pricing.free.desc}</p>
-            <div className="flex items-baseline mb-8">
-              <span className="font-display-md font-bold text-on-surface">{curr.pricing.free.price}</span>
-              <span className="font-body-sm text-on-surface-variant ml-1">{curr.pricing.free.period}</span>
-            </div>
-            <ul className="font-body-sm text-on-surface-variant space-y-4 mb-8 flex-1">
-              {curr.pricing.free.features.map((feat, idx) => (
-                <li key={idx} className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check</span> {feat}</li>
-              ))}
-            </ul>
-            <Link to="/auth" className="w-full py-3 text-center font-label-md text-on-surface border border-outline hover:border-primary hover:text-primary hover:bg-surface-container rounded-xl transition-all">
-              {curr.pricing.free.btn}
-            </Link>
-          </div>
+          {/* Feature Item Renderer */}
+          {(() => {
+            const renderFeature = (feat, idx) => {
+              let icon = null;
+              if (feat.type === 'check') icon = <span className="material-symbols-outlined text-[18px] text-[#10B981] shrink-0">check</span>;
+              else if (feat.type === 'cross') icon = <span className="material-symbols-outlined text-[18px] text-[#52525B] shrink-0">close</span>;
+              else if (feat.type === 'star-yellow') icon = <span className="material-symbols-outlined text-[18px] text-[#FDE047] shrink-0">star</span>;
+              else if (feat.type === 'star-blue') icon = <span className="material-symbols-outlined text-[18px] text-[#3B82F6] shrink-0">star</span>;
+              
+              return (
+                <li key={idx} className={`flex items-start gap-3 font-body-sm ${feat.type === 'cross' ? 'text-on-surface-variant/50' : 'text-on-surface'}`}>
+                  {icon}
+                  <span>{feat.text}</span>
+                </li>
+              );
+            };
 
-          {/* Pro */}
-          <div className="bg-surface-container border border-primary rounded-2xl p-8 flex flex-col relative transform md:-translate-y-4 shadow-[0_0_40px_rgba(255,195,0,0.15)] ring-1 ring-primary/20 backdrop-blur-xl transition-all duration-300 ease-out hover:md:-translate-y-6 hover:-translate-y-2 hover:scale-105 hover:shadow-[0_0_50px_rgba(255,195,0,0.3)] hover:z-20">
-            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-primary text-on-primary font-label-sm uppercase font-bold tracking-widest px-4 py-1.5 rounded-full shadow-[0_0_15px_rgba(255,195,0,0.5)]">
-              {curr.pricing.pro.badge}
-            </div>
-            <h3 className="font-headline-md text-primary mb-2 mt-2">{curr.pricing.pro.name}</h3>
-            <p className="text-on-surface-variant text-sm mb-6 h-10">{curr.pricing.pro.desc}</p>
-            <div className="flex items-baseline mb-8">
-              <span className="font-display-md font-bold text-on-surface">{curr.pricing.pro.price}</span>
-              <span className="font-body-sm text-on-surface-variant ml-1">{curr.pricing.pro.period}</span>
-            </div>
-            <ul className="font-body-sm text-on-surface space-y-4 mb-8 flex-1">
-              {curr.pricing.pro.features.map((feat, idx) => (
-                <li key={idx} className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check_circle</span> {feat}</li>
-              ))}
-            </ul>
-            <Link to="/auth" className="w-full py-3 text-center font-label-md bg-primary text-on-primary hover:bg-primary/90 hover:scale-[1.02] rounded-xl transition-all shadow-[0_0_20px_rgba(255,195,0,0.3)]">
-              {curr.pricing.pro.btn}
-            </Link>
-          </div>
+            return (
+              <>
+                {/* Başlangıç (Free) */}
+                <div className="bg-[#18181B] border border-[#27272A] rounded-2xl p-6 flex flex-col transition-all">
+                  <h3 className="font-headline-sm text-[#FDE047] mb-6">{curr.pricing.free.name}</h3>
+                  <div className="flex items-baseline mb-2">
+                    <span className="font-display-lg font-bold text-on-surface">{billingCycle === 'monthly' ? curr.pricing.free.priceMonthly : curr.pricing.free.priceYearly}</span>
+                    <span className="font-body-sm text-on-surface-variant ml-1">{curr.pricing.free.period}</span>
+                  </div>
+                  <div className="font-body-sm text-on-surface-variant mb-1">{curr.pricing.free.yearlyText}</div>
+                  <div className="font-body-sm text-on-surface-variant mb-8">{curr.pricing.free.desc}</div>
+                  
+                  <ul className="space-y-4 mb-8 flex-1">
+                    {curr.pricing.free.features.map(renderFeature)}
+                  </ul>
+                  
+                  <Link to="/auth" className="w-full py-3 text-center font-label-md text-on-surface border border-[#3F3F46] hover:bg-[#27272A] rounded-lg transition-all">
+                    {curr.pricing.free.btn}
+                  </Link>
+                </div>
 
-          {/* Pro+ */}
-          <div className="bg-surface-container-low/50 backdrop-blur-lg border border-outline-variant/50 rounded-2xl p-8 flex flex-col shadow-lg transition-all duration-300 ease-out hover:-translate-y-3 hover:scale-105 hover:shadow-2xl hover:border-primary/40 hover:z-20">
-            <h3 className="font-headline-md text-on-surface mb-2 transition-colors duration-300">{curr.pricing.proPlus.name}</h3>
-            <p className="text-on-surface-variant text-sm mb-6 h-10">{curr.pricing.proPlus.desc}</p>
-            <div className="flex items-baseline mb-8">
-              <span className="font-display-md font-bold text-on-surface">{curr.pricing.proPlus.price}</span>
-              <span className="font-body-sm text-on-surface-variant ml-1">{curr.pricing.proPlus.period}</span>
-            </div>
-            <ul className="font-body-sm text-on-surface-variant space-y-4 mb-8 flex-1">
-              {curr.pricing.proPlus.features.map((feat, idx) => (
-                <li key={idx} className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check</span> {feat}</li>
-              ))}
-            </ul>
-            <Link to="/auth" className="w-full py-3 text-center font-label-md text-on-surface border border-outline hover:border-primary hover:text-primary hover:bg-surface-container rounded-xl transition-all">
-              {curr.pricing.proPlus.btn}
-            </Link>
-          </div>
+                {/* Pro (En Popüler) */}
+                <div className="bg-[#18181B] border border-[#FDE047] rounded-2xl p-6 flex flex-col relative transform scale-105 z-10">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#FDE047] text-[#18181B] font-label-sm font-bold uppercase tracking-wider px-3 py-1 rounded-full text-[11px]">
+                    {curr.pricing.pro.badge}
+                  </div>
+                  <h3 className="font-headline-sm text-[#FDE047] mb-6 mt-2">{curr.pricing.pro.name}</h3>
+                  <div className="flex items-baseline mb-2">
+                    <span className="font-display-lg font-bold text-on-surface">{billingCycle === 'monthly' ? curr.pricing.pro.priceMonthly : curr.pricing.pro.priceYearly}</span>
+                    <span className="font-body-sm text-on-surface-variant ml-1">{curr.pricing.pro.period}</span>
+                  </div>
+                  <div className="font-body-sm text-on-surface-variant mb-1">{curr.pricing.pro.yearlyText} {curr.pricing.pro.priceYearly}</div>
+                  <div className="font-body-sm text-on-surface-variant mb-8">{curr.pricing.pro.desc}</div>
+                  
+                  <ul className="space-y-4 mb-8 flex-1">
+                    {curr.pricing.pro.features.map(renderFeature)}
+                  </ul>
+                  
+                  <Link to="/auth" className="w-full py-3 text-center font-label-md text-[#18181B] bg-[#FDE047] hover:bg-[#EAB308] rounded-lg transition-all mb-4">
+                    {curr.pricing.pro.btn}
+                  </Link>
+                  <div className="text-center font-body-xs text-on-surface-variant/70">
+                    {curr.pricing.pro.footer}
+                  </div>
+                </div>
 
-          {/* Kurumsal */}
-          <div className="bg-surface-container-low/50 backdrop-blur-lg border border-outline-variant/50 rounded-2xl p-8 flex flex-col shadow-lg transition-all duration-300 ease-out hover:-translate-y-3 hover:scale-105 hover:shadow-2xl hover:border-primary/40 hover:z-20">
-            <h3 className="font-headline-md text-on-surface mb-2 transition-colors duration-300">{curr.pricing.enterprise.name}</h3>
-            <p className="text-on-surface-variant text-sm mb-6 h-10">{curr.pricing.enterprise.desc}</p>
-            <div className="flex items-baseline mb-8">
-              <span className="font-display-md font-bold text-on-surface">{curr.pricing.enterprise.price}</span>
-            </div>
-            <ul className="font-body-sm text-on-surface-variant space-y-4 mb-8 flex-1">
-              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">domain</span> {curr.pricing.enterprise.features[0]}</li>
-              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">api</span> {curr.pricing.enterprise.features[1]}</li>
-              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">chat</span> {curr.pricing.enterprise.features[2]}</li>
-              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">smart_toy</span> {curr.pricing.enterprise.features[3]}</li>
-            </ul>
-            <a href="https://wa.me/905555555555?text=Merhaba" target="_blank" rel="noopener noreferrer" className="w-full py-3 text-center font-label-md text-on-surface border border-outline hover:border-primary hover:text-primary hover:bg-surface-container rounded-xl transition-all">
-              {curr.pricing.enterprise.btn}
-            </a>
-          </div>
+                {/* Pro+ */}
+                <div className="bg-[#18181B] border border-[#27272A] rounded-2xl p-6 flex flex-col transition-all">
+                  <h3 className="font-headline-sm text-[#3B82F6] mb-6">{curr.pricing.proPlus.name}</h3>
+                  <div className="flex items-baseline mb-2">
+                    <span className="font-display-lg font-bold text-on-surface">{billingCycle === 'monthly' ? curr.pricing.proPlus.priceMonthly : curr.pricing.proPlus.priceYearly}</span>
+                    <span className="font-body-sm text-on-surface-variant ml-1">{curr.pricing.proPlus.period}</span>
+                  </div>
+                  <div className="font-body-sm text-on-surface-variant mb-1">{curr.pricing.proPlus.yearlyText} {curr.pricing.proPlus.priceYearly}</div>
+                  <div className="font-body-sm text-on-surface-variant mb-8 h-10">{curr.pricing.proPlus.desc}</div>
+                  
+                  <ul className="space-y-4 mb-8 flex-1">
+                    {curr.pricing.proPlus.features.map(renderFeature)}
+                  </ul>
+                  
+                  <Link to="/auth" className="w-full py-3 text-center font-label-md text-[#60A5FA] bg-[#1E3A8A]/30 hover:bg-[#1E3A8A]/50 border border-[#1E3A8A]/50 rounded-lg transition-all">
+                    {curr.pricing.proPlus.btn}
+                  </Link>
+                </div>
+
+                {/* Kurumsal */}
+                <div className="bg-[#18181B] border border-[#27272A] rounded-2xl p-6 flex flex-col transition-all">
+                  <h3 className="font-headline-sm text-[#E5E7EB] mb-6">{curr.pricing.enterprise.name}</h3>
+                  <div className="flex items-baseline mb-2">
+                    <span className="font-display-lg font-bold text-on-surface">{curr.pricing.enterprise.price}</span>
+                  </div>
+                  <div className="font-body-sm text-on-surface-variant mb-1">&nbsp;</div>
+                  <div className="font-body-sm text-on-surface-variant mb-8 h-10">{curr.pricing.enterprise.desc}</div>
+                  
+                  <ul className="space-y-4 mb-8 flex-1">
+                    {curr.pricing.enterprise.features.map(renderFeature)}
+                  </ul>
+                  
+                  <a href="https://wa.me/905555555555?text=Merhaba" target="_blank" rel="noopener noreferrer" className="w-full py-3 text-center font-label-md text-on-surface bg-[#27272A] hover:bg-[#3F3F46] rounded-lg transition-all">
+                    {curr.pricing.enterprise.btn}
+                  </a>
+                </div>
+              </>
+            );
+          })()}
 
         </div>
       </section>
