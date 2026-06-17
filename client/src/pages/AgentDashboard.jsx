@@ -17,6 +17,7 @@ import ActionCenter from '../components/ActionCenter';
 import AgendaView from '../components/AgendaView';
 import MorningSummary from '../components/MorningSummary';
 import CommandCenter from '../components/CommandCenter';
+import AnimatedLeadList from '../components/AnimatedLeadList';
 import PricingModal from '../components/PricingModal';
 
 const AgentDashboard = () => {
@@ -234,7 +235,7 @@ const AgentDashboard = () => {
           </div>
         )}
 
-        <div className="flex-1 flex flex-col p-6 gap-6 overflow-hidden">
+        <div className="flex-1 flex flex-col p-6 gap-6 overflow-y-auto custom-scrollbar">
           
           {/* COMMAND CENTER & AGENDA */}
           <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 shrink-0 h-auto xl:h-[400px]">
@@ -244,6 +245,12 @@ const AgentDashboard = () => {
             <div className="xl:col-span-1 bg-surface-container/50 border border-outline/50 rounded-2xl p-4 h-[400px] xl:h-full overflow-hidden">
                <AgendaView leads={leads} />
             </div>
+          </div>
+
+          {/* RECENT LEADS (ANIMATED LIST) */}
+          <div className="flex-1 flex flex-col gap-4 mt-2">
+            <h3 className="font-display-sm text-lg text-on-surface">Son Eklenen Müşteriler</h3>
+            <AnimatedLeadList leads={leads} />
           </div>
         </div>
       </div>
