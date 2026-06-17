@@ -603,7 +603,7 @@ const Landing = () => {
             return (
               <>
                 {/* Başlangıç (Free) */}
-                <div className="bg-[#18181B] border border-[#27272A] rounded-2xl p-6 flex flex-col transition-all">
+                <div className="bg-[#18181B] border border-[#27272A] rounded-2xl p-6 flex flex-col transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-2xl hover:border-[#3F3F46] hover:z-20 relative">
                   <h3 className="font-headline-sm text-[#FDE047] mb-6">{curr.pricing.free.name}</h3>
                   <div className="flex items-baseline mb-2">
                     <span className="font-display-lg font-bold text-on-surface">{billingCycle === 'monthly' ? curr.pricing.free.priceMonthly : curr.pricing.free.priceYearly}</span>
@@ -622,7 +622,7 @@ const Landing = () => {
                 </div>
 
                 {/* Pro (En Popüler) */}
-                <div className="bg-[#18181B] border border-[#FDE047] rounded-2xl p-6 flex flex-col relative transform scale-105 z-10">
+                <div className="bg-[#18181B] border border-[#FDE047] rounded-2xl p-6 flex flex-col relative transform md:-translate-y-4 scale-105 shadow-[0_0_40px_rgba(253,224,71,0.15)] transition-all duration-300 ease-out hover:md:-translate-y-6 hover:-translate-y-2 hover:scale-[1.07] hover:shadow-[0_0_50px_rgba(253,224,71,0.3)] hover:z-20">
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#FDE047] text-[#18181B] font-label-sm font-bold uppercase tracking-wider px-3 py-1 rounded-full text-[11px]">
                     {curr.pricing.pro.badge}
                   </div>
@@ -647,7 +647,7 @@ const Landing = () => {
                 </div>
 
                 {/* Pro+ */}
-                <div className="bg-[#18181B] border border-[#27272A] rounded-2xl p-6 flex flex-col transition-all">
+                <div className="bg-[#18181B] border border-[#27272A] rounded-2xl p-6 flex flex-col transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-2xl hover:border-[#3B82F6]/50 hover:z-20 relative">
                   <h3 className="font-headline-sm text-[#3B82F6] mb-6">{curr.pricing.proPlus.name}</h3>
                   <div className="flex items-baseline mb-2">
                     <span className="font-display-lg font-bold text-on-surface">{billingCycle === 'monthly' ? curr.pricing.proPlus.priceMonthly : curr.pricing.proPlus.priceYearly}</span>
@@ -666,7 +666,7 @@ const Landing = () => {
                 </div>
 
                 {/* Kurumsal */}
-                <div className="bg-[#18181B] border border-[#27272A] rounded-2xl p-6 flex flex-col transition-all">
+                <div className="bg-[#18181B] border border-[#27272A] rounded-2xl p-6 flex flex-col transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-2xl hover:border-[#E5E7EB]/50 hover:z-20 relative">
                   <h3 className="font-headline-sm text-[#E5E7EB] mb-6">{curr.pricing.enterprise.name}</h3>
                   <div className="flex items-baseline mb-2">
                     <span className="font-display-lg font-bold text-on-surface">{curr.pricing.enterprise.price}</span>
