@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Play, X, Menu } from 'lucide-react';
+import { Play, X, Menu, Sun, Moon } from 'lucide-react';
 import { Logo } from '../components/Logo';
 import { BLOG_POSTS } from './BlogList';
 
@@ -46,6 +46,21 @@ const MOCK_LEADS = [
 const Landing = () => {
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [theme, setTheme] = useState('dark');
+
+  React.useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    // Hardcoded hex check that might break light mode in body
+    if (theme === 'light') {
+       document.documentElement.style.backgroundColor = '#F8FAFC';
+    } else {
+       document.documentElement.style.backgroundColor = '#0F172A';
+    }
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
   const [activeMockIndex, setActiveMockIndex] = React.useState(0);
   const [activeFlowStep, setActiveFlowStep] = React.useState(0);
   const [activeMockupView, setActiveMockupView] = React.useState(0); // 0: Savaş Odası, 1: Saldırı Planı, 2: Eşleşme
@@ -85,6 +100,9 @@ const Landing = () => {
           <div className="hidden md:flex items-center gap-6">
             <Link to="/blog" className="text-on-surface-variant hover:text-on-surface font-body-sm font-medium transition-colors">Blog</Link>
             <a href="#fiyatlar" className="text-on-surface-variant hover:text-on-surface font-body-sm font-medium transition-colors">Fiyatlar</a>
+            <button onClick={toggleTheme} className="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full bg-surface-container-high border border-outline-variant">
+              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
             <Link to="/auth" className="text-on-surface-variant hover:text-on-surface font-body-sm font-medium transition-colors">Giriş Yap</Link>
             <Link to="/auth" className="bg-primary hover:bg-primary/90 text-on-primary font-body-sm font-medium px-5 py-2 rounded-md transition-colors">
               Ücretsiz Başla
@@ -105,7 +123,12 @@ const Landing = () => {
           <div className="md:hidden bg-surface-container-lowest border-b border-outline-variant px-6 py-4 flex flex-col space-y-4">
             <Link to="/blog" onClick={() => setIsMobileMenuOpen(false)} className="text-on-surface-variant hover:text-on-surface font-body-md font-medium transition-colors py-2">Blog</Link>
             <a href="#fiyatlar" onClick={() => setIsMobileMenuOpen(false)} className="text-on-surface-variant hover:text-on-surface font-body-md font-medium transition-colors py-2">Fiyatlar</a>
-            <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)} className="text-on-surface-variant hover:text-on-surface font-body-md font-medium transition-colors py-2">Giriş Yap</Link>
+            <div className="flex items-center gap-4 py-2">
+              <button onClick={toggleTheme} className="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full bg-surface-container border border-outline-variant">
+                {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+              </button>
+              <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)} className="text-on-surface-variant hover:text-on-surface font-body-md font-medium transition-colors">Giriş Yap</Link>
+            </div>
             <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)} className="bg-primary hover:bg-primary/90 text-on-primary font-body-md font-medium px-5 py-3 rounded-md transition-colors text-center mt-2">
               Ücretsiz Başla
             </Link>
