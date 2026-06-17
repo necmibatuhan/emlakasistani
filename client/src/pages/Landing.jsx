@@ -296,6 +296,96 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* BÖLÜM 5 — DASHBOARD MOCKUP */}
+      <section className="py-24 px-6 bg-surface-container-lowest relative border-t border-outline-variant">
+        <div className="max-w-[1200px] mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="font-display-md text-[36px] lg:text-[42px] font-semibold text-on-surface mb-4">
+              İçeride Sizi Neler Bekliyor?
+            </h2>
+            <p className="font-body-lg text-on-surface-variant max-w-[600px] mx-auto">
+              Karmaşık Excel tablolarını unutun. Her şey tek bir ekranda, satışa dönmeye hazır şekilde sizi bekliyor.
+            </p>
+          </div>
+
+          <div className="bg-surface-container/60 backdrop-blur-xl border border-outline/50 rounded-2xl shadow-2xl p-6 lg:p-10 relative overflow-hidden">
+            {/* Window controls mockup */}
+            <div className="flex items-center gap-2 mb-8 pb-4 border-b border-outline-variant/50">
+              <div className="w-3 h-3 rounded-full bg-outline-variant"></div>
+              <div className="w-3 h-3 rounded-full bg-outline-variant"></div>
+              <div className="w-3 h-3 rounded-full bg-outline-variant"></div>
+              <div className="ml-4 font-label-sm text-on-surface-variant tracking-widest uppercase">
+                Panel Önizlemesi
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Sol Panel: Bugün Aranacaklar */}
+              <div className="bg-surface-container-high border border-outline-variant/60 rounded-xl p-6 relative">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="font-headline-sm text-on-surface flex items-center gap-2">
+                    <span className="text-[20px]">🔥</span> Bugün Aranacaklar
+                  </h3>
+                  <span className="bg-status-hot/20 text-status-hot border border-status-hot/30 px-3 py-1 rounded-full font-label-sm">
+                    3 Aktif Müşteri Eşleşti
+                  </span>
+                </div>
+                
+                <div className="space-y-4">
+                  {/* Lead Item 1 */}
+                  <div className="flex items-center justify-between bg-surface-container p-4 rounded-lg border border-outline-variant/30">
+                    <div>
+                      <div className="font-label-md text-on-surface">Ahmet Yılmaz</div>
+                      <div className="font-body-sm text-on-surface-variant">Beşiktaş · 3+1 Satılık</div>
+                    </div>
+                    <button className="bg-primary/10 text-primary hover:bg-primary hover:text-on-primary transition-colors px-4 py-2 rounded-md font-label-sm border border-primary/20">
+                      Hemen Ara
+                    </button>
+                  </div>
+                  {/* Lead Item 2 */}
+                  <div className="flex items-center justify-between bg-surface-container p-4 rounded-lg border border-outline-variant/30">
+                    <div>
+                      <div className="font-label-md text-on-surface">Pelin K.</div>
+                      <div className="font-body-sm text-on-surface-variant">Kadıköy · 15M Bütçe</div>
+                    </div>
+                    <button className="bg-primary/10 text-primary hover:bg-primary hover:text-on-primary transition-colors px-4 py-2 rounded-md font-label-sm border border-primary/20">
+                      Hemen Ara
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Sağ Panel: Kayıp Riski Olanlar */}
+              <div className="bg-surface-container-high border border-outline-variant/60 rounded-xl p-6 relative">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="font-headline-sm text-on-surface flex items-center gap-2">
+                    <span className="text-[20px]">🚨</span> Kayıp Riski Olanlar
+                  </h3>
+                  <span className="bg-status-error/20 text-status-error border border-status-error/30 px-3 py-1 rounded-full font-label-sm flex items-center gap-1">
+                    <span className="material-symbols-outlined text-[14px]">warning</span> Dikkat
+                  </span>
+                </div>
+
+                <div className="space-y-4">
+                  {/* Risk Item 1 */}
+                  <div className="flex flex-col bg-surface-container p-4 rounded-lg border border-outline-variant/30 relative overflow-hidden">
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-status-error"></div>
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="font-label-md text-on-surface">Cem E.</div>
+                      <div className="font-label-sm text-status-error">14 gündür aranmadı</div>
+                    </div>
+                    <div className="font-body-sm text-on-surface-variant mb-3">Geçen ay Ataşehir ofis ilanını sormuştu.</div>
+                    <button className="w-full bg-surface-container-highest text-on-surface hover:text-primary transition-colors py-2 rounded font-label-sm flex items-center justify-center gap-2">
+                      <span className="material-symbols-outlined text-[16px]">chat</span> WhatsApp Mesajı Yolla
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* BÖLÜM 6 — FİYATLANDIRMA */}
       <section id="fiyatlar" className="py-24 px-6 max-w-[1200px] mx-auto relative">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-primary/5 blur-[120px] rounded-full pointer-events-none"></div>
