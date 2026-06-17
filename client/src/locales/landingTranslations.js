@@ -33,7 +33,7 @@ export const t = {
       step1Title: "1. Sesli Not Bırakın",
       step1Desc: "Sahadayken sadece konuşun. Sistem müşteri kriterlerini (bütçe, bölge, aciliyet) saniyeler içinde fişler ve ajandanıza işler.",
       step2Title: "2. Akıllı Satış Koçu ile Eşleştirin",
-      step2Desc: "Sistem, müşteri talebine uyan en karlı portföyleri veri tabanınızdan otomatik bulur ve komisyon ihtimalini hesaplar.",
+      step2Desc: "Müşteriniz daha telefonu kapatmadan portföy eşleşmesi hazır. Müşteri WhatsApp'tan yazıp telefonu cebine koyana kadar, Kapora uygun evi bulur ve teklif mesajını hazırlar.",
       step3Title: "3. Tek Tıkla Sunum Gönderin",
       step3Desc: "Eşleşen portföylerin profesyonel WhatsApp sunum taslağı hazır. Sadece gönder tuşuna basarak müşteriye ulaşın.",
       newRequest: "Yeni Talep:",
@@ -69,31 +69,16 @@ export const t = {
     },
     pricing: {
       title: "Basit fiyatlandırma. Gizli ücret yok.",
-      desc1: "Her plan 14 gün ücretsiz deneme içerir.",
-      desc2: "Kredi kartı gerekmez.",
+      desc1: "14 Günlük Sınırsız Deneme Süresi (14-Day Free Trial).",
+      desc2: "Kredi kartı gerekmez. Deneme süresi bittiğinde müşteri havuzunuzu ve eşleşmeleri kaybetmemek için Pro'ya geçin.",
       monthly: "Aylık",
       yearly: "Yıllık — %17 indirim",
-      free: {
-        name: "Başlangıç",
-        desc: "Sistemi test etmek için ideal.",
-        priceMonthly: "0 ₺",
-        priceYearly: "0 ₺",
-        period: "/ay",
-        yearlyText: "Ücretsiz",
-        features: [
-          { type: 'check', text: 'Ayda 5 Lead Analizi' },
-          { type: 'check', text: 'Temel AI Skorlama' },
-          { type: 'check', text: 'Manuel WhatsApp Taslakları' },
-          { type: 'cross', text: 'Sesli not' }
-        ],
-        btn: "Hemen Başla"
-      },
       pro: {
         badge: "EN POPÜLER",
         name: "Pro",
-        desc: "Aktif danışmanlar için",
-        priceMonthly: "149 ₺",
-        priceYearly: "1.490 ₺",
+        desc: "Sisteme tam entegre olan ve sıcak müşteri veritabanını kaybetmek istemeyen danışmanlar için.",
+        priceMonthly: "299 ₺",
+        priceYearly: "2.990 ₺",
         period: "/ay",
         yearlyText: "Yıllık ödemede",
         features: [
@@ -148,7 +133,7 @@ export const t = {
       minRead: "dk okuma"
     },
     footer: {
-      desc: "Kullanıcı verilerinizin güvenliği Kapora için birinci önceliktir. Aydınlatma Metni ve Gizlilik Politikası'nı aşağıdan inceleyebilirsiniz.",
+      desc: "PrivacyPipeline Mimarisi: Sisteme gelen sesli notlardaki müşteri isimleri ve telefon numaraları, yapay zeka analizine gönderilmeden önce backend tarafında tamamen maskelenir. Kişisel veriler üçüncü parti API'ler ile asla ham veri olarak paylaşılmaz. Kullanıcı verilerinizin güvenliği Kapora için birinci önceliktir.",
       clarification: "Aydınlatma Metni",
       privacy: "Gizlilik Politikası",
       rights: "Tüm Hakları Saklıdır."
@@ -188,7 +173,7 @@ export const t = {
       step1Title: "1. Leave a Voice Note",
       step1Desc: "Just speak while on the field. The system instantly captures client criteria (budget, location, urgency) and schedules it in your agenda.",
       step2Title: "2. Match with Smart Sales Coach",
-      step2Desc: "The system automatically finds the most profitable listings in your database that match the client's request and calculates commission probability.",
+      step2Desc: "Portfolio match is ready before your client even hangs up. By the time they text on WhatsApp and pocket their phone, Kapora finds the right property and drafts the offer.",
       step3Title: "3. Send Presentation with One Click",
       step3Desc: "A professional WhatsApp presentation draft of matching listings is ready. Reach your client with just one click.",
       newRequest: "New Request:",
@@ -224,31 +209,16 @@ export const t = {
     },
     pricing: {
       title: "Simple pricing. No hidden fees.",
-      desc1: "Every plan includes a 14-day free trial.",
-      desc2: "No credit card required.",
+      desc1: "14-Day Unlimited Free Trial.",
+      desc2: "No credit card required. Upgrade to Pro anytime to keep your data and portfolio matches safe after the trial.",
       monthly: "Monthly",
       yearly: "Yearly — 17% off",
-      free: {
-        name: "Starter",
-        desc: "Ideal for testing the system.",
-        priceMonthly: "0 ₺",
-        priceYearly: "0 ₺",
-        period: "/mo",
-        yearlyText: "Free",
-        features: [
-          { type: 'check', text: '5 Lead Analyses / month' },
-          { type: 'check', text: 'Basic AI Scoring' },
-          { type: 'check', text: 'Manual WhatsApp Drafts' },
-          { type: 'cross', text: 'Voice Notes' }
-        ],
-        btn: "Start Now"
-      },
       pro: {
         badge: "MOST POPULAR",
         name: "Pro",
-        desc: "For active agents",
-        priceMonthly: "149 ₺",
-        priceYearly: "1,490 ₺",
+        desc: "For agents who want to keep their database and matches safe without interruption.",
+        priceMonthly: "299 ₺",
+        priceYearly: "2,990 ₺",
         period: "/mo",
         yearlyText: "Billed annually",
         features: [
@@ -303,7 +273,7 @@ export const t = {
       minRead: "min read"
     },
     footer: {
-      desc: "The security of your user data is a top priority for Kapora. You can review the Clarification Text and Privacy Policy below.",
+      desc: "PrivacyPipeline Architecture: Client names and phone numbers in incoming voice notes are fully masked on the backend before being sent to AI analysis. Personal data is never shared as raw data with third-party APIs. The security of your user data is our top priority.",
       clarification: "Clarification Text",
       privacy: "Privacy Policy",
       rights: "All Rights Reserved."

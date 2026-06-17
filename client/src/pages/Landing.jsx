@@ -581,7 +581,7 @@ const Landing = () => {
           </div>
         </div>
 
-        <div className="max-w-[1100px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
+        <div className="max-w-[1100px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
           
           {/* Feature Item Renderer */}
           {(() => {
@@ -602,25 +602,6 @@ const Landing = () => {
 
             return (
               <>
-                {/* Başlangıç (Free) */}
-                <div className="bg-[#18181B] border border-[#27272A] rounded-2xl p-6 flex flex-col transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-2xl hover:border-[#3F3F46] hover:z-20 relative">
-                  <h3 className="font-headline-sm text-[#FDE047] mb-6">{curr.pricing.free.name}</h3>
-                  <div className="flex items-baseline mb-2">
-                    <span className="font-display-lg font-bold text-on-surface">{billingCycle === 'monthly' ? curr.pricing.free.priceMonthly : curr.pricing.free.priceYearly}</span>
-                    <span className="font-body-sm text-on-surface-variant ml-1">{curr.pricing.free.period}</span>
-                  </div>
-                  <div className="font-body-sm text-on-surface-variant mb-1">{curr.pricing.free.yearlyText}</div>
-                  <div className="font-body-sm text-on-surface-variant mb-8">{curr.pricing.free.desc}</div>
-                  
-                  <ul className="space-y-4 mb-8 flex-1">
-                    {curr.pricing.free.features.map(renderFeature)}
-                  </ul>
-                  
-                  <Link to="/auth" className="w-full py-3 text-center font-label-md text-on-surface border border-[#3F3F46] hover:bg-[#27272A] rounded-lg transition-all">
-                    {curr.pricing.free.btn}
-                  </Link>
-                </div>
-
                 {/* Pro (En Popüler) */}
                 <div className="bg-[#18181B] border border-[#FDE047] rounded-2xl p-6 flex flex-col relative transform md:-translate-y-4 scale-105 shadow-[0_0_40px_rgba(253,224,71,0.15)] transition-all duration-300 ease-out hover:md:-translate-y-6 hover:-translate-y-2 hover:scale-[1.07] hover:shadow-[0_0_50px_rgba(253,224,71,0.3)] hover:z-20">
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#FDE047] text-[#18181B] font-label-sm font-bold uppercase tracking-wider px-3 py-1 rounded-full text-[11px]">
