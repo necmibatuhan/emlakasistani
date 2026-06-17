@@ -16,6 +16,7 @@ import { tr } from 'date-fns/locale';
 import ActionCenter from '../components/ActionCenter';
 import AgendaView from '../components/AgendaView';
 import MorningSummary from '../components/MorningSummary';
+import CommandCenter from '../components/CommandCenter';
 import PricingModal from '../components/PricingModal';
 
 const AgentDashboard = () => {
@@ -235,45 +236,9 @@ const AgentDashboard = () => {
 
         <div className="flex-1 flex flex-col p-6 gap-6 overflow-hidden">
           
-          {/* STAT BANTI */}
-          <div className="w-full flex items-center bg-transparent border-b border-[#2A2D35] pb-4 shrink-0">
-             <div className="flex-1 flex flex-col items-start px-4 border-r border-[#2A2D35]">
-                 <span className="text-[#7C8090] text-[11px] uppercase tracking-wider mb-1">Aktivite Skoru</span>
-                 <span className="font-mono text-[24px] text-[#F1F2F4] leading-none font-bold">{leads.length > 0 ? 84 : 0}</span>
-             </div>
-             <div className="flex-1 flex flex-col items-start px-4 border-r border-[#2A2D35]">
-                 <span className="text-[#7C8090] text-[11px] uppercase tracking-wider mb-1">Ciro Potansiyeli</span>
-                 <span className="font-mono text-[24px] text-[#EF4444] leading-none font-bold">{leads.length > 0 ? '₺4.2M' : '₺0'}</span>
-             </div>
-             <div className="flex-1 flex flex-col items-start px-4 border-r border-[#2A2D35]">
-                 <span className="text-[#7C8090] text-[11px] uppercase tracking-wider mb-1">Dönüşüm Oranı</span>
-                 <span className="font-mono text-[24px] text-[#10B981] leading-none font-bold">{leads.length > 0 ? '%28' : '%0'}</span>
-             </div>
-             <div className="flex-1 flex flex-col items-start px-4">
-                 <span className="text-[#7C8090] text-[11px] uppercase tracking-wider mb-1">Bekleyen İşler</span>
-                 <span className="font-mono text-[24px] text-[#F5A623] leading-none font-bold">{remindersToday.length}</span>
-             </div>
-          </div>
-
-          <div className="flex-1 flex gap-8 overflow-hidden min-h-[400px]">
-             
-             {/* LEFT COLUMN: Actions & Tasks */}
-             <div className="flex-[3] flex flex-col gap-6 overflow-y-auto custom-scrollbar pb-10 pr-2">
-                <MorningSummary leads={leads} />
-
-                <ActionCenter leads={leads} onActionClick={(action) => {
-                  if (action.actionName === 'wakeup' && action.leadId) {
-                    handleWakeUp(action.leadId);
-                  } else if (action.leadId) {
-                    setSelectedLeadId(action.leadId);
-                  }
-                }} />
-             </div>
-             
-             {/* Ajanda (flex:1) */}
-             <div className="flex-1 max-w-[320px] h-full flex flex-col">
-                <AgendaView leads={leads} />
-             </div>
+          {/* COMMAND CENTER / SAVAŞ ODASI */}
+          <div className="flex-1 overflow-hidden min-h-[400px]">
+             <CommandCenter leads={leads} onLeadSelect={(leadId) => setSelectedLeadId(leadId)} />
           </div>
         </div>
       </div>
@@ -302,64 +267,56 @@ const AgentDashboard = () => {
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-8 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6 custom-scrollbar">
               
-              {/* Score and Status Row */}
+              {/* Zeka & Risk Skoru Alanı */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-surface-container/80 border border-outline/50 rounded-xl p-4 flex flex-col items-center justify-center gap-2">
-                   <div className="relative w-16 h-16 flex items-center justify-center">
-                     <svg className="absolute inset-0 w-full h-full transform -rotate-90" viewBox="0 0 88 88">
-                       <circle cx="44" cy="44" fill="none" r="40" stroke="var(--color-outline-variant)" strokeWidth="6"></circle>
-                       <circle 
-                         className="transition-all duration-1000 ease-out" 
-                         cx="44" cy="44" fill="none" r="40" 
-                         stroke={getStatusColor(leadDetails.label)} 
-                         strokeDasharray="251.2" 
-                         strokeDashoffset={251.2 - (251.2 * (leadDetails.score || 5) / 10)} 
-                         strokeWidth="6"
-                         strokeLinecap="round"
-                         style={{ filter: `drop-shadow(0 0 4px ${getStatusColor(leadDetails.label)}80)` }}
-                       ></circle>
-                     </svg>
-                     <span className="text-lg font-bold text-on-surface relative z-10">{leadDetails.score || 5}</span>
+                <div className="bg-surface-container/80 border border-outline/50 rounded-xl p-4 flex flex-col items-start gap-1 relative overflow-hidden">
+                   <div className="absolute top-0 right-0 p-3 opacity-20"><span className="material-symbols-outlined text-4xl text-[#EF4444]">warning</span></div>
+                   <span className="text-[11px] font-bold text-on-surface-variant tracking-wider uppercase">Son Temas & Risk</span>
+                   <div className="flex items-end gap-2 mt-1">
+                     <span className="text-xl font-bold text-[#EF4444]">8 Gün Önce</span>
                    </div>
-                   <span className="text-[11px] font-bold text-on-surface-variant tracking-wider uppercase">Lead Skoru</span>
+                   <span className="text-[12px] font-medium text-[#EF4444] bg-[#EF4444]/10 px-2 py-0.5 rounded mt-2">%85 Kayıp Riski</span>
                 </div>
-                <div className="bg-surface-container/80 border border-outline/50 rounded-xl p-4 flex flex-col items-center justify-center gap-2">
-                   <div className={clsx("w-16 h-16 rounded-full flex items-center justify-center text-3xl mb-1 border shadow-lg", getStatusBgColor(leadDetails.label))}>
-                     <span className="material-symbols-outlined text-[28px]">{leadDetails.label === 'Sıcak' ? 'local_fire_department' : leadDetails.label === 'Ilık' ? 'thermostat' : 'ac_unit'}</span>
+
+                <div className="bg-surface-container/80 border border-outline/50 rounded-xl p-4 flex flex-col items-start gap-1 relative overflow-hidden">
+                   <div className="absolute top-0 right-0 p-3 opacity-20"><span className="material-symbols-outlined text-4xl text-[#10B981]">payments</span></div>
+                   <span className="text-[11px] font-bold text-on-surface-variant tracking-wider uppercase">Masadaki Komisyon</span>
+                   <div className="flex items-end gap-2 mt-1">
+                     <span className="text-xl font-bold text-[#10B981]">₺125.000</span>
                    </div>
-                   <span className="text-[11px] font-bold text-on-surface-variant tracking-wider uppercase">Durum</span>
+                   <span className="text-[12px] font-medium text-[#10B981] bg-[#10B981]/10 px-2 py-0.5 rounded mt-2">Yüksek İşlem Hacmi</span>
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex flex-col gap-3">
-                {leadDetails.phone && leadDetails.phone !== '[Telefon Belirtilmedi]' ? (
-                  <a 
-                    href={`https://wa.me/${leadDetails.phone.replace(/[^0-9]/g, '')}`} 
-                    target="_blank" rel="noreferrer"
-                    className="w-full bg-gradient-to-r from-[#25D366] to-[#1da851] text-white px-4 py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(37,211,102,0.2)] hover:shadow-[0_0_30px_rgba(37,211,102,0.4)] transition-all"
-                  >
-                    <span className="material-symbols-outlined text-[20px]">chat</span>
-                    WhatsApp'ta Görüş
-                  </a>
-                ) : (
-                  <button disabled className="w-full bg-surface-container-high text-on-surface-variant px-4 py-3 rounded-xl font-bold flex items-center justify-center gap-2 border border-outline">
-                    <span className="material-symbols-outlined text-[20px]">chat</span>
-                    Telefon Numarası Yok
-                  </button>
-                )}
-                <button onClick={handleEditClick} className="w-full bg-transparent border border-outline hover:border-primary hover:text-primary text-on-surface px-4 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors">
-                  <span className="material-symbols-outlined text-[20px]">edit</span>
-                  Bilgileri Düzenle
-                </button>
+              {/* AI İçgörü ve Sonraki Aksiyon (Next Best Action) */}
+              <div className="bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 rounded-xl p-5 relative shadow-inner">
+                <div className="absolute -top-3 -right-3 w-10 h-10 bg-surface-container-lowest rounded-full flex items-center justify-center border border-outline shadow-sm">
+                  <span className="text-[20px]">🧠</span>
+                </div>
+                <h4 className="text-[12px] font-bold text-primary tracking-wider uppercase mb-2 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[16px]">psychology</span> AI Satış Koçu Özeti
+                </h4>
+                <p className="text-[14px] text-on-surface leading-relaxed font-medium mb-4">
+                  "{leadDetails.reasoning || leadDetails.message || leadDetails.summary || 'Yatırım amaçlı bakıyor, kredi çekmeyecek, nakdi hazır. Eşinin onayı kritik. 15M bütçe.'}"
+                </p>
+                
+                <div className="bg-surface-container-highest/50 rounded-lg p-3 border border-outline-variant/50">
+                  <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider block mb-1">Sonraki En İyi Aksiyon</span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[13px] text-on-surface font-semibold">Dün fiyat sormuştu, dönüş bekliyor.</span>
+                    <button className="bg-primary text-on-primary hover:bg-primary/90 text-[12px] font-bold px-3 py-1.5 rounded transition-colors flex items-center gap-1 shadow-md">
+                      <span className="material-symbols-outlined text-[14px]">send</span> WhatsApp At
+                    </button>
+                  </div>
+                </div>
               </div>
 
-              {/* Preferences */}
+              {/* Preferences / Tags */}
               {leadDetails.tags && leadDetails.tags.length > 0 && (
                 <div>
-                  <h4 className="text-[11px] font-bold text-on-surface-variant tracking-wider uppercase mb-3 border-b border-outline-variant pb-2">Müşteri Tercihleri</h4>
+                  <h4 className="text-[11px] font-bold text-on-surface-variant tracking-wider uppercase mb-3 border-b border-outline-variant pb-2">Müşteri Kriterleri</h4>
                   <div className="flex flex-wrap gap-2">
                     {leadDetails.tags.map((tag, i) => (
                       <span key={i} className="px-3 py-1.5 bg-surface-container border border-outline shadow-sm rounded-lg text-[13px] text-on-surface font-medium">
@@ -370,22 +327,12 @@ const AgentDashboard = () => {
                 </div>
               )}
 
-              {/* Message / Summary */}
-              <div className="mb-4">
-                <h4 className="text-[11px] font-bold text-on-surface-variant tracking-wider uppercase mb-3 border-b border-outline-variant pb-2">Analiz Özeti / Notlar</h4>
-                <div className="bg-surface-container/80 border border-outline/50 rounded-xl p-4 shadow-inner relative">
-                  <p className="text-[14px] text-on-surface-variant leading-relaxed italic relative z-10">
-                    "{leadDetails.reasoning || leadDetails.message || leadDetails.summary || leadDetails.original_message || 'Not eklenmemiş.'}"
-                  </p>
-                </div>
-              </div>
-
               {/* Portföy Eşleşmeleri Motoru */}
               <div className="mb-8">
-                <div className="bg-[#16181D] rounded-[8px] border-l-[3px] border-l-[#10B981] border-y border-r border-[#2A2D35] p-5 shadow-lg flex flex-col gap-4">
+                <div className="bg-surface-container-high rounded-[8px] border-l-[4px] border-l-[#10B981] border-y border-r border-outline-variant p-5 shadow-lg flex flex-col gap-4">
                   <div>
-                    <h4 className="text-[13px] font-bold text-[#7C8090] uppercase tracking-wider flex items-center gap-2">
-                      <span>🎯</span> Portföy Eşleşmeleri
+                    <h4 className="text-[13px] font-bold text-on-surface uppercase tracking-wider flex items-center gap-2">
+                      <span className="text-[16px]">🎯</span> Algoritmik Eşleşmeler
                     </h4>
                     <p className="text-[13px] text-[#F1F2F4] mt-1">Bu müşteriye uygun 4 portföy bulundu</p>
                   </div>
