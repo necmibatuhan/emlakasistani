@@ -87,9 +87,12 @@ const Landing = () => {
           </div>
 
           <h1 className="font-display-lg text-[48px] lg:text-[56px] font-semibold leading-[1.1] tracking-tight text-on-surface mb-6">
-            Daha Fazla<br/>Portföy.<br/>
-            Daha Fazla<br/>Satış.<br/>
-            <span className="text-primary">Daha Fazla<br/>Komisyon.</span>
+            Daha Fazla<br/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-[#FDE047] to-primary bg-[length:200%_auto] animate-gradient-x">Portföy.</span><br/>
+            Daha Fazla<br/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-[#FDE047] to-primary bg-[length:200%_auto] animate-gradient-x">Satış.</span><br/>
+            Daha Fazla<br/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-[#FDE047] to-primary bg-[length:200%_auto] animate-gradient-x">Komisyon.</span>
           </h1>
 
           <p className="font-body-lg text-on-surface-variant mt-4 mb-10 max-w-[480px] leading-relaxed">
