@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Play, X, Menu, Sun, Moon } from 'lucide-react';
+import { Play, X, Menu, Sun, Moon, Globe } from 'lucide-react';
 import { Logo } from '../components/Logo';
 import { BLOG_POSTS } from './BlogList';
+import { t } from '../locales/landingTranslations';
 
 const MOCK_LEADS = [
   {
@@ -47,6 +48,8 @@ const Landing = () => {
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [theme, setTheme] = useState('dark');
+  const [lang, setLang] = useState('tr');
+  const curr = t[lang];
 
   React.useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -98,15 +101,24 @@ const Landing = () => {
           
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-6">
-            <Link to="/blog" className="text-on-surface-variant hover:text-on-surface font-body-sm font-medium transition-colors">Blog</Link>
-            <a href="#fiyatlar" className="text-on-surface-variant hover:text-on-surface font-body-sm font-medium transition-colors">Fiyatlar</a>
-            <button onClick={toggleTheme} className="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full bg-surface-container-high border border-outline-variant">
-              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-            </button>
-            <Link to="/auth" className="text-on-surface-variant hover:text-on-surface font-body-sm font-medium transition-colors">Giriş Yap</Link>
+            <Link to="/blog" className="text-on-surface-variant hover:text-on-surface font-body-sm font-medium transition-colors">{curr.nav.blog}</Link>
+            <a href="#fiyatlar" className="text-on-surface-variant hover:text-on-surface font-body-sm font-medium transition-colors">{curr.nav.pricing}</a>
+            <Link to="/auth" className="text-on-surface-variant hover:text-on-surface font-body-sm font-medium transition-colors">{curr.nav.login}</Link>
             <Link to="/auth" className="bg-primary hover:bg-primary/90 text-on-primary font-body-sm font-medium px-5 py-2 rounded-md transition-colors">
-              Ücretsiz Başla
+              {curr.nav.startFree}
             </Link>
+            <div className="flex items-center gap-2 border-l border-outline-variant pl-6 ml-2">
+              <button 
+                onClick={() => setLang(lang === 'tr' ? 'en' : 'tr')} 
+                className="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1 p-2 rounded-md bg-surface-container-high border border-outline-variant text-[12px] font-bold tracking-wider"
+              >
+                <Globe size={16} />
+                {lang === 'tr' ? 'EN' : 'TR'}
+              </button>
+              <button onClick={toggleTheme} className="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full bg-surface-container-high border border-outline-variant">
+                {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+              </button>
+            </div>
           </div>
 
           {/* Mobile Menu Button */}
@@ -121,17 +133,26 @@ const Landing = () => {
         {/* Mobile Nav Dropdown */}
         {isMobileMenuOpen && (
           <div className="md:hidden bg-surface-container-lowest border-b border-outline-variant px-6 py-4 flex flex-col space-y-4">
-            <Link to="/blog" onClick={() => setIsMobileMenuOpen(false)} className="text-on-surface-variant hover:text-on-surface font-body-md font-medium transition-colors py-2">Blog</Link>
-            <a href="#fiyatlar" onClick={() => setIsMobileMenuOpen(false)} className="text-on-surface-variant hover:text-on-surface font-body-md font-medium transition-colors py-2">Fiyatlar</a>
+            <Link to="/blog" onClick={() => setIsMobileMenuOpen(false)} className="text-on-surface-variant hover:text-on-surface font-body-md font-medium transition-colors py-2">{curr.nav.blog}</Link>
+            <a href="#fiyatlar" onClick={() => setIsMobileMenuOpen(false)} className="text-on-surface-variant hover:text-on-surface font-body-md font-medium transition-colors py-2">{curr.nav.pricing}</a>
             <div className="flex items-center gap-4 py-2">
-              <button onClick={toggleTheme} className="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full bg-surface-container border border-outline-variant">
-                {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-              </button>
-              <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)} className="text-on-surface-variant hover:text-on-surface font-body-md font-medium transition-colors">Giriş Yap</Link>
+              <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)} className="text-on-surface-variant hover:text-on-surface font-body-md font-medium transition-colors">{curr.nav.login}</Link>
             </div>
             <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)} className="bg-primary hover:bg-primary/90 text-on-primary font-body-md font-medium px-5 py-3 rounded-md transition-colors text-center mt-2">
-              Ücretsiz Başla
+              {curr.nav.startFree}
             </Link>
+            <div className="flex items-center justify-center gap-4 pt-4 border-t border-outline-variant">
+              <button 
+                onClick={() => { setLang(lang === 'tr' ? 'en' : 'tr'); setIsMobileMenuOpen(false); }} 
+                className="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1 p-2 rounded-md bg-surface-container border border-outline-variant text-[12px] font-bold tracking-wider"
+              >
+                <Globe size={18} />
+                {lang === 'tr' ? 'EN' : 'TR'}
+              </button>
+              <button onClick={() => { toggleTheme(); setIsMobileMenuOpen(false); }} className="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full bg-surface-container border border-outline-variant">
+                {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+              </button>
+            </div>
           </div>
         )}
       </nav>
@@ -143,36 +164,36 @@ const Landing = () => {
           
           <div className="bg-surface-container px-4 py-2 rounded-full flex items-center space-x-2 mb-8 border border-outline-variant">
             <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            <span className="text-on-surface font-label-md font-medium">Türkiye'de 180.000 emlak danışmanı</span>
+            <span className="text-on-surface font-label-md font-medium">{curr.hero.stat}</span>
           </div>
 
           <h1 className="font-display-lg text-[40px] md:text-[48px] lg:text-[56px] font-semibold leading-[1.1] tracking-tight text-on-surface mb-6">
-            Daha Fazla<br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-[#FDE047] to-primary bg-[length:200%_auto] animate-gradient-x">Portföy.</span><br/>
-            Daha Fazla<br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-[#FDE047] to-primary bg-[length:200%_auto] animate-gradient-x">Satış.</span><br/>
-            Daha Fazla<br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-[#FDE047] to-primary bg-[length:200%_auto] animate-gradient-x">Komisyon.</span>
+            {curr.hero.title1}<br/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-[#FDE047] to-primary bg-[length:200%_auto] animate-gradient-x">{curr.hero.title2}</span><br/>
+            {curr.hero.title1}<br/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-[#FDE047] to-primary bg-[length:200%_auto] animate-gradient-x">{curr.hero.title3}</span><br/>
+            {curr.hero.title1}<br/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-[#FDE047] to-primary bg-[length:200%_auto] animate-gradient-x">{curr.hero.title4}</span>
           </h1>
 
           <p className="font-body-lg text-on-surface-variant mt-4 mb-10 max-w-[480px] leading-relaxed">
-            Manuel veri girişiyle vakit kaybetmeyin. Kapora, gün içinde aldığınız sesli notları analiz ederek ajandanızı düzenleyen, potansiyel alıcıları portföyünüzle eşleştiren ve bugün odaklanmanız gereken en sıcak fırsatları listeleyen akıllı satış asistanınızdır.
+            {curr.hero.desc}
           </p>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8 w-full sm:w-auto">
             <Link to="/auth" className="bg-primary hover:bg-[#C2933B] text-on-primary font-label-lg font-medium px-6 py-3 rounded-md transition-colors flex items-center justify-center gap-2 w-full sm:w-auto">
               <span className="material-symbols-outlined text-[20px]">account_balance_wallet</span>
-              Komisyonunu Artır
+              {curr.hero.increaseCommission}
             </Link>
             <button onClick={() => setIsVideoModalOpen(true)} className="text-on-surface-variant hover:text-on-surface font-label-lg font-medium transition-colors flex items-center justify-center gap-2 w-full sm:w-auto py-2">
               <span className="material-symbols-outlined text-primary text-[20px]">play_circle</span>
-              <span>Sistemi Gör</span>
+              <span>{curr.hero.seeSystem}</span>
             </button>
           </div>
 
           <div className="flex items-center space-x-2 font-label-sm text-on-surface-variant">
             <span className="material-symbols-outlined text-[16px] text-[#10B981]">event</span>
-            <span>Günde 3 saat tasarruf eden binlerce danışman</span>
+            <span>{curr.hero.saveTime}</span>
           </div>
 
         </div>
@@ -193,7 +214,7 @@ const Landing = () => {
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse shadow-[0_0_8px_#10B981]" />
-                <span className="font-label-sm text-[#10B981] tracking-widest">OTOPİLOT AKTİF</span>
+                <span className="font-label-sm text-[#10B981] tracking-widest">{curr.hero.autopilot}</span>
               </div>
             </div>
             
@@ -235,7 +256,7 @@ const Landing = () => {
             {/* Action Bar */}
             <div className="border-t border-outline/30 p-4 bg-surface-container-low/60 flex justify-end">
               <button className="bg-primary text-on-primary font-label-sm px-6 py-2.5 rounded-lg flex items-center gap-2 shadow-[0_0_15px_rgba(99,102,241,0.4)] hover:bg-primary/90 transition-colors">
-                <span className="material-symbols-outlined text-[16px]">send</span> Otomatik Yanıtlandı
+                <span className="material-symbols-outlined text-[16px]">send</span> {curr.flow.autoReplied}
               </button>
             </div>
           </div>
@@ -250,30 +271,30 @@ const Landing = () => {
         <div className="flex w-[200%] animate-marquee">
           <div className="flex w-1/2 justify-around items-center space-x-16">
             <div className="font-body-md text-on-surface-variant whitespace-nowrap">
-              <span className="text-primary font-bold">"</span>Artık sabah kimi arayacağımı biliyorum.<span className="text-primary font-bold">"</span> <span className="mx-2">·</span> Kadıköy, İstanbul
+              <span className="text-primary font-bold">"</span>{curr.socialProof.quote1}<span className="text-primary font-bold">"</span> <span className="mx-2">·</span> {curr.socialProof.loc1}
             </div>
             <div className="font-body-md text-on-surface-variant whitespace-nowrap">
-              <span className="text-primary font-bold">"</span>Sıcak leadleri kaçırmıyorum.<span className="text-primary font-bold">"</span> <span className="mx-2">·</span> Çankaya, Ankara
+              <span className="text-primary font-bold">"</span>{curr.socialProof.quote2}<span className="text-primary font-bold">"</span> <span className="mx-2">·</span> {curr.socialProof.loc2}
             </div>
             <div className="font-body-md text-on-surface-variant whitespace-nowrap">
-              <span className="text-primary font-bold">"</span>WhatsApp taslağı tek tıkla hazır.<span className="text-primary font-bold">"</span> <span className="mx-2">·</span> Konak, İzmir
+              <span className="text-primary font-bold">"</span>{curr.socialProof.quote3}<span className="text-primary font-bold">"</span> <span className="mx-2">·</span> {curr.socialProof.loc3}
             </div>
             <div className="font-body-md text-on-surface-variant whitespace-nowrap">
-              <span className="text-primary font-bold">"</span>Haftada 3-4 saat kazandım.<span className="text-primary font-bold">"</span> <span className="mx-2">·</span> Nilüfer, Bursa
+              <span className="text-primary font-bold">"</span>{curr.socialProof.quote4}<span className="text-primary font-bold">"</span> <span className="mx-2">·</span> {curr.socialProof.loc4}
             </div>
           </div>
           <div className="flex w-1/2 justify-around items-center space-x-16">
             <div className="font-body-md text-on-surface-variant whitespace-nowrap">
-              <span className="text-primary font-bold">"</span>Artık sabah kimi arayacağımı biliyorum.<span className="text-primary font-bold">"</span> <span className="mx-2">·</span> Kadıköy, İstanbul
+              <span className="text-primary font-bold">"</span>{curr.socialProof.quote1}<span className="text-primary font-bold">"</span> <span className="mx-2">·</span> {curr.socialProof.loc1}
             </div>
             <div className="font-body-md text-on-surface-variant whitespace-nowrap">
-              <span className="text-primary font-bold">"</span>Sıcak leadleri kaçırmıyorum.<span className="text-primary font-bold">"</span> <span className="mx-2">·</span> Çankaya, Ankara
+              <span className="text-primary font-bold">"</span>{curr.socialProof.quote2}<span className="text-primary font-bold">"</span> <span className="mx-2">·</span> {curr.socialProof.loc2}
             </div>
             <div className="font-body-md text-on-surface-variant whitespace-nowrap">
-              <span className="text-primary font-bold">"</span>WhatsApp taslağı tek tıkla hazır.<span className="text-primary font-bold">"</span> <span className="mx-2">·</span> Konak, İzmir
+              <span className="text-primary font-bold">"</span>{curr.socialProof.quote3}<span className="text-primary font-bold">"</span> <span className="mx-2">·</span> {curr.socialProof.loc3}
             </div>
             <div className="font-body-md text-on-surface-variant whitespace-nowrap">
-              <span className="text-primary font-bold">"</span>Haftada 3-4 saat kazandım.<span className="text-primary font-bold">"</span> <span className="mx-2">·</span> Nilüfer, Bursa
+              <span className="text-primary font-bold">"</span>{curr.socialProof.quote4}<span className="text-primary font-bold">"</span> <span className="mx-2">·</span> {curr.socialProof.loc4}
             </div>
           </div>
         </div>
@@ -284,25 +305,25 @@ const Landing = () => {
         <div className="flex flex-col md:flex-row items-center gap-12 md:gap-20">
           {/* Sol: Adımlar */}
           <div className="w-full md:w-1/2 space-y-8">
-            <h2 className="font-headline-lg text-[32px] text-on-surface mb-8">Sesli Asistan ve Dijital Sekreter ile Hız Kazanın</h2>
+            <h2 className="font-headline-lg text-[32px] text-on-surface mb-8">{curr.flow.title}</h2>
             
             <div className="relative pl-8 border-l-2 border-surface-container-high space-y-12">
               <div className="relative transition-opacity duration-300" style={{ opacity: activeFlowStep >= 0 ? 1 : 0.4 }}>
                 <div className={`absolute -left-[41px] top-1 w-5 h-5 rounded-full ring-4 ring-background transition-colors duration-500 ${activeFlowStep === 0 ? 'bg-primary shadow-[0_0_15px_rgba(217,167,74,0.5)]' : 'bg-surface-container-highest'}`}></div>
-                <h3 className="font-headline-sm text-on-surface mb-2">1. Sesli Not Bırakın</h3>
-                <p className="font-body-md text-on-surface-variant">Sahadayken sadece konuşun. Sistem müşteri kriterlerini (bütçe, bölge, aciliyet) saniyeler içinde fişler ve ajandanıza işler.</p>
+                <h3 className="font-headline-sm text-on-surface mb-2">{curr.flow.step1Title}</h3>
+                <p className="font-body-md text-on-surface-variant">{curr.flow.step1Desc}</p>
               </div>
 
               <div className="relative transition-opacity duration-300" style={{ opacity: activeFlowStep >= 1 ? 1 : 0.4 }}>
                 <div className={`absolute -left-[41px] top-1 w-5 h-5 rounded-full ring-4 ring-background transition-colors duration-500 ${activeFlowStep === 1 ? 'bg-primary shadow-[0_0_15px_rgba(217,167,74,0.5)]' : 'bg-surface-container-highest'}`}></div>
-                <h3 className="font-headline-sm text-on-surface mb-2">2. Akıllı Satış Koçu ile Eşleştirin</h3>
-                <p className="font-body-md text-on-surface-variant">Sistem, müşteri talebine uyan en karlı portföyleri veri tabanınızdan otomatik bulur ve komisyon ihtimalini hesaplar.</p>
+                <h3 className="font-headline-sm text-on-surface mb-2">{curr.flow.step2Title}</h3>
+                <p className="font-body-md text-on-surface-variant">{curr.flow.step2Desc}</p>
               </div>
 
               <div className="relative transition-opacity duration-300" style={{ opacity: activeFlowStep >= 2 ? 1 : 0.4 }}>
                 <div className={`absolute -left-[41px] top-1 w-5 h-5 rounded-full ring-4 ring-background transition-colors duration-500 ${activeFlowStep === 2 ? 'bg-primary shadow-[0_0_15px_rgba(217,167,74,0.5)]' : 'bg-surface-container-highest'}`}></div>
-                <h3 className="font-headline-sm text-on-surface mb-2">3. Tek Tıkla Sunum Gönderin</h3>
-                <p className="font-body-md text-on-surface-variant">Eşleşen portföylerin profesyonel WhatsApp sunum taslağı hazır. Sadece gönder tuşuna basarak müşteriye ulaşın.</p>
+                <h3 className="font-headline-sm text-on-surface mb-2">{curr.flow.step3Title}</h3>
+                <p className="font-body-md text-on-surface-variant">{curr.flow.step3Desc}</p>
               </div>
             </div>
           </div>
@@ -316,7 +337,7 @@ const Landing = () => {
                   <span className="material-symbols-outlined text-[#25D366]">chat</span>
                 </div>
                 <div>
-                  <div className="font-headline-sm text-on-surface">Yeni Talep: {mockLead.name}</div>
+                  <div className="font-headline-sm text-on-surface">{curr.flow.newRequest} {mockLead.name}</div>
                   <div className="font-label-sm text-on-surface-variant">{mockLead.time}</div>
                 </div>
                 <div className="ml-auto px-3 py-1 rounded-full bg-primary/20 text-primary font-label-sm border border-primary/30 transition-all duration-500">
@@ -341,7 +362,7 @@ const Landing = () => {
 
                 {activeFlowStep >= 2 && (
                   <div className="mt-6 pt-4 border-t border-outline-variant/50 animate-fade-in-up">
-                    <div className="font-label-sm text-on-surface-variant mb-3 uppercase tracking-wider">Taslak Mesajınız Hazır</div>
+                    <div className="font-label-sm text-on-surface-variant mb-3 uppercase tracking-wider">{curr.flow.draftReady}</div>
                     <div className="bg-surface-container-highest/30 p-4 rounded-lg border border-outline-variant/30 border-l-4 border-l-primary relative overflow-hidden">
                       <div className="absolute top-0 right-0 p-2 opacity-30"><span className="material-symbols-outlined text-primary">send_to_mobile</span></div>
                       <p className="font-body-sm text-on-surface">
@@ -349,7 +370,7 @@ const Landing = () => {
                       </p>
                     </div>
                     <button className="w-full mt-4 bg-primary hover:bg-primary/90 text-on-primary font-label-md py-2.5 rounded transition-colors flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(255,195,0,0.3)]">
-                      <span className="material-symbols-outlined text-[18px]">send</span> Yanıtı Gönder
+                      <span className="material-symbols-outlined text-[18px]">send</span> {curr.flow.sendReply}
                     </button>
                   </div>
                 )}
@@ -364,10 +385,10 @@ const Landing = () => {
         <div className="max-w-[1200px] mx-auto">
           <div className="text-center mb-16">
             <h2 className="font-display-md text-[36px] lg:text-[42px] font-semibold text-on-surface mb-4">
-              İçeride Sizi Neler Bekliyor?
+              {curr.mockup.title}
             </h2>
             <p className="font-body-lg text-on-surface-variant max-w-[600px] mx-auto">
-              Karmaşık Excel tablolarını unutun. Her şey tek bir ekranda, satışa dönmeye hazır şekilde sizi bekliyor.
+              {curr.mockup.desc}
             </p>
           </div>
 
@@ -378,13 +399,13 @@ const Landing = () => {
               <div className="w-3 h-3 rounded-full bg-outline-variant"></div>
               <div className="w-3 h-3 rounded-full bg-outline-variant"></div>
               <div className="ml-4 font-label-sm text-on-surface-variant tracking-widest uppercase">
-                Panel Önizlemesi
+                {curr.mockup.preview}
               </div>
             </div>
 
             {/* Mockup Tabs */}
             <div className="flex items-center gap-6 mb-6">
-              {['Savaş Odası', 'Saldırı Planı', 'Eşleşmeler'].map((tab, idx) => (
+              {curr.mockup.tabs.map((tab, idx) => (
                 <button 
                   key={idx}
                   onClick={() => setActiveMockupView(idx)}
@@ -403,10 +424,10 @@ const Landing = () => {
                   <div className="bg-surface-container-high border border-outline-variant/60 rounded-xl p-6 relative">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-6">
                       <h3 className="font-headline-sm text-on-surface flex items-center gap-2">
-                        <span className="text-[20px]">🔥</span> Bugün Aranacaklar
+                        <span className="text-[20px]">🔥</span> {curr.mockup.warRoom.hotTitle}
                       </h3>
                       <span className="bg-status-hot/20 text-status-hot border border-status-hot/30 px-3 py-1 rounded-full font-label-sm">
-                        3 Aktif Müşteri Eşleşti
+                        {curr.mockup.warRoom.hotBadge}
                       </span>
                     </div>
                     
@@ -417,7 +438,7 @@ const Landing = () => {
                           <div className="font-body-sm text-on-surface-variant">Beşiktaş · 3+1 Satılık</div>
                         </div>
                         <button className="bg-primary/10 text-primary px-4 py-2 rounded-md font-label-sm border border-primary/20">
-                          Hemen Ara
+                          {curr.mockup.warRoom.callNow}
                         </button>
                       </div>
                       <div className="flex items-center justify-between bg-surface-container p-4 rounded-lg border border-outline-variant/30">
@@ -426,7 +447,7 @@ const Landing = () => {
                           <div className="font-body-sm text-on-surface-variant">Kadıköy · 15M Bütçe</div>
                         </div>
                         <button className="bg-primary/10 text-primary px-4 py-2 rounded-md font-label-sm border border-primary/20">
-                          Hemen Ara
+                          {curr.mockup.warRoom.callNow}
                         </button>
                       </div>
                     </div>
@@ -436,10 +457,10 @@ const Landing = () => {
                   <div className="bg-surface-container-high border border-outline-variant/60 rounded-xl p-6 relative">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-6">
                       <h3 className="font-headline-sm text-on-surface flex items-center gap-2">
-                        <span className="text-[20px]">🚨</span> Kayıp Riski Olanlar
+                        <span className="text-[20px]">🚨</span> {curr.mockup.warRoom.riskTitle}
                       </h3>
                       <span className="bg-status-error/20 text-status-error border border-status-error/30 px-3 py-1 rounded-full font-label-sm flex items-center gap-1">
-                        <span className="material-symbols-outlined text-[14px]">warning</span> Dikkat
+                        <span className="material-symbols-outlined text-[14px]">warning</span> {curr.mockup.warRoom.riskBadge}
                       </span>
                     </div>
 
@@ -452,7 +473,7 @@ const Landing = () => {
                         </div>
                         <div className="font-body-sm text-on-surface-variant mb-3">Geçen ay Ataşehir ofis ilanını sormuştu.</div>
                         <button className="w-full bg-surface-container-highest text-on-surface py-2 rounded font-label-sm flex items-center justify-center gap-2">
-                          <span className="material-symbols-outlined text-[16px]">chat</span> WhatsApp Mesajı Yolla
+                          <span className="material-symbols-outlined text-[16px]">chat</span> {curr.mockup.warRoom.sendWa}
                         </button>
                       </div>
                     </div>
@@ -465,29 +486,29 @@ const Landing = () => {
                 <div className="bg-surface-container-high border border-outline-variant/60 rounded-xl p-6 h-full flex flex-col gap-6">
                    <div className="grid grid-cols-2 gap-4">
                       <div className="bg-surface-container/80 border border-outline/50 rounded-xl p-4 flex flex-col items-start relative overflow-hidden">
-                        <span className="text-[11px] font-bold text-on-surface-variant tracking-wider uppercase mb-1">Son Temas & Risk</span>
+                        <span className="text-[11px] font-bold text-on-surface-variant tracking-wider uppercase mb-1">{curr.mockup.attackPlan.lastContact}</span>
                         <span className="text-xl font-bold text-[#EF4444]">8 Gün Önce</span>
                         <span className="text-[12px] font-medium text-[#EF4444] bg-[#EF4444]/10 px-2 py-0.5 rounded mt-2">%85 Kayıp Riski</span>
                       </div>
                       <div className="bg-surface-container/80 border border-outline/50 rounded-xl p-4 flex flex-col items-start relative overflow-hidden">
-                        <span className="text-[11px] font-bold text-on-surface-variant tracking-wider uppercase mb-1">Masadaki Komisyon</span>
+                        <span className="text-[11px] font-bold text-on-surface-variant tracking-wider uppercase mb-1">{curr.mockup.attackPlan.commission}</span>
                         <span className="text-xl font-bold text-[#10B981]">₺125.000</span>
                         <span className="text-[12px] font-medium text-[#10B981] bg-[#10B981]/10 px-2 py-0.5 rounded mt-2">Yüksek İşlem Hacmi</span>
                       </div>
                    </div>
                    <div className="bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 rounded-xl p-5 relative shadow-inner">
                       <h4 className="text-[12px] font-bold text-primary tracking-wider uppercase mb-2 flex items-center gap-2">
-                        <span className="material-symbols-outlined text-[16px]">psychology</span> AI Satış Koçu Özeti
+                        <span className="material-symbols-outlined text-[16px]">psychology</span> {curr.mockup.attackPlan.aiSummaryTitle}
                       </h4>
                       <p className="text-[14px] text-on-surface leading-relaxed font-medium mb-4">
                         "Yatırım amaçlı bakıyor, kredi çekmeyecek, nakdi hazır. Eşinin onayı kritik. 15M bütçe."
                       </p>
                       <div className="bg-surface-container-highest/50 rounded-lg p-3 border border-outline-variant/50">
-                        <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider block mb-1">Sonraki En İyi Aksiyon</span>
+                        <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider block mb-1">{curr.mockup.attackPlan.nextAction}</span>
                         <div className="flex items-center justify-between">
                           <span className="text-[13px] text-on-surface font-semibold">Dün fiyat sormuştu, dönüş bekliyor.</span>
                           <button className="bg-primary text-on-primary text-[12px] font-bold px-3 py-1.5 rounded flex items-center gap-1 shadow-md">
-                            <span className="material-symbols-outlined text-[14px]">send</span> WhatsApp At
+                            <span className="material-symbols-outlined text-[14px]">send</span> {curr.mockup.attackPlan.sendWa}
                           </button>
                         </div>
                       </div>
@@ -500,9 +521,9 @@ const Landing = () => {
                  <div className="bg-surface-container-high border border-outline-variant/60 rounded-xl p-6 h-full flex flex-col gap-4">
                     <div>
                       <h4 className="text-[13px] font-bold text-on-surface uppercase tracking-wider flex items-center gap-2">
-                        <span className="text-[16px]">🎯</span> Algoritmik Eşleşmeler
+                        <span className="text-[16px]">🎯</span> {curr.mockup.matches.title}
                       </h4>
-                      <p className="text-[13px] text-on-surface-variant mt-1">Bu müşteriye uygun 2 portföy bulundu.</p>
+                      <p className="text-[13px] text-on-surface-variant mt-1">{curr.mockup.matches.desc}</p>
                     </div>
                     <div className="h-[1px] w-full bg-outline-variant/50" />
                     <div className="flex flex-col gap-3">
@@ -513,7 +534,7 @@ const Landing = () => {
                         </div>
                         <span className="font-mono text-on-surface">11.5M ₺</span>
                         <span className="text-[#F5A623] text-[12px] font-medium w-[90px]">Bütçeye yakın</span>
-                        <button className="border border-outline-variant text-on-surface px-2 py-1 rounded text-[11px]">Gör →</button>
+                        <button className="border border-outline-variant text-on-surface px-2 py-1 rounded text-[11px]">{curr.mockup.matches.view}</button>
                       </div>
                       <div className="flex items-center justify-between text-[13px] bg-surface-container p-3 rounded-lg border border-outline-variant/30">
                         <div className="flex items-center gap-2">
@@ -522,7 +543,7 @@ const Landing = () => {
                         </div>
                         <span className="font-mono text-on-surface">9.8M ₺</span>
                         <span className="text-[#10B981] text-[12px] font-medium w-[90px]">✓ Bütçe uygun</span>
-                        <button className="border border-outline-variant text-on-surface px-2 py-1 rounded text-[11px]">Gör →</button>
+                        <button className="border border-outline-variant text-on-surface px-2 py-1 rounded text-[11px]">{curr.mockup.matches.view}</button>
                       </div>
                     </div>
                  </div>
@@ -537,86 +558,84 @@ const Landing = () => {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-primary/5 blur-[120px] rounded-full pointer-events-none"></div>
         
         <div className="text-center mb-16 relative z-10">
-          <h2 className="font-display-lg text-[36px] text-on-surface font-semibold mb-4">Size Uygun Planı Seçin</h2>
-          <p className="text-on-surface-variant max-w-2xl mx-auto font-body-lg">Hiçbir gizli ücret yok. İhtiyacınıza göre ölçeklendirin.</p>
+          <h2 className="font-display-lg text-[36px] text-on-surface font-semibold mb-4">{curr.pricing.title}</h2>
+          <p className="text-on-surface-variant max-w-2xl mx-auto font-body-lg">{curr.pricing.desc}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10 group/pricing">
           
           {/* Ücretsiz */}
           <div className="bg-surface-container-low/50 backdrop-blur-lg border border-outline-variant/50 rounded-2xl p-8 flex flex-col shadow-lg transition-all duration-300 ease-out hover:-translate-y-3 hover:scale-105 hover:shadow-2xl hover:border-primary/40 hover:z-20">
-            <h3 className="font-headline-md text-on-surface mb-2 transition-colors duration-300">Ücretsiz</h3>
-            <p className="text-on-surface-variant text-sm mb-6 h-10">Sistemi test etmek için ideal.</p>
+            <h3 className="font-headline-md text-on-surface mb-2 transition-colors duration-300">{curr.pricing.free.name}</h3>
+            <p className="text-on-surface-variant text-sm mb-6 h-10">{curr.pricing.free.desc}</p>
             <div className="flex items-baseline mb-8">
-              <span className="font-display-md font-bold text-on-surface">0 ₺</span>
-              <span className="font-body-sm text-on-surface-variant ml-1">/ay</span>
+              <span className="font-display-md font-bold text-on-surface">{curr.pricing.free.price}</span>
+              <span className="font-body-sm text-on-surface-variant ml-1">{curr.pricing.free.period}</span>
             </div>
             <ul className="font-body-sm text-on-surface-variant space-y-4 mb-8 flex-1">
-              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check</span> Ayda 5 Lead Analizi</li>
-              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check</span> Temel AI Skorlama</li>
-              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check</span> Manuel WhatsApp Taslakları</li>
+              {curr.pricing.free.features.map((feat, idx) => (
+                <li key={idx} className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check</span> {feat}</li>
+              ))}
             </ul>
             <Link to="/auth" className="w-full py-3 text-center font-label-md text-on-surface border border-outline hover:border-primary hover:text-primary hover:bg-surface-container rounded-xl transition-all">
-              Hemen Başla
+              {curr.pricing.free.btn}
             </Link>
           </div>
 
           {/* Pro */}
           <div className="bg-surface-container border border-primary rounded-2xl p-8 flex flex-col relative transform md:-translate-y-4 shadow-[0_0_40px_rgba(255,195,0,0.15)] ring-1 ring-primary/20 backdrop-blur-xl transition-all duration-300 ease-out hover:md:-translate-y-6 hover:-translate-y-2 hover:scale-105 hover:shadow-[0_0_50px_rgba(255,195,0,0.3)] hover:z-20">
             <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-primary text-on-primary font-label-sm uppercase font-bold tracking-widest px-4 py-1.5 rounded-full shadow-[0_0_15px_rgba(255,195,0,0.5)]">
-              En Popüler
+              {curr.pricing.pro.badge}
             </div>
-            <h3 className="font-headline-md text-primary mb-2 mt-2">Pro</h3>
-            <p className="text-on-surface-variant text-sm mb-6 h-10">Aktif danışmanlar için eksiksiz otopilot.</p>
+            <h3 className="font-headline-md text-primary mb-2 mt-2">{curr.pricing.pro.name}</h3>
+            <p className="text-on-surface-variant text-sm mb-6 h-10">{curr.pricing.pro.desc}</p>
             <div className="flex items-baseline mb-8">
-              <span className="font-display-md font-bold text-on-surface">299 ₺</span>
-              <span className="font-body-sm text-on-surface-variant ml-1">/ay</span>
+              <span className="font-display-md font-bold text-on-surface">{curr.pricing.pro.price}</span>
+              <span className="font-body-sm text-on-surface-variant ml-1">{curr.pricing.pro.period}</span>
             </div>
             <ul className="font-body-sm text-on-surface space-y-4 mb-8 flex-1">
-              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check_circle</span> <strong>Sınırsız</strong> Lead Analizi</li>
-              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check_circle</span> AI Sesli Not & Otomatik Kayıt</li>
-              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check_circle</span> Akıllı Hatırlatıcılar & Bildirimler</li>
-              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check_circle</span> Portföy Eşleştirme Motoru</li>
+              {curr.pricing.pro.features.map((feat, idx) => (
+                <li key={idx} className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check_circle</span> {feat}</li>
+              ))}
             </ul>
             <Link to="/auth" className="w-full py-3 text-center font-label-md bg-primary text-on-primary hover:bg-primary/90 hover:scale-[1.02] rounded-xl transition-all shadow-[0_0_20px_rgba(255,195,0,0.3)]">
-              Pro'ya Geç
+              {curr.pricing.pro.btn}
             </Link>
           </div>
 
           {/* Pro+ */}
           <div className="bg-surface-container-low/50 backdrop-blur-lg border border-outline-variant/50 rounded-2xl p-8 flex flex-col shadow-lg transition-all duration-300 ease-out hover:-translate-y-3 hover:scale-105 hover:shadow-2xl hover:border-primary/40 hover:z-20">
-            <h3 className="font-headline-md text-on-surface mb-2 transition-colors duration-300">Pro+</h3>
-            <p className="text-on-surface-variant text-sm mb-6 h-10">Yoğun ekipler ve ofis yöneticileri için.</p>
+            <h3 className="font-headline-md text-on-surface mb-2 transition-colors duration-300">{curr.pricing.proPlus.name}</h3>
+            <p className="text-on-surface-variant text-sm mb-6 h-10">{curr.pricing.proPlus.desc}</p>
             <div className="flex items-baseline mb-8">
-              <span className="font-display-md font-bold text-on-surface">599 ₺</span>
-              <span className="font-body-sm text-on-surface-variant ml-1">/ay</span>
+              <span className="font-display-md font-bold text-on-surface">{curr.pricing.proPlus.price}</span>
+              <span className="font-body-sm text-on-surface-variant ml-1">{curr.pricing.proPlus.period}</span>
             </div>
             <ul className="font-body-sm text-on-surface-variant space-y-4 mb-8 flex-1">
-              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check</span> Pro planındaki her şey</li>
-              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check</span> Gelişmiş İstatistik ve Raporlama</li>
-              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check</span> Müşteri Timeline Takibi</li>
-              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check</span> 7/24 Öncelikli Destek</li>
+              {curr.pricing.proPlus.features.map((feat, idx) => (
+                <li key={idx} className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">check</span> {feat}</li>
+              ))}
             </ul>
             <Link to="/auth" className="w-full py-3 text-center font-label-md text-on-surface border border-outline hover:border-primary hover:text-primary hover:bg-surface-container rounded-xl transition-all">
-              Pro+'ya Geç
+              {curr.pricing.proPlus.btn}
             </Link>
           </div>
 
           {/* Kurumsal */}
           <div className="bg-surface-container-low/50 backdrop-blur-lg border border-outline-variant/50 rounded-2xl p-8 flex flex-col shadow-lg transition-all duration-300 ease-out hover:-translate-y-3 hover:scale-105 hover:shadow-2xl hover:border-primary/40 hover:z-20">
-            <h3 className="font-headline-md text-on-surface mb-2 transition-colors duration-300">Kurumsal</h3>
-            <p className="text-on-surface-variant text-sm mb-6 h-10">Kendi sistemine entegre etmek isteyen brokerlar için.</p>
+            <h3 className="font-headline-md text-on-surface mb-2 transition-colors duration-300">{curr.pricing.enterprise.name}</h3>
+            <p className="text-on-surface-variant text-sm mb-6 h-10">{curr.pricing.enterprise.desc}</p>
             <div className="flex items-baseline mb-8">
-              <span className="font-display-md font-bold text-on-surface">Özel</span>
+              <span className="font-display-md font-bold text-on-surface">{curr.pricing.enterprise.price}</span>
             </div>
             <ul className="font-body-sm text-on-surface-variant space-y-4 mb-8 flex-1">
-              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">domain</span> Sınırsız Danışman Hesabı</li>
-              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">api</span> Özel API & CRM Entegrasyonu</li>
-              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">chat</span> WhatsApp Business API Bağlantısı</li>
-              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">smart_toy</span> Özel Eğitilmiş Yapay Zeka Modeliniz</li>
+              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">domain</span> {curr.pricing.enterprise.features[0]}</li>
+              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">api</span> {curr.pricing.enterprise.features[1]}</li>
+              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">chat</span> {curr.pricing.enterprise.features[2]}</li>
+              <li className="flex items-start gap-3"><span className="material-symbols-outlined text-[18px] text-primary shrink-0">smart_toy</span> {curr.pricing.enterprise.features[3]}</li>
             </ul>
-            <a href="https://wa.me/905555555555?text=Merhaba,%20Emlak%20Asistanı%20Kurumsal%20plan%20hakkında%20bilgi%20almak%20istiyorum." target="_blank" rel="noopener noreferrer" className="w-full py-3 text-center font-label-md text-on-surface border border-outline hover:border-primary hover:text-primary hover:bg-surface-container rounded-xl transition-all">
-              Satışla İletişime Geç
+            <a href="https://wa.me/905555555555?text=Merhaba" target="_blank" rel="noopener noreferrer" className="w-full py-3 text-center font-label-md text-on-surface border border-outline hover:border-primary hover:text-primary hover:bg-surface-container rounded-xl transition-all">
+              {curr.pricing.enterprise.btn}
             </a>
           </div>
 
@@ -649,10 +668,10 @@ const Landing = () => {
         <div className="max-w-[1200px] mx-auto">
           <div className="text-center mb-16">
             <h2 className="font-display-md text-[36px] lg:text-[42px] font-semibold text-on-surface mb-4">
-              Akıllı Satış Koçundan İpuçları
+              {curr.blog.title}
             </h2>
             <p className="font-body-lg text-on-surface-variant max-w-[600px] mx-auto">
-              Emlak sektöründe zaman yönetimi, komisyon artırma ve yeni nesil dijital satış taktiklerini keşfedin.
+              {curr.blog.desc}
             </p>
           </div>
 
@@ -663,7 +682,7 @@ const Landing = () => {
                   <span className="text-[11px] font-bold text-primary uppercase tracking-wider bg-primary/10 px-2.5 py-1 rounded-full">
                     {post.category}
                   </span>
-                  <span className="text-[13px] text-on-surface-variant">{post.readTime} okuma</span>
+                  <span className="text-on-surface-variant">{post.readTime} {curr.blog.minRead}</span>
                 </div>
                 <h3 className="font-headline-md text-on-surface text-xl mb-3 leading-snug">
                   {post.title}
@@ -671,9 +690,8 @@ const Landing = () => {
                 <p className="font-body-sm text-on-surface-variant mb-6 flex-1 line-clamp-4">
                   {post.excerpt}
                 </p>
-                <Link to={`/blog/${post.slug}`} className="text-primary font-medium text-sm flex items-center group/link mt-auto">
-                  Devamını Oku 
-                  <span className="material-symbols-outlined ml-1 text-[18px] group-hover/link:translate-x-1 transition-transform">arrow_forward</span>
+                <Link to={`/blog/${post.slug}`} className="text-primary font-label-md flex items-center gap-1 hover:gap-2 transition-all">
+                  {curr.blog.read} <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                 </Link>
               </div>
             ))}
@@ -687,18 +705,18 @@ const Landing = () => {
           <div className="max-w-2xl w-full">
             <Logo className="mb-8" />
             <p className="font-body-sm text-on-surface-variant leading-relaxed mb-4 border-t border-outline-variant pt-8">
-              Kullanıcı verilerinizin güvenliği Kapora için birinci önceliktir. Aydınlatma Metni ve Gizlilik Politikası'nı aşağıdan inceleyebilirsiniz.
+              {curr.footer.desc}
             </p>
             <div className="flex items-center space-x-4 font-body-sm">
-              <a href="/aydinlatma-metni" className="text-primary hover:text-primary/80 transition-colors font-medium">Aydınlatma Metni</a>
+              <a href="/aydinlatma-metni" className="text-primary hover:text-primary/80 transition-colors font-medium">{curr.footer.clarification}</a>
               <span className="text-outline-variant">•</span>
-              <a href="/gizlilik-politikasi" className="text-primary hover:text-primary/80 transition-colors font-medium">Gizlilik Politikası</a>
+              <a href="/gizlilik-politikasi" className="text-primary hover:text-primary/80 transition-colors font-medium">{curr.footer.privacy}</a>
             </div>
           </div>
           
           <div className="font-body-sm text-on-surface-variant text-left md:text-right">
             <p>© {new Date().getFullYear()} Kapora.</p>
-            <p className="mt-1">Tüm Hakları Saklıdır.</p>
+            <p className="mt-1">{curr.footer.rights}</p>
           </div>
         </div>
       </footer>
