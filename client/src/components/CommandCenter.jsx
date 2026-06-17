@@ -148,6 +148,18 @@ const CommandCenter = ({ leads, onLeadSelect }) => {
 
   const actionMap = generateMockActions();
 
+  let totalCommission = 0;
+  Object.values(actionMap).forEach(actionList => {
+    actionList.forEach(action => {
+      if (action.expected_commission) {
+        const val = parseInt(action.expected_commission.replace(/\./g, ''), 10);
+        if (!isNaN(val)) totalCommission += val;
+      }
+    });
+  });
+
+  const formattedCommission = totalCommission === 0 ? '0' : totalCommission.toLocaleString('tr-TR');
+
   return (
     <div className="w-full h-full flex flex-col gap-6">
       <div className="flex items-center justify-between shrink-0">
@@ -157,7 +169,7 @@ const CommandCenter = ({ leads, onLeadSelect }) => {
         </div>
         <div className="bg-[#10B981]/10 border border-[#10B981]/30 px-4 py-2 rounded-lg flex items-center gap-3">
            <span className="text-[11px] font-bold text-[#10B981] uppercase tracking-wider">Masadaki Toplam Komisyon</span>
-           <span className="font-mono text-xl font-bold text-[#10B981]">₺575.000</span>
+           <span className="font-mono text-xl font-bold text-[#10B981]">₺{formattedCommission}</span>
         </div>
       </div>
 
