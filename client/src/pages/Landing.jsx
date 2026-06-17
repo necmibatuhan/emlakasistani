@@ -133,7 +133,7 @@ const Landing = () => {
           </h1>
 
           <p className="font-body-lg text-on-surface-variant mt-4 mb-10 max-w-[480px] leading-relaxed">
-            Veri girişiyle uğraşmayın. Kapora size bugün kimi arayacağınızı ve hangi portföyden ne kadar komisyon kazanacağınızı söyleyen ilk yapay zeka satış müdürüdür.
+            Manuel veri girişiyle vakit kaybetmeyin. Kapora, gün içinde aldığınız sesli notları analiz ederek ajandanızı düzenleyen, potansiyel alıcıları portföyünüzle eşleştiren ve bugün odaklanmanız gereken en sıcak fırsatları listeleyen akıllı satış asistanınızdır.
           </p>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8 w-full sm:w-auto">
