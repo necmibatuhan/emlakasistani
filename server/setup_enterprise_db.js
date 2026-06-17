@@ -30,6 +30,8 @@ DROP TABLE IF EXISTS whatsapp_messages CASCADE;
 DROP TABLE IF EXISTS crm_integrations CASCADE;
 DROP TABLE IF EXISTS lead_property_matches CASCADE;
 DROP TABLE IF EXISTS properties CASCADE;
+DROP TABLE IF EXISTS lead_events CASCADE;
+DROP TABLE IF EXISTS lead_notes CASCADE;
 DROP TABLE IF EXISTS notes CASCADE;
 DROP TABLE IF EXISTS leads CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
@@ -78,10 +80,18 @@ CREATE TABLE leads (
   properties JSONB
 );
 
-CREATE TABLE notes (
+CREATE TABLE lead_notes (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   lead_id UUID REFERENCES leads(id) ON DELETE CASCADE,
   content TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE lead_events (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  lead_id UUID REFERENCES leads(id) ON DELETE CASCADE,
+  event_type TEXT NOT NULL,
+  description TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

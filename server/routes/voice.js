@@ -222,8 +222,13 @@ Danışmanın sesli notu:
     values.push(mappedLabel);
 
     if (analysis.yeni_durum) {
-      setClause.push(`status = $${idx++}`);
-      values.push(analysis.yeni_durum);
+      const allowedStatuses = ['Takipte','Arandı','Randevu Alındı','Teklif Verildi','Sözleşme Aşamasında','Satış Tamamlandı','İptal'];
+      if (allowedStatuses.includes(analysis.yeni_durum)) {
+        setClause.push(`status = $${idx++}`);
+        values.push(analysis.yeni_durum);
+      } else {
+        console.warn('Geçersiz AI durumu, atlandı:', analysis.yeni_durum);
+      }
     }
     if (analysis.whatsapp_message) {
       setClause.push(`whatsapp_draft = $${idx++}`);
@@ -343,8 +348,22 @@ ${transcript}
       try {
         const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash', generationConfig: { responseMimeType: "application/json" } });
         const aiResult = await model.generateContent(prompt);
-        parsedResult = JSON.parse(aiResult.response.text());
+        let respText = aiResult.response.text().trim();
+        if (respText.startsWith('```json')) {
+          respText = respText.substring(7, respText.length - 3).trim();
+        } else if (respText.startsWith('```')) {
+          respText = respText.substring(3, respText.length - 3).trim();
+        }
+        
+        try {
+          parsedResult = JSON.parse(respText);
+        } catch (parseErr) {
+          console.error('Failed to parse new lead AI JSON', respText);
+          parsedResult = getMockNewLead();
+          parsedResult.gerekceler.aciklama = "Sistem Notu: Yapay zeka yapılandırılmış veri dönemedi, bu nedenle geçici mock verisi oluşturuldu. Ham analiz: " + respText.substring(0, 200);
+        }
       } catch (err) {
+        console.error('Gemini create-lead AI Error', err);
         parsedResult = getMockNewLead();
       }
     }
@@ -360,7 +379,19 @@ ${transcript}
       };
     }
 
-    const { maskedText, tokenMap } = maskPII(transcript, parsedResult.isim);
+    const pipeline = new PrivacyPipeline();
+    const customReplacements = [];
+    if (parsedResult.isim) customReplacements.push({ originalValue: parsedResult.isim.trim(), type: 'CLIENT_NAME' });
+    if (parsedResult.telefon) customReplacements.push({ originalValue: parsedResult.telefon.trim(), type: 'PHONE' });
+    
+    // Note: Since we didn't mask before sending to AI for create-lead because we needed the AI to extract name/phone,
+    // we don't strictly need to unmask the result here. The AI already has the raw data.
+    // However, to keep it consistent, we could run the pipeline. But the AI extracted it from raw text.
+    // The previous implementation used maskPII but it was undefined.
+    // I will simply store the AI's result. No need to unmask since we didn't mask it.
+    
+    const unmaskedAciklama = parsedResult.gerekceler?.aciklama || '';
+    const unmaskedTaslak = parsedResult.yanit_taslak || '';
     
     // Veritabanına Ekle
     const leadInsert = await db.query(
@@ -368,8 +399,8 @@ ${transcript}
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`,
       [
         req.user.company_id, req.user.office_id, req.user.id, 'voice', parsedResult.isim, parsedResult.telefon, transcript, 
-        parsedResult.skor, parsedResult.etiket, unmaskPII(parsedResult.gerekceler.aciklama, tokenMap), 
-        parsedResult.onerilen_aksiyon, unmaskPII(parsedResult.yanit_taslak, tokenMap), JSON.stringify(parsedResult.mulk_tercihleri)
+        parsedResult.skor, parsedResult.etiket, unmaskedAciklama, 
+        parsedResult.onerilen_aksiyon, unmaskedTaslak, JSON.stringify(parsedResult.mulk_tercihleri)
       ]
     );
 
@@ -377,7 +408,7 @@ ${transcript}
 
     // Sesli Notu da lead_notes'a ekle
     await db.query(
-      'INSERT INTO notes (lead_id, content) VALUES ($1, $2)',
+      'INSERT INTO lead_notes (lead_id, content) VALUES ($1, $2)',
       [newLead.id, `Sistem (Sesli Kayıt): ${transcript}`]
     );
 
