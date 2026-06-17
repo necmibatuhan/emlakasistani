@@ -96,12 +96,12 @@ export default function ActionCenter({ leads = [], onActionClick }) {
           >
             <span>{tab.icon} {tab.title}</span>
             {tab.count > 0 && (
-              <span className="bg-[#EF4444] text-white text-[10px] px-1.5 py-0.5 rounded font-bold leading-none">
+              <span className="bg-error text-white text-[10px] px-1.5 py-0.5 rounded font-bold leading-none">
                 {tab.count}
               </span>
             )}
             {activeTab === tab.id && (
-              <motion.div layoutId="activeTabIndicator" className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#F5A623]" />
+              <motion.div layoutId="activeTabIndicator" className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary" />
             )}
           </button>
         ))}
@@ -119,15 +119,15 @@ export default function ActionCenter({ leads = [], onActionClick }) {
             className="flex flex-col gap-4"
           >
             {currentLeads.length === 0 ? (
-              <div className="text-center py-10 text-[#7C8090] text-[13px]">
+              <div className="text-center py-10 text-on-surface-variant text-[13px]">
                 Bu kategoride lead bulunmuyor.
               </div>
             ) : (
               currentLeads.map(lead => {
                 const daysAgo = getDaysAgo(lead.updated_at);
-                let daysColor = '#7C8090';
-                if (daysAgo >= 14) daysColor = '#EF4444';
-                else if (daysAgo >= 7) daysColor = '#F5A623';
+                let daysColor = 'var(--color-on-surface-variant)';
+                if (daysAgo >= 14) daysColor = 'var(--color-error)';
+                else if (daysAgo >= 7) daysColor = 'var(--color-primary)';
 
                 const budget = getBudgetVal(lead);
                 const commission = budget * 0.02;
@@ -135,9 +135,9 @@ export default function ActionCenter({ leads = [], onActionClick }) {
                 // Mock Risk Calculation
                 let riskPercent = Math.min(99, daysAgo * 5);
                 if (lead.score < 5) riskPercent += 20;
-                let riskColor = '#10B981';
-                if (riskPercent >= 80) riskColor = '#EF4444';
-                else if (riskPercent >= 60) riskColor = '#F5A623';
+                let riskColor = 'var(--color-success)';
+                if (riskPercent >= 80) riskColor = 'var(--color-error)';
+                else if (riskPercent >= 60) riskColor = 'var(--color-primary)';
 
                 // Parse AI properties
                 let insight = '';

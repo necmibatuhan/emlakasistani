@@ -61,7 +61,7 @@ const Sidebar = () => {
                   </span>
                   <span>{item.label}</span>
                   {item.badge && (
-                    <span className="ml-auto text-[11px] bg-[#2A2D35] text-[#7C8090] px-1.5 py-0.5 rounded font-medium">
+                    <span className="ml-auto text-[11px] bg-surface-container-high text-on-surface-variant px-1.5 py-0.5 rounded font-medium">
                       {item.badge}
                     </span>
                   )}
@@ -76,8 +76,8 @@ const Sidebar = () => {
       <ul className="mt-auto border-t border-outline-variant pt-stack-sm flex flex-col gap-unit">
         
         {/* Plan Info (Minimal) */}
-        <li className="mt-2 pt-3 border-t border-[#2A2D35] px-2">
-          <div className="flex items-center gap-2 text-[11px] text-[#7C8090]">
+        <li className="mt-2 pt-3 border-t border-outline px-2">
+          <div className="flex items-center gap-2 text-[11px] text-on-surface-variant">
             <span className="material-symbols-outlined text-[14px]">hexagon</span>
             <span className="uppercase tracking-wider font-semibold">{user?.plan === 'free' ? 'ÜCRETSİZ' : user?.plan || 'FREE'}</span>
           </div>
@@ -85,7 +85,7 @@ const Sidebar = () => {
             <NavLink
               to="/plans"
               onClick={() => closeSidebar()}
-              className="block ml-6 mt-0.5 text-[11px] text-[#7C8090] hover:text-[#F1F2F4] transition-colors"
+              className="block ml-6 mt-0.5 text-[11px] text-on-surface-variant hover:text-on-surface transition-colors"
             >
               Yenile
             </NavLink>

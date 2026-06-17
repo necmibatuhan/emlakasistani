@@ -1,36 +1,36 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #000814; /* Deep Navy Black */
-  --color-surface: #000814;
-  --color-surface-dim: #000814;
-  --color-surface-bright: #001D3D;
-  --color-surface-container-lowest: #000814;
-  --color-surface-container-low: #001021;
-  --color-surface-container: #001D3D; /* Deep Blue */
-  --color-surface-container-high: #002952;
-  --color-surface-container-highest: #003566; /* Royal Navy */
+  --color-background: #0F172A; /* Deep Navy */
+  --color-surface: #1E293B; /* Cards & Sidebar */
+  --color-surface-dim: #0F172A;
+  --color-surface-bright: #1E293B;
+  --color-surface-container-lowest: #0F172A;
+  --color-surface-container-low: #0F172A;
+  --color-surface-container: #1E293B; 
+  --color-surface-container-high: #334155;
+  --color-surface-container-highest: #475569;
   
-  --color-on-surface: #FDFEFE;
-  --color-on-surface-variant: #A2C2DF; /* Ice Blue / Gray */
-  --color-on-background: #FDFEFE;
+  --color-on-surface: #F8FAFC;
+  --color-on-surface-variant: #94A3B8; /* Helper Gray */
+  --color-on-background: #F8FAFC;
   
-  --color-outline: #003566;
-  --color-outline-variant: #001D3D;
+  --color-outline: #334155;
+  --color-outline-variant: #475569;
   
-  --color-primary: #FFC300; /* Vibrant Gold */
-  --color-on-primary: #000000;
-  --color-primary-container: #FFD60A; /* Lighter Gold */
-  --color-on-primary-container: #000814;
-  --color-primary-fixed: #FFD60A;
+  --color-primary: #D9A74A; /* Mustard Gold */
+  --color-on-primary: #0F172A;
+  --color-primary-container: #EAB308;
+  --color-on-primary-container: #0F172A;
+  --color-primary-fixed: #EAB308;
   --color-on-primary-fixed: #000000;
   
-  --color-secondary: #a1a1aa;
-  --color-on-secondary: #18181b;
-  --color-secondary-container: #27272a;
-  --color-on-secondary-container: #fafafa;
+  --color-secondary: #94A3B8;
+  --color-on-secondary: #0F172A;
+  --color-secondary-container: #334155;
+  --color-on-secondary-container: #F8FAFC;
   
-  --color-error: #ef4444; /* red-500 */
+  --color-error: #EF4444; 
   --color-on-error: #ffffff;
   --color-error-container: #7f1d1d;
   --color-on-error-container: #fecaca;
@@ -57,9 +57,9 @@
   --font-mono: 'JetBrains Mono', monospace;
 
   /* Status Colors */
-  --color-status-hot: #f43f5e; /* rose-500 */
-  --color-status-warm: #f59e0b; /* amber-500 */
-  --color-status-cold: #3b82f6; /* blue-500 */
+  --color-status-hot: #EF4444; 
+  --color-status-warm: #F59E0B; 
+  --color-status-cold: #3B82F6; 
   --color-success: #10B981;
   --color-whatsapp: #25D366;
 }
