@@ -152,7 +152,7 @@ const CommandCenter = ({ leads, onLeadSelect }) => {
     <div className="w-full h-full flex flex-col gap-6">
       <div className="flex items-center justify-between shrink-0">
         <div>
-           <h2 className="text-2xl font-display-md text-on-surface tracking-tight">AI Savaş Odası</h2>
+           <h2 className="text-2xl font-display-md text-on-surface tracking-tight">Satış Aksiyon Merkezi</h2>
            <p className="text-sm text-on-surface-variant mt-1">Bugün odaklanmanız gereken komisyon üretecek aksiyonlar.</p>
         </div>
         <div className="bg-[#10B981]/10 border border-[#10B981]/30 px-4 py-2 rounded-lg flex items-center gap-3">

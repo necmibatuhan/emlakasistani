@@ -236,9 +236,14 @@ const AgentDashboard = () => {
 
         <div className="flex-1 flex flex-col p-6 gap-6 overflow-hidden">
           
-          {/* COMMAND CENTER / SAVAŞ ODASI */}
-          <div className="flex-1 overflow-hidden min-h-[400px]">
-             <CommandCenter leads={leads} onLeadSelect={(leadId) => setSelectedLeadId(leadId)} />
+          {/* COMMAND CENTER & AGENDA */}
+          <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 shrink-0 h-auto xl:h-[400px]">
+            <div className="xl:col-span-3 h-[400px] xl:h-full overflow-hidden">
+               <CommandCenter leads={leads} onLeadSelect={(leadId) => setSelectedLeadId(leadId)} />
+            </div>
+            <div className="xl:col-span-1 bg-surface-container/50 border border-outline/50 rounded-2xl p-4 h-[400px] xl:h-full overflow-hidden">
+               <AgendaView leads={leads} />
+            </div>
           </div>
         </div>
       </div>
