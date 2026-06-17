@@ -137,7 +137,17 @@ function AnimatedLeadCard({ lead }) {
  */
 export default function AnimatedLeadList({ leads = [] }) {
   if (!leads || leads.length === 0) {
-    return <p className="text-zinc-500 text-sm">Gösterilecek lead bulunamadı.</p>;
+    return (
+      <div className="flex flex-col items-center justify-center h-64 bg-surface-container/30 border border-outline/30 rounded-2xl p-8 text-center mt-2">
+        <div className="w-16 h-16 bg-surface-container-high rounded-full flex items-center justify-center mb-4 text-on-surface-variant border border-outline">
+          <User className="w-8 h-8 opacity-50" />
+        </div>
+        <h4 className="text-on-surface font-headline-sm mb-2">Henüz Müşteri Yok</h4>
+        <p className="text-on-surface-variant font-body-sm max-w-sm">
+          Sağ üst köşedeki <span className="text-primary font-bold">Yeni</span> butonuna tıklayarak sesli not bırakın ve yapay zekanın ilk müşterinizi analiz etmesine izin verin.
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -145,7 +155,7 @@ export default function AnimatedLeadList({ leads = [] }) {
       variants={containerVariants}
       initial="hidden"
       animate="show"
-      className="flex flex-col gap-3 w-full max-w-2xl mx-auto"
+      className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 w-full"
     >
       {leads.map((lead) => (
         <AnimatedLeadCard key={lead.id} lead={lead} />
