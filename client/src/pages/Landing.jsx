@@ -125,7 +125,7 @@ const Landing = () => {
           </h1>
 
           <p className="font-body-lg text-on-surface-variant mt-4 mb-10 max-w-[480px] leading-relaxed">
-            Emlak danışmanı müşteri takip programı (CRM). Sesli asistan ve dijital sekreter ile hiçbir fırsatı kaçırmayın.
+            Veri girişiyle uğraşmayın. Kapora size bugün kimi arayacağınızı ve hangi portföyden ne kadar komisyon kazanacağınızı söyleyen ilk yapay zeka satış müdürüdür.
           </p>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8 w-full sm:w-auto">
