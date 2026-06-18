@@ -19,6 +19,7 @@ import MorningSummary from '../components/MorningSummary';
 import CommandCenter from '../components/CommandCenter';
 import AnimatedLeadList from '../components/AnimatedLeadList';
 import PricingModal from '../components/PricingModal';
+import { EmptyState } from '../components/EmptyState';
 
 const AgentDashboard = () => {
   const { token, user } = useContext(AuthContext);
@@ -249,8 +250,16 @@ const AgentDashboard = () => {
 
           {/* RECENT LEADS (ANIMATED LIST) */}
           <div className="flex-1 flex flex-col gap-4 mt-2">
-            <h3 className="font-display-sm text-lg text-on-surface">Son Eklenen Müşteriler</h3>
-            <AnimatedLeadList leads={leads} />
+            <h3 className="font-display-sm text-lg text-on-surface">Günün Öncelikleri</h3>
+            {leads.length < 3 ? (
+              <EmptyState 
+                icon="Target"
+                title="Öncelikli müşteri hesaplanıyor"
+                description="En az 3 müşteri eklediğinizde AI günlük önceliklerinizi gösterir."
+              />
+            ) : (
+              <AnimatedLeadList leads={leads} />
+            )}
           </div>
         </div>
       </div>

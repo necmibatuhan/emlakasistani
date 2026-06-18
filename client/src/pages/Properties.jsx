@@ -6,6 +6,7 @@ import { Home, Plus, MapPin, Tag, Check, Search, Building } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
+import { EmptyState } from '../components/EmptyState';
 
 const fetchProperties = async (token) => {
   const { data } = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/properties`, {
@@ -69,11 +70,13 @@ const Properties = () => {
               {[1,2,3].map(i => <div key={i} className="h-64 bg-[#16181D] rounded-xl border border-[#2A2D35] animate-pulse" />)}
             </div>
           ) : properties.length === 0 ? (
-            <div className="bg-[#16181D] rounded-[10px] border border-[#2A2D35] p-16 flex flex-col items-center justify-center text-[#7C8090]">
-              <Building size={48} className="mb-4 opacity-50 text-[#7C8090]" />
-              <p className="font-medium text-[14px] text-[#7C8090]">Henüz portföye mülk eklenmemiş.</p>
-              <button onClick={() => setShowModal(true)} className="mt-4 text-[#F5A623] text-[13px] font-medium hover:underline">İlk mülkü ekle</button>
-            </div>
+            <EmptyState 
+              icon="Home"
+              title="Portföyünüz boş"
+              description="İlan ekleyerek müşteri eşleştirmesini aktif edin."
+              ctaText="Portföy Ekle"
+              ctaAction={() => setShowModal(true)}
+            />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {properties.map(prop => (
