@@ -28,6 +28,11 @@ const Leads = () => {
   const [newLeadName, setNewLeadName] = useState('');
   const [newLeadPhone, setNewLeadPhone] = useState('');
   const [newLeadMessage, setNewLeadMessage] = useState('');
+  const [activeFormTab, setActiveFormTab] = useState('quick');
+  const [newLeadSource, setNewLeadSource] = useState('Sahibinden');
+  const [newLeadBudgetMin, setNewLeadBudgetMin] = useState('');
+  const [newLeadBudgetMax, setNewLeadBudgetMax] = useState('');
+  const [newLeadLocations, setNewLeadLocations] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analyzeError, setAnalyzeError] = useState('');
 
@@ -142,27 +147,39 @@ const Leads = () => {
     }
   };
 
-  const handleAddLead = async () => {
-    if (!newLeadName || !newLeadPhone) {
-      setAnalyzeError('Lütfen ad ve telefon alanlarını doldurun.');
-      return;
-    }
-    
+  const handleAddLead = async (e) => {
+    if (e) e.preventDefault();
     setIsAnalyzing(true);
     setAnalyzeError('');
-    
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/analyze`, {
+      const payload = {
         name: newLeadName,
         phone: newLeadPhone,
-        message: newLeadMessage
-      }, { headers: { Authorization: `Bearer ${token}` } });
+        message: newLeadMessage,
+      };
       
-      await queryClient.invalidateQueries(['leads']);
-      setNewLeadName(''); setNewLeadPhone(''); setNewLeadMessage('');
+      if (activeFormTab === 'detailed') {
+        payload.source = newLeadSource;
+        payload.budgetMin = newLeadBudgetMin;
+        payload.budgetMax = newLeadBudgetMax;
+        payload.locations = newLeadLocations;
+      }
+
+      await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/analyze`, payload, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       setIsNewLeadModalOpen(false);
+      setNewLeadName('');
+      setNewLeadPhone('');
+      setNewLeadMessage('');
+      setNewLeadSource('Sahibinden');
+      setNewLeadBudgetMin('');
+      setNewLeadBudgetMax('');
+      setNewLeadLocations('');
+      setActiveFormTab('quick');
+      queryClient.invalidateQueries({ queryKey: ['leads'] });
     } catch (err) {
-      setAnalyzeError(err.response?.data?.error || err.response?.data?.message || 'Lead analiz edilirken hata oluştu.');
+      setAnalyzeError(err.response?.data?.message || 'Bir hata oluştu');
     } finally {
       setIsAnalyzing(false);
     }
@@ -555,6 +572,22 @@ const Leads = () => {
             
             <div className="p-6 space-y-4">
               {analyzeError && <div className="p-4 bg-[#EF4444]/10 border border-[#EF4444]/30 text-[#EF4444] rounded-[6px] text-[13px]">{analyzeError}</div>}
+              
+              <div className="flex bg-[#0A0B0D] p-1 rounded-lg border border-[#2A2D35] mb-4">
+                <button
+                  onClick={() => setActiveFormTab('quick')}
+                  className={`flex-1 py-1.5 text-[13px] font-medium rounded-md transition-colors ${activeFormTab === 'quick' ? 'bg-[#1E2028] text-[#F1F2F4]' : 'text-[#7C8090] hover:text-[#F1F2F4]'}`}
+                >
+                  Hızlı Ekle
+                </button>
+                <button
+                  onClick={() => setActiveFormTab('detailed')}
+                  className={`flex-1 py-1.5 text-[13px] font-medium rounded-md transition-colors ${activeFormTab === 'detailed' ? 'bg-[#1E2028] text-[#F1F2F4]' : 'text-[#7C8090] hover:text-[#F1F2F4]'}`}
+                >
+                  Detaylı Form
+                </button>
+              </div>
+
               <div>
                 <label className="block text-[13px] text-[#7C8090] mb-1.5">Müşteri Adı <span className="text-[#EF4444]">*</span></label>
                 <input type="text" value={newLeadName} onChange={e => setNewLeadName(e.target.value)} className="w-full bg-[#0A0B0D] border border-[#2A2D35] rounded-[6px] px-4 py-2.5 text-[14px] text-[#F1F2F4] focus:outline-none focus:border-[#F5A623]" />
@@ -563,9 +596,41 @@ const Leads = () => {
                 <label className="block text-[13px] text-[#7C8090] mb-1.5">Telefon <span className="text-[#EF4444]">*</span></label>
                 <input type="tel" value={newLeadPhone} onChange={e => setNewLeadPhone(e.target.value)} className="w-full bg-[#0A0B0D] border border-[#2A2D35] rounded-[6px] px-4 py-2.5 text-[14px] text-[#F1F2F4] focus:outline-none focus:border-[#F5A623]" />
               </div>
+              
+              {activeFormTab === 'detailed' && (
+                <>
+                  <div>
+                    <label className="block text-[13px] text-[#7C8090] mb-1.5">Kaynak</label>
+                    <select value={newLeadSource} onChange={e => setNewLeadSource(e.target.value)} className="w-full bg-[#0A0B0D] border border-[#2A2D35] rounded-[6px] px-4 py-2.5 text-[14px] text-[#F1F2F4] focus:outline-none focus:border-[#F5A623]">
+                      <option>Sahibinden</option>
+                      <option>HepsiEmlak</option>
+                      <option>EmlakJet</option>
+                      <option>Instagram</option>
+                      <option>Referans</option>
+                      <option>Branda</option>
+                      <option>Diğer</option>
+                    </select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[13px] text-[#7C8090] mb-1.5">Min Bütçe (₺)</label>
+                      <input type="number" value={newLeadBudgetMin} onChange={e => setNewLeadBudgetMin(e.target.value)} className="w-full bg-[#0A0B0D] border border-[#2A2D35] rounded-[6px] px-4 py-2.5 text-[14px] text-[#F1F2F4] focus:outline-none focus:border-[#F5A623]" />
+                    </div>
+                    <div>
+                      <label className="block text-[13px] text-[#7C8090] mb-1.5">Max Bütçe (₺)</label>
+                      <input type="number" value={newLeadBudgetMax} onChange={e => setNewLeadBudgetMax(e.target.value)} className="w-full bg-[#0A0B0D] border border-[#2A2D35] rounded-[6px] px-4 py-2.5 text-[14px] text-[#F1F2F4] focus:outline-none focus:border-[#F5A623]" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[13px] text-[#7C8090] mb-1.5">İlgilendiği Bölgeler (Virgülle ayırın)</label>
+                    <input type="text" placeholder="Örn: Kadıköy, Üsküdar" value={newLeadLocations} onChange={e => setNewLeadLocations(e.target.value)} className="w-full bg-[#0A0B0D] border border-[#2A2D35] rounded-[6px] px-4 py-2.5 text-[14px] text-[#F1F2F4] focus:outline-none focus:border-[#F5A623]" />
+                  </div>
+                </>
+              )}
+
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-[13px] text-[#7C8090]">Mesaj (Müşteri Talebi)</label>
+                  <label className="block text-[13px] text-[#7C8090]">Mesaj / Notlar</label>
                   {isRecording ? (
                     <button onClick={handleStopVoice} className="flex items-center gap-1.5 text-xs text-[#EF4444] bg-[#EF4444]/10 px-2 py-1 rounded">
                       <span className="material-symbols-outlined text-[14px]">stop_circle</span> 
@@ -580,7 +645,7 @@ const Leads = () => {
                 </div>
                 <textarea 
                   rows={5}
-                  placeholder="Örn: Kadıköy'de 3+1 arıyorum, bütçem 5M TL..."
+                  placeholder={activeFormTab === 'detailed' ? "Müşteriyle ilgili detaylı notlar ekleyin..." : "Örn: Kadıköy'de 3+1 arıyorum, bütçem 5M TL..."}
                   value={newLeadMessage}
                   onChange={(e) => setNewLeadMessage(e.target.value)}
                   className="w-full bg-[#0A0B0D] border border-[#2A2D35] rounded-[6px] px-4 py-2.5 text-[14px] text-[#F1F2F4] placeholder-[#7C8090] focus:outline-none focus:border-[#F5A623] resize-none"
@@ -595,8 +660,8 @@ const Leads = () => {
               >
                 İptal
               </button>
-              <button onClick={handleAddLead} disabled={isAnalyzing} className="bg-[#F5A623] text-[#0A0B0D] text-[14px] font-medium rounded-[6px] px-8 py-2.5 hover:bg-[#d9921e] transition-colors disabled:opacity-50">
-                {isAnalyzing ? 'Analiz Ediliyor...' : 'Analiz Et'}
+              <button onClick={handleAddLead} disabled={isAnalyzing} className="bg-[#F5A623] text-[#0A0B0D] text-[14px] font-medium rounded-[6px] px-8 py-2.5 hover:bg-[#d9921e] transition-colors disabled:opacity-50 flex items-center gap-2">
+                {isAnalyzing ? 'İşleniyor...' : (activeFormTab === 'quick' ? 'Ekle ve AI\'a Gönder' : 'Detaylı Ekle')}
               </button>
             </div>
           </div>

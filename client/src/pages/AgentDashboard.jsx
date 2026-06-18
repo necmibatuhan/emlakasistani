@@ -33,6 +33,11 @@ const AgentDashboard = () => {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [message, setMessage] = useState('');
+  const [activeFormTab, setActiveFormTab] = useState('quick');
+  const [source, setSource] = useState('Sahibinden');
+  const [budgetMin, setBudgetMin] = useState('');
+  const [budgetMax, setBudgetMax] = useState('');
+  const [locations, setLocations] = useState('');
   const [analyzing, setAnalyzing] = useState(false);
   const [analyzeError, setAnalyzeError] = useState('');
 
@@ -96,6 +101,11 @@ const AgentDashboard = () => {
     setName('');
     setPhone('');
     setMessage('');
+    setSource('Sahibinden');
+    setBudgetMin('');
+    setBudgetMax('');
+    setLocations('');
+    setActiveFormTab('quick');
     setIsNewLeadDrawerOpen(true);
   };
 
@@ -112,20 +122,26 @@ const AgentDashboard = () => {
     setAnalyzing(true);
     setAnalyzeError('');
     try {
+      const payload = { name, phone, message };
+      if (activeFormTab === 'detailed') {
+        payload.source = source;
+        payload.budgetMin = budgetMin;
+        payload.budgetMax = budgetMax;
+        payload.locations = locations;
+      }
+      
       let res;
       if (selectedLeadId) {
         // Düzenleme (Update)
-        res = await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/${selectedLeadId}/analyze`, {
-          name, phone, message
-        }, { headers: { Authorization: `Bearer ${token}` } });
+        res = await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/${selectedLeadId}/analyze`, payload, { headers: { Authorization: `Bearer ${token}` } });
       } else {
         // Yeni Lead Ekleme
-        res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/analyze`, {
-          name, phone, message
-        }, { headers: { Authorization: `Bearer ${token}` } });
+        res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/analyze`, payload, { headers: { Authorization: `Bearer ${token}` } });
       }
       
       setName(''); setPhone(''); setMessage('');
+      setSource('Sahibinden'); setBudgetMin(''); setBudgetMax(''); setLocations('');
+      setActiveFormTab('quick');
       await queryClient.invalidateQueries(['leads']);
       setSelectedLeadId(res.data.id);
       setIsNewLeadDrawerOpen(false);
@@ -439,6 +455,22 @@ const AgentDashboard = () => {
             </div>
             <div className="p-6 flex-1 overflow-y-auto flex flex-col gap-6">
               {analyzeError && <div className="p-4 bg-[#EF4444]/10 border border-[#EF4444]/30 text-[#EF4444] rounded-lg text-sm">{analyzeError}</div>}
+              
+              <div className="flex bg-[#1C1E24] p-1 rounded-lg border border-[#2A2D35]">
+                <button
+                  onClick={() => setActiveFormTab('quick')}
+                  className={`flex-1 py-1.5 text-[13px] font-bold rounded-md transition-colors ${activeFormTab === 'quick' ? 'bg-[#2A2D35] text-[#F1F2F4]' : 'text-[#8E929C] hover:text-[#F1F2F4]'}`}
+                >
+                  Hızlı Ekle
+                </button>
+                <button
+                  onClick={() => setActiveFormTab('detailed')}
+                  className={`flex-1 py-1.5 text-[13px] font-bold rounded-md transition-colors ${activeFormTab === 'detailed' ? 'bg-[#2A2D35] text-[#F1F2F4]' : 'text-[#8E929C] hover:text-[#F1F2F4]'}`}
+                >
+                  Detaylı Form
+                </button>
+              </div>
+
               <div className="flex flex-col gap-2">
                 <label className="text-[13px] font-bold text-[#8E929C] uppercase tracking-wider">Müşteri Adı</label>
                 <input 
@@ -457,6 +489,38 @@ const AgentDashboard = () => {
                   value={phone} onChange={e=>setPhone(e.target.value)}
                 />
               </div>
+
+              {activeFormTab === 'detailed' && (
+                <>
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[13px] font-bold text-[#8E929C] uppercase tracking-wider">Kaynak</label>
+                    <select value={source} onChange={e => setSource(e.target.value)} className="bg-[#1C1E24] border border-[#2A2D35] text-[#F1F2F4] p-3 rounded-xl focus:outline-none focus:border-[#F5A623] focus:ring-1 focus:ring-[#F5A623] transition-all appearance-none">
+                      <option>Sahibinden</option>
+                      <option>HepsiEmlak</option>
+                      <option>EmlakJet</option>
+                      <option>Instagram</option>
+                      <option>Referans</option>
+                      <option>Branda</option>
+                      <option>Diğer</option>
+                    </select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-2">
+                      <label className="text-[13px] font-bold text-[#8E929C] uppercase tracking-wider">Min Bütçe (₺)</label>
+                      <input type="number" value={budgetMin} onChange={e => setBudgetMin(e.target.value)} className="bg-[#1C1E24] border border-[#2A2D35] text-[#F1F2F4] p-3 rounded-xl focus:outline-none focus:border-[#F5A623] focus:ring-1 focus:ring-[#F5A623] transition-all" />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <label className="text-[13px] font-bold text-[#8E929C] uppercase tracking-wider">Max Bütçe (₺)</label>
+                      <input type="number" value={budgetMax} onChange={e => setBudgetMax(e.target.value)} className="bg-[#1C1E24] border border-[#2A2D35] text-[#F1F2F4] p-3 rounded-xl focus:outline-none focus:border-[#F5A623] focus:ring-1 focus:ring-[#F5A623] transition-all" />
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[13px] font-bold text-[#8E929C] uppercase tracking-wider">İlgilendiği Bölgeler</label>
+                    <input type="text" placeholder="Örn: Kadıköy, Üsküdar" value={locations} onChange={e => setLocations(e.target.value)} className="bg-[#1C1E24] border border-[#2A2D35] text-[#F1F2F4] p-3 rounded-xl focus:outline-none focus:border-[#F5A623] focus:ring-1 focus:ring-[#F5A623] transition-all" />
+                  </div>
+                </>
+              )}
+
               <div className="flex flex-col gap-2 flex-1">
                 <label className="text-[13px] font-bold text-[#8E929C] uppercase tracking-wider flex items-center justify-between">
                   <span>Mesaj / Not (AI Analizi)</span>
@@ -467,7 +531,7 @@ const AgentDashboard = () => {
                 </label>
                 <textarea 
                   className="bg-[#1C1E24] border border-[#2A2D35] text-[#F1F2F4] p-3 rounded-xl flex-1 resize-none focus:outline-none focus:border-[#F5A623] focus:ring-1 focus:ring-[#F5A623] transition-all" 
-                  placeholder="Müşterinin talebini detaylıca yazın, yapay zeka analiz edip puanlasın..."
+                  placeholder={activeFormTab === 'detailed' ? "Müşteriyle ilgili detaylı notlar ekleyin..." : "Müşterinin talebini detaylıca yazın, yapay zeka analiz edip puanlasın..."}
                   value={message} onChange={e=>setMessage(e.target.value)}
                 ></textarea>
               </div>
@@ -486,7 +550,7 @@ const AgentDashboard = () => {
                 ) : (
                   <>
                     <span className="material-symbols-outlined">auto_awesome</span>
-                    Kaydet ve Analiz Et
+                    {activeFormTab === 'quick' ? 'Kaydet ve AI\'a Gönder' : 'Detaylı Ekle'}
                   </>
                 )}
               </button>
