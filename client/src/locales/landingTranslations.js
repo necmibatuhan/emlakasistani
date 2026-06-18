@@ -8,14 +8,14 @@ export const t = {
     },
     hero: {
       stat: "Türkiye'de 180.000 emlak danışmanı",
-      title1: "Daha Fazla",
-      title2: "Portföy.",
-      title3: "Satış.",
-      title4: "Komisyon.",
-      desc: "Manuel veri girişiyle vakit kaybetmeyin. Kapora, gün içinde aldığınız sesli notları analiz ederek ajandanızı düzenleyen, potansiyel alıcıları portföyünüzle eşleştiren ve bugün odaklanmanız gereken en sıcak fırsatları listeleyen akıllı satış asistanınızdır.",
-      increaseCommission: "Komisyonunu Artır",
+      title1: "Bugün hangi müşteriyi aramalısın?",
+      title2: "Kapora söyler.",
+      title3: "",
+      title4: "",
+      desc: "Yapay zeka müşteri skorlaması ile günlük önceliklerini otomatik belirle. Saha ziyaretinden önce hazır ol.",
+      increaseCommission: "Ücretsiz Dene — 14 Gün",
       seeSystem: "Sistemi Gör",
-      saveTime: "Günde 3 saat tasarruf eden binlerce danışman",
+      saveTime: "Kredi kartı gerekmez",
       autopilot: "OTOPİLOT AKTİF"
     },
     socialProof: {
@@ -148,15 +148,15 @@ export const t = {
     },
     hero: {
       stat: "180,000 real estate agents in Turkey",
-      title1: "More",
-      title2: "Listings.",
-      title3: "Sales.",
-      title4: "Commission.",
-      desc: "Stop wasting time with manual data entry. Kapora is your intelligent sales assistant that organizes your agenda by analyzing voice notes, matches potential buyers with your listings, and highlights the hottest opportunities you need to focus on today.",
-      increaseCommission: "Boost Your Commission",
+      title1: "Who should you call today?",
+      title2: "Kapora tells you.",
+      title3: "",
+      title4: "",
+      desc: "Automatically determine your daily priorities with AI lead scoring. Be prepared before you head to the field.",
+      increaseCommission: "Start Free — 14 Days",
       seeSystem: "See the System",
-      saveTime: "Thousands of agents saving 3 hours a day",
-      autopilot: "AUTOPILOT ACTIVE"
+      saveTime: "No credit card required",
+      autopilot: "AUTOPILOT ON"
     },
     socialProof: {
       quote1: "\"Now I know exactly who to call every morning.\"",

@@ -170,11 +170,7 @@ const Landing = () => {
 
           <h1 className="font-display-lg text-[40px] md:text-[48px] lg:text-[56px] font-semibold leading-[1.1] tracking-tight text-on-surface mb-6">
             {curr.hero.title1}<br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-[#FDE047] to-primary bg-[length:200%_auto] animate-gradient-x">{curr.hero.title2}</span><br/>
-            {curr.hero.title1}<br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-[#FDE047] to-primary bg-[length:200%_auto] animate-gradient-x">{curr.hero.title3}</span><br/>
-            {curr.hero.title1}<br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-[#FDE047] to-primary bg-[length:200%_auto] animate-gradient-x">{curr.hero.title4}</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-[#FDE047] to-primary bg-[length:200%_auto] animate-gradient-x">{curr.hero.title2}</span>
           </h1>
 
           <p className="font-body-lg text-on-surface-variant mt-4 mb-10 max-w-[480px] leading-relaxed">
@@ -193,7 +189,7 @@ const Landing = () => {
           </div>
 
           <div className="flex items-center space-x-2 font-label-sm text-on-surface-variant">
-            <span className="material-symbols-outlined text-[16px] text-[#10B981]">event</span>
+            <span className="material-symbols-outlined text-[16px] text-on-surface-variant">check_circle</span>
             <span>{curr.hero.saveTime}</span>
           </div>
 
