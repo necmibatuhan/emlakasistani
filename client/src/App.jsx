@@ -8,6 +8,7 @@ import { Analytics } from "@vercel/analytics/react";
 import Landing from './pages/Landing';
 import Auth from './pages/Auth';
 import ResetPassword from './pages/ResetPassword';
+import Onboarding from './pages/Onboarding';
 import BlogList from './pages/BlogList';
 import BlogPost from './pages/BlogPost';
 import CompanyDashboard from './pages/CompanyDashboard';
@@ -42,6 +43,11 @@ const RoleBasedDashboard = () => {
   if (loading) return null;
   if (!user) return <Navigate to="/" />;
 
+  const hasCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
+  if (!hasCompletedOnboarding) {
+    return <Navigate to="/onboarding" />;
+  }
+
   if (user.role === 'company_admin' || user.role === 'super_admin') {
     return <CompanyDashboard />;
   } else if (user.role === 'office_manager') {
@@ -66,6 +72,7 @@ const AppRoutes = () => {
       <Route path="/gizlilik-politikasi" element={<GizlilikPolitikasi />} />
       <Route path="/blog" element={<BlogList />} />
       <Route path="/blog/:slug" element={<BlogPost />} />
+      <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
       <Route path="/dashboard" element={<ProtectedRoute><RoleBasedDashboard /></ProtectedRoute>} />
       <Route path="/leads" element={<ProtectedRoute><Leads /></ProtectedRoute>} />
       <Route path="/integrations" element={<ProtectedRoute><Integrations /></ProtectedRoute>} />
