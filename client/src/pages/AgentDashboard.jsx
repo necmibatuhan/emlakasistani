@@ -23,6 +23,7 @@ import ReturnBanner from '../components/ReturnBanner';
 import { EmptyState } from '../components/EmptyState';
 import PrioritiesWidget from '../components/PrioritiesWidget';
 import ScoreExplanation from '../components/ScoreExplanation';
+import ReferralWidget from '../components/ReferralWidget';
 
 const AgentDashboard = () => {
   const { token, user } = useContext(AuthContext);
@@ -300,6 +301,9 @@ const AgentDashboard = () => {
           </div>
           
           <ReturnBanner token={token} />
+
+          {/* REFERRAL WIDGET (Sadece 'free' plandakiler için görünür) */}
+          <ReferralWidget userPlan={currentPlan} />
 
           {/* GÜNÜN ÖNCELİKLERİ WIDGET */}
           <PrioritiesWidget />
