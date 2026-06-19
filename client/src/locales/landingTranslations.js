@@ -97,8 +97,8 @@ export const t = {
       proPlus: {
         name: "Pro+",
         desc: "Performansını ölçmek isteyenler için",
-        priceMonthly: "249 ₺",
-        priceYearly: "2.490 ₺",
+        priceMonthly: "499 ₺",
+        priceYearly: "4.990 ₺",
         period: "/ay",
         yearlyText: "Yıllık ödemede",
         features: [
@@ -237,8 +237,8 @@ export const t = {
       proPlus: {
         name: "Pro+",
         desc: "For those who want to track performance",
-        priceMonthly: "249 ₺",
-        priceYearly: "2,490 ₺",
+        priceMonthly: "499 ₺",
+        priceYearly: "4,990 ₺",
         period: "/mo",
         yearlyText: "Billed annually",
         features: [
