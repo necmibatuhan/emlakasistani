@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Play, X, Menu, Sun, Moon, Globe, Sparkles } from 'lucide-react';
 import { Logo } from '../components/Logo';
+import SocialProofToast from '../components/SocialProofToast';
 import { BLOG_POSTS } from './BlogList';
 import { t } from '../locales/landingTranslations';
 
@@ -764,6 +765,7 @@ const Landing = () => {
         </div>
       </footer>
 
+      <SocialProofToast />
     </div>
   );
 };
