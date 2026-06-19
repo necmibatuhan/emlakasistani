@@ -115,20 +115,22 @@ function AnimatedLeadCard({ lead, onDelete }) {
                 </p>
               </div>
 
-              <div className="flex justify-end mt-2">
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (window.confirm('Bu müşteriyi silmek istediğinize emin misiniz?')) {
-                      onDelete(lead.id);
-                    }
-                  }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-md text-xs font-medium transition-colors"
-                >
-                  <span className="material-symbols-outlined text-[14px]">delete</span>
-                  Sil
-                </button>
-              </div>
+              {onDelete && (
+                <div className="flex justify-end mt-2">
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (window.confirm('Bu müşteriyi silmek istediğinize emin misiniz?')) {
+                        onDelete(lead.id);
+                      }
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-md text-xs font-medium transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[14px]">delete</span>
+                    Sil
+                  </button>
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

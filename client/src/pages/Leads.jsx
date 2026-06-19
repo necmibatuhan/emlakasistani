@@ -66,6 +66,19 @@ const Leads = () => {
     enabled: !!token
   });
 
+  const handleDeleteLead = async (idToDelete) => {
+    if (!idToDelete) return;
+    try {
+      await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/${idToDelete}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      queryClient.invalidateQueries(['leads']);
+    } catch (err) {
+      console.error(err);
+      alert('Lead silinirken hata oluştu.');
+    }
+  };
+
   useEffect(() => {
     return () => clearInterval(timerRef.current);
   }, []);
@@ -309,7 +322,7 @@ const Leads = () => {
                   
                   {/* Mobile Card List */}
                   <div className="lg:hidden">
-                    <AnimatedLeadList leads={filteredLeads} />
+                    <AnimatedLeadList leads={filteredLeads} onDeleteLead={handleDeleteLead} />
                   </div>
                   
                   {/* Desktop Table List */}
@@ -391,12 +404,25 @@ const Leads = () => {
                   <h2 className="text-[16px] font-medium text-[#F1F2F4]">{selectedLead.name}</h2>
                   <span className="text-[14px] text-[#7C8090]">{selectedLead.phone}</span>
                 </div>
-                <button 
-                  onClick={() => setSelectedLead(null)}
-                  className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#1E2028] text-[#7C8090] transition-colors"
-                >
-                  <span className="material-symbols-outlined text-[20px]">close</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={async () => {
+                      if (window.confirm('Bu müşteriyi silmek istediğinize emin misiniz?')) {
+                        await handleDeleteLead(selectedLead.id);
+                        setSelectedLead(null);
+                      }
+                    }}
+                    className="w-8 h-8 flex items-center justify-center rounded-full bg-surface-container-high text-[#EF4444] hover:bg-[#EF4444]/10 transition-colors border border-outline" title="Leadi Sil"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">delete</span>
+                  </button>
+                  <button 
+                    onClick={() => setSelectedLead(null)}
+                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#1E2028] text-[#7C8090] transition-colors border border-transparent"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">close</span>
+                  </button>
+                </div>
               </div>
 
               {/* Detail Content */}
