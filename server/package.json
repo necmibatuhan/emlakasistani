@@ -25,7 +25,9 @@
     "multer": "^2.1.1",
     "node-cron": "^4.4.1",
     "nodemailer": "^8.0.11",
+    "openai": "^6.44.0",
     "pg": "^8.21.0",
+    "pgvector": "^0.3.0",
     "resend": "^6.12.4",
     "shopier-api": "^1.1.4"
   },

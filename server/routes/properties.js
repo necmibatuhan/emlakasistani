@@ -1,6 +1,7 @@
 const express = require('express');
 const db = require('../db');
 const { authMiddleware, requireRole } = require('../middleware/auth');
+const semanticSearch = require('../services/semanticSearch');
 
 const router = express.Router();
 
@@ -45,6 +46,9 @@ router.post('/', authMiddleware, requireRole(['company_admin', 'office_manager',
     // Publish NEW_PROPERTY event to Queue to match existing leads
     const queue = require('../services/queue');
     queue.add('MATCH_LEADS_FOR_PROPERTY', { propertyId: newProperty.rows[0].id });
+
+    // Generate vector embedding in background
+    semanticSearch.embedProperty(newProperty.rows[0].id).catch(console.error);
 
     res.status(201).json(newProperty.rows[0]);
   } catch (err) {
