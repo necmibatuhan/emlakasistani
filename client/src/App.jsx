@@ -12,7 +12,6 @@ import Landing from './pages/Landing';
 import Pricing from './pages/Pricing';
 import Auth from './pages/Auth';
 import ResetPassword from './pages/ResetPassword';
-import Onboarding from './pages/Onboarding';
 import BlogList from './pages/BlogList';
 import BlogPost from './pages/BlogPost';
 import CompanyDashboard from './pages/CompanyDashboard';
@@ -58,10 +57,7 @@ const RoleBasedDashboard = () => {
   if (loading) return null;
   if (!user) return <Navigate to="/" />;
 
-  const hasCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
-  if (!hasCompletedOnboarding) {
-    return <Navigate to="/onboarding" />;
-  }
+
 
   if (user.role === 'company_admin' || user.role === 'super_admin') {
     return <CompanyDashboard />;
@@ -90,7 +86,6 @@ const AppRoutes = () => {
       <Route path="/blog" element={<BlogList />} />
       <Route path="/blog/:slug" element={<BlogPost />} />
       <Route path="/ilan-analizi" element={<Analyzer />} />
-      <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
       <Route path="/dashboard" element={<ProtectedRoute><RoleBasedDashboard /></ProtectedRoute>} />
       <Route path="/leads" element={<ProtectedRoute><Leads /></ProtectedRoute>} />
       <Route path="/integrations" element={<ProtectedRoute><Integrations /></ProtectedRoute>} />

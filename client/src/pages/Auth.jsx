@@ -31,8 +31,7 @@ const Auth = () => {
       });
       setUser(res.data.user);
       localStorage.setItem('token', res.data.token);
-      const hasCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
-      navigate(hasCompletedOnboarding ? '/dashboard' : '/onboarding');
+      navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Google ile giriş başarısız.');
     }
@@ -62,8 +61,7 @@ const Auth = () => {
     if (isLogin) {
       try {
         await login(email, password, captchaToken);
-        const hasCompletedOnboarding = localStorage.getItem('onboarding_completed') === 'true';
-        navigate(hasCompletedOnboarding ? '/dashboard' : '/onboarding');
+        navigate('/dashboard');
       } catch (err) {
         setError(err.response?.data?.message || 'Giriş başarısız.');
       }
@@ -102,7 +100,7 @@ const Auth = () => {
     try {
       const res = await register(name, email, password, selectedRole, captchaToken);
       if (res?.data?.token) {
-        navigate('/onboarding');
+        navigate('/dashboard');
       } else {
         setMessage(res?.data?.message || 'Kayıt başarılı. Lütfen e-postanıza gönderilen doğrulama linkine tıklayın.');
         setRegisterStep(1);
