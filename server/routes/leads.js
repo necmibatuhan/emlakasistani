@@ -649,10 +649,10 @@ router.post('/recalculate-all', authMiddleware, async (req, res) => {
           // Rate limiting sleep 1s
           await new Promise(resolve => setTimeout(resolve, 1000));
         } catch (e) {
-          console.error(\`Failed to calculate score for lead \${lead.id}\`);
+          console.error(`Failed to calculate score for lead ${lead.id}`);
         }
       }
-      console.log(\`Finished recalculating scores for job \${jobId}\`);
+      console.log(`Finished recalculating scores for job ${jobId}`);
     })();
 
   } catch (err) {
