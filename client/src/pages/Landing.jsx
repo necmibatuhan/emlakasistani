@@ -4,6 +4,7 @@ import { Play, X, Menu, Sun, Moon, Globe, Sparkles } from 'lucide-react';
 import { Logo } from '../components/Logo';
 import SocialProofToast from '../components/SocialProofToast';
 import { BLOG_POSTS } from '../data/blogPosts';
+import districtsData from '../data/districts.json';
 import { t } from '../locales/landingTranslations';
 
 const MOCK_LEADS = [
@@ -738,6 +739,20 @@ const Landing = () => {
                   {curr.blog.read} <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                 </Link>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* REGIONAL PSEO LINKS */}
+      <section className="bg-surface-container py-12 px-6 sm:px-12 lg:px-24 border-t border-outline-variant">
+        <div className="max-w-[1200px] mx-auto">
+          <h3 className="text-xl font-bold mb-6 text-on-surface">Hizmet Bölgelerimiz</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {districtsData.map((district) => (
+              <Link key={district.slug} to={`/sehir/${district.slug}-emlak-asistani`} className="text-sm text-on-surface-variant hover:text-primary transition-colors">
+                {district.name} Emlak Programı
+              </Link>
             ))}
           </div>
         </div>

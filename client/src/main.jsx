@@ -1,5 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { HelmetProvider } from 'react-helmet-async';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import '@fontsource/geist-sans/400.css';
 import '@fontsource/geist-sans/500.css';
@@ -16,12 +17,14 @@ const queryClient = new QueryClient();
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || 'MOCK_CLIENT_ID'}>
-      <QueryClientProvider client={queryClient}>
-        <UIProvider>
-          <App />
-        </UIProvider>
-      </QueryClientProvider>
-    </GoogleOAuthProvider>
+    <HelmetProvider>
+      <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || 'MOCK_CLIENT_ID'}>
+        <QueryClientProvider client={queryClient}>
+          <UIProvider>
+            <App />
+          </UIProvider>
+        </QueryClientProvider>
+      </GoogleOAuthProvider>
+    </HelmetProvider>
   </StrictMode>,
 )
