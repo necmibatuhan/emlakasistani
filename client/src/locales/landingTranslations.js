@@ -42,7 +42,7 @@ export const t = {
       autoReplied: "Otomatik Yanıtlandı"
     },
     mockup: {
-      title: "İçeride Sizi Neler Bekliyor?",
+      title: "Bugün Hangi Müşteriyi Aramalısın? Kapora Söyler.",
       desc: "Karmaşık Excel tablolarını unutun. Her şey tek bir ekranda, satışa dönmeye hazır şekilde sizi bekliyor.",
       preview: "Panel Önizlemesi",
       tabs: ["Savaş Odası", "Saldırı Planı", "Eşleşmeler"],
@@ -182,7 +182,7 @@ export const t = {
       autoReplied: "Auto-Replied"
     },
     mockup: {
-      title: "What Awaits You Inside?",
+      title: "Who should you call today? Kapora tells you.",
       desc: "Forget complex Excel sheets. Everything is ready on a single screen, poised to turn into a sale.",
       preview: "Dashboard Preview",
       tabs: ["War Room", "Attack Plan", "Matches"],
