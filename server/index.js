@@ -16,7 +16,9 @@ const dashboardRoutes = require('./routes/dashboard');
 const templatesRoutes = require('./routes/templates');
 const contactsRoutes = require('./routes/contacts');
 const analyticsRoutes = require('./routes/analytics');
+const notificationsRoutes = require('./routes/notifications');
 require('./services/queue'); // Start background worker
+require('./services/churnPrevention'); // Start cron job
 
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
@@ -75,6 +77,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/templates', templatesRoutes);
 app.use('/api/contacts', contactsRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/notifications', notificationsRoutes);
 
 app.get('/', (req, res) => {
   res.send('Kapora API');

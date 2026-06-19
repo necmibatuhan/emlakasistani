@@ -9,6 +9,7 @@ import QuickAddFAB from './components/QuickAddFAB';
 import InstallPrompt from './components/InstallPrompt';
 
 import Landing from './pages/Landing';
+import Pricing from './pages/Pricing';
 import Auth from './pages/Auth';
 import ResetPassword from './pages/ResetPassword';
 import Onboarding from './pages/Onboarding';
@@ -68,6 +69,8 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Landing />} />
+      <Route path="/pricing" element={<Pricing />} />
+      <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Auth />} />
       <Route path="/auth" element={user ? <Navigate to="/dashboard" /> : <Auth />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/verify-email" element={<VerifyEmail />} />

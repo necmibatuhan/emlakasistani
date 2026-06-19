@@ -19,6 +19,7 @@ import MorningSummary from '../components/MorningSummary';
 import CommandCenter from '../components/CommandCenter';
 import AnimatedLeadList from '../components/AnimatedLeadList';
 import PricingModal from '../components/PricingModal';
+import ReturnBanner from '../components/ReturnBanner';
 import { EmptyState } from '../components/EmptyState';
 import PrioritiesWidget from '../components/PrioritiesWidget';
 import ScoreExplanation from '../components/ScoreExplanation';
@@ -261,6 +262,8 @@ const AgentDashboard = () => {
             <h1 className="text-2xl font-bold text-on-surface">Merhaba, {user?.name?.split(' ')[0] || 'Danışman'}</h1>
             <p className="text-sm text-on-surface-variant">Bugün, {format(new Date(), 'd MMMM EEEE', { locale: tr })}</p>
           </div>
+          
+          <ReturnBanner token={token} />
 
           {/* GÜNÜN ÖNCELİKLERİ WIDGET */}
           <PrioritiesWidget />
