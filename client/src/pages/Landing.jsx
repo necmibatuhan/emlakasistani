@@ -591,7 +591,7 @@ const Landing = () => {
             </button>
             <button 
               onClick={() => setBillingCycle('yearly')}
-              className={`px-6 py-2 rounded-md font-label-sm transition-colors ${billingCycle === 'yearly' ? 'bg-[#surface-container-highest] text-on-surface shadow-sm font-semibold' : 'text-on-surface-variant hover:text-on-surface'}`}
+              className={`px-6 py-2 rounded-md font-label-sm transition-colors ${billingCycle === 'yearly' ? 'bg-[#FDE047] text-[#1e1b4b] shadow-sm font-semibold' : 'text-on-surface-variant hover:text-on-surface'}`}
             >
               {curr.pricing.yearly}
             </button>
