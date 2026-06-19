@@ -63,7 +63,21 @@ function AnimatedLeadCard({ lead, onDelete }) {
             </div>
           </div>
           
-          <div onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+            {onDelete && (
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (window.confirm('Bu müşteriyi silmek istediğinize emin misiniz?')) {
+                    onDelete(lead.id);
+                  }
+                }}
+                className="w-8 h-8 flex items-center justify-center rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-colors"
+                title="Müşteriyi Sil"
+              >
+                <span className="material-symbols-outlined text-[16px]">delete</span>
+              </button>
+            )}
             <ScoreExplanation lead={lead} />
           </div>
         </motion.div>
@@ -115,22 +129,6 @@ function AnimatedLeadCard({ lead, onDelete }) {
                 </p>
               </div>
 
-              {onDelete && (
-                <div className="flex justify-end mt-2">
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (window.confirm('Bu müşteriyi silmek istediğinize emin misiniz?')) {
-                        onDelete(lead.id);
-                      }
-                    }}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-md text-xs font-medium transition-colors"
-                  >
-                    <span className="material-symbols-outlined text-[14px]">delete</span>
-                    Sil
-                  </button>
-                </div>
-              )}
             </motion.div>
           )}
         </AnimatePresence>
