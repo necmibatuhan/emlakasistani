@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useQueryClient } from '@tanstack/react-query';
 import { AuthContext } from '../contexts/AuthContext';
+import { useAnalytics, EVENTS } from '../hooks/useAnalytics';
 
 const QuickAddFAB = () => {
   const location = useLocation();
@@ -17,6 +18,7 @@ const QuickAddFAB = () => {
   const [isListening, setIsListening] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [toast, setToast] = useState(null);
+  const { track } = useAnalytics();
 
   const sheetRef = useRef(null);
 
@@ -109,6 +111,8 @@ const QuickAddFAB = () => {
         if (!old) return [newLead];
         return [newLead, ...old];
       });
+
+      track(EVENTS.CUSTOMER_QUICK_ADD, { lead_id: newLead.id });
 
       showToast('Kaydedildi! ✓ Skor hesaplanıyor...');
       closeSheet();

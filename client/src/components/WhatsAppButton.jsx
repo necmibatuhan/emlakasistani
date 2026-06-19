@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 import { AuthContext } from '../contexts/AuthContext';
 import clsx from 'clsx';
+import { useAnalytics, EVENTS } from '../hooks/useAnalytics';
 
 const WhatsAppButton = ({ customer, variant = 'icon-text', className = '' }) => {
   const { token, user } = useContext(AuthContext);
@@ -11,6 +12,7 @@ const WhatsAppButton = ({ customer, variant = 'icon-text', className = '' }) => 
   const [editedText, setEditedText] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const sheetRef = useRef(null);
+  const { track } = useAnalytics();
 
   const { data: templates = [], isLoading } = useQuery({
     queryKey: ['whatsapp_templates'],
@@ -80,6 +82,7 @@ const WhatsAppButton = ({ customer, variant = 'icon-text', className = '' }) => 
     const url = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
     logContact(templateId);
+    track(EVENTS.WHATSAPP_CLICKED, { customer_id: customer.id, template_id: templateId });
     setIsOpen(false);
     setSelectedTemplate(null);
   };
