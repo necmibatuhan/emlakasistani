@@ -24,6 +24,7 @@ import { EmptyState } from '../components/EmptyState';
 import PrioritiesWidget from '../components/PrioritiesWidget';
 import ScoreExplanation from '../components/ScoreExplanation';
 import ReferralWidget from '../components/ReferralWidget';
+import OnboardingWidget from '../components/OnboardingWidget';
 
 const AgentDashboard = () => {
   const { token, user } = useContext(AuthContext);
@@ -294,6 +295,8 @@ const AgentDashboard = () => {
 
         <div className="flex-1 flex flex-col p-4 md:p-6 gap-6 overflow-y-auto custom-scrollbar">
           
+          <OnboardingWidget token={token} />
+
           {/* Mobile Only Header Text */}
           <div className="lg:hidden mb-1 px-1">
             <h1 className="text-2xl font-bold text-on-surface">Merhaba, {user?.name?.split(' ')[0] || 'Danışman'}</h1>

@@ -50,6 +50,11 @@ router.post('/', authMiddleware, requireRole(['company_admin', 'office_manager',
     // Generate vector embedding in background
     semanticSearch.embedProperty(newProperty.rows[0].id).catch(console.error);
 
+    try {
+      const { triggerListingAnalyzed } = require('../services/onboardingService');
+      await triggerListingAnalyzed(req.user.id);
+    } catch (e) { console.error(e); }
+
     res.status(201).json(newProperty.rows[0]);
   } catch (err) {
     console.error(err);

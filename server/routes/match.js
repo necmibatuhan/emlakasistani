@@ -21,10 +21,17 @@ router.post('/', authMiddleware, async (req, res) => {
     // 1. Semantic Search Servisini Çağır
     const matchResult = await semanticSearch.findMatchingProperties(company_id, query, 5);
     
-    res.json({
+    const result = {
       intent: matchResult.intent,
       matches: matchResult.matches
-    });
+    };
+
+    try {
+      const { triggerFirstMatch } = require('../services/onboardingService');
+      await triggerFirstMatch(req.user.id);
+    } catch (e) { console.error(e); }
+
+    res.json(result);
   } catch (error) {
     console.error('Match Route Error:', error);
     res.status(500).json({ message: 'Eşleştirme sırasında bir hata oluştu.' });

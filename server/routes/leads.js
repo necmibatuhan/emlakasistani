@@ -224,6 +224,11 @@ Lütfen çıktını başka hiçbir metin olmadan sadece geçerli bir JSON olarak
       ]
     );
 
+    try {
+      const { triggerLeadAdded } = require('../services/onboardingService');
+      await triggerLeadAdded(req.user.id);
+    } catch (e) { console.error(e); }
+
     const newLead = leadInsert.rows[0];
 
     const queue = require('../services/queue');

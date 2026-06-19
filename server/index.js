@@ -85,6 +85,7 @@ app.use('/api/notifications', notificationsRoutes);
 app.use('/api/subscription', subscriptionRoutes);
 app.use('/api/social-proof', socialProofRoutes);
 app.use('/api/match', matchRoutes);
+app.use('/api/onboarding', onboardingRoutes);
 
 app.get('/', (req, res) => {
   res.send('Kapora API');
