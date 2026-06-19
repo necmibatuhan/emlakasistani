@@ -20,6 +20,7 @@ import CommandCenter from '../components/CommandCenter';
 import AnimatedLeadList from '../components/AnimatedLeadList';
 import PricingModal from '../components/PricingModal';
 import { EmptyState } from '../components/EmptyState';
+import PrioritiesWidget from '../components/PrioritiesWidget';
 
 const AgentDashboard = () => {
   const { token, user } = useContext(AuthContext);
@@ -254,6 +255,9 @@ const AgentDashboard = () => {
 
         <div className="flex-1 flex flex-col p-6 gap-6 overflow-y-auto custom-scrollbar">
           
+          {/* GÜNÜN ÖNCELİKLERİ WIDGET */}
+          <PrioritiesWidget />
+
           {/* COMMAND CENTER & AGENDA */}
           <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 shrink-0 h-auto xl:h-[400px]">
             <div className="xl:col-span-3 h-[400px] xl:h-full overflow-hidden">
@@ -266,12 +270,12 @@ const AgentDashboard = () => {
 
           {/* RECENT LEADS (ANIMATED LIST) */}
           <div className="flex-1 flex flex-col gap-4 mt-2">
-            <h3 className="font-display-sm text-lg text-on-surface">Günün Öncelikleri</h3>
-            {leads.length < 3 ? (
+            <h3 className="font-display-sm text-lg text-on-surface">Tüm Müşteriler</h3>
+            {leads.length === 0 ? (
               <EmptyState 
-                icon="Target"
-                title="Öncelikli müşteri hesaplanıyor"
-                description="En az 3 müşteri eklediğinizde AI günlük önceliklerinizi gösterir."
+                icon="Users"
+                title="Henüz müşteri eklemediniz"
+                description="Müşteri eklediğinizde yapay zeka onları puanlayacak ve önceliklendirecektir."
               />
             ) : (
               <AnimatedLeadList leads={leads} />

@@ -12,6 +12,7 @@ const officesRoutes = require('./routes/offices');
 const voiceRoutes = require('./routes/voice');
 const paymentRoutes = require('./routes/payment');
 const calendarRoutes = require('./routes/calendar');
+const dashboardRoutes = require('./routes/dashboard');
 require('./services/queue'); // Start background worker
 
 const helmet = require('helmet');
@@ -67,6 +68,7 @@ app.use('/api/offices', officesRoutes);
 app.use('/api/voice', voiceRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/calendar', calendarRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 app.get('/', (req, res) => {
   res.send('Kapora API');
