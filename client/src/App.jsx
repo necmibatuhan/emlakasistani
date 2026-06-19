@@ -4,6 +4,7 @@ import { AuthContext, AuthProvider } from './contexts/AuthContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { Analytics } from "@vercel/analytics/react";
+import GlobalMobileNav from './components/GlobalMobileNav';
 
 import Landing from './pages/Landing';
 import Auth from './pages/Auth';
@@ -96,7 +97,10 @@ function App() {
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || 'GIRILECEK_GOOGLE_CLIENT_ID'}>
       <AuthProvider>
         <Router>
-          <AppRoutes />
+          <div className="pb-[56px] lg:pb-0">
+            <AppRoutes />
+            <GlobalMobileNav />
+          </div>
           <SpeedInsights />
           <Analytics />
         </Router>

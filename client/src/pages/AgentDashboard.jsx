@@ -254,8 +254,14 @@ const AgentDashboard = () => {
           </div>
         )}
 
-        <div className="flex-1 flex flex-col p-6 gap-6 overflow-y-auto custom-scrollbar">
+        <div className="flex-1 flex flex-col p-4 md:p-6 gap-6 overflow-y-auto custom-scrollbar">
           
+          {/* Mobile Only Header Text */}
+          <div className="lg:hidden mb-1 px-1">
+            <h1 className="text-2xl font-bold text-on-surface">Merhaba, {user?.name?.split(' ')[0] || 'Danışman'}</h1>
+            <p className="text-sm text-on-surface-variant">Bugün, {format(new Date(), 'd MMMM EEEE', { locale: tr })}</p>
+          </div>
+
           {/* GÜNÜN ÖNCELİKLERİ WIDGET */}
           <PrioritiesWidget />
 

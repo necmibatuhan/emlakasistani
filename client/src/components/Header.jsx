@@ -2,6 +2,7 @@ import React, { useContext, useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
 import { UIContext } from '../contexts/UIContext';
+import { Logo } from './Logo';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { format } from 'date-fns';
@@ -57,13 +58,10 @@ const Header = () => {
     <header className="bg-background dark:bg-background border-b border-outline-variant flex justify-between items-center h-16 px-4 md:px-container-padding sticky top-0 z-30">
       {/* Left: Search/Title */}
       <div className="flex items-center gap-2 md:gap-stack-lg flex-1">
-        {/* Hamburger Menu (Mobile Only) */}
-        <button 
-          onClick={toggleSidebar}
-          className="lg:hidden text-on-surface-variant hover:text-on-surface p-1 mr-2"
-        >
-          <span className="material-symbols-outlined text-[28px]">menu</span>
-        </button>
+        {/* Logo (Mobile Only) */}
+        <div className="lg:hidden flex items-center mr-2">
+          <Logo iconSize="w-7 h-7" textSize="text-[20px]" />
+        </div>
         
         <div className="relative w-full max-w-[200px] md:max-w-xs hidden sm:block">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
@@ -89,7 +87,7 @@ const Header = () => {
         <div className="relative" ref={notifRef}>
           <button 
             onClick={() => setShowNotifications(!showNotifications)}
-            className="text-on-surface-variant hover:text-on-surface transition-colors hidden sm:flex items-center justify-center relative"
+            className="text-on-surface-variant hover:text-on-surface transition-colors flex items-center justify-center relative"
           >
             <span className="material-symbols-outlined">notifications</span>
             {reminders.length > 0 && (

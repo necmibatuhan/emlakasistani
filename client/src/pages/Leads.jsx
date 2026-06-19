@@ -7,6 +7,9 @@ import Sidebar from '../components/Sidebar';
 import { format, isToday } from 'date-fns';
 import { EmptyState } from '../components/EmptyState';
 import ScoreExplanation from '../components/ScoreExplanation';
+import WhatsAppButton from '../components/WhatsAppButton';
+import AnimatedLeadList from '../components/AnimatedLeadList';
+import { Logo } from '../components/Logo';
 
 // MOCK_LEADS removed, will fetch from backend
 
@@ -217,13 +220,10 @@ const Leads = () => {
         {/* PAGE HEADER */}
         <header className="h-[72px] flex-shrink-0 border-b border-[#2A2D35] px-4 lg:px-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <button 
-              onClick={toggleSidebar} 
-              className="lg:hidden p-1 mr-1 text-[#F1F2F4] hover:bg-[#1E2028] rounded-md transition-colors"
-            >
-              <span className="material-symbols-outlined text-[24px]">menu</span>
-            </button>
-            <h1 className="text-[18px] font-medium text-[#F1F2F4]">Leadler</h1>
+            <div className="lg:hidden flex items-center mr-1">
+              <Logo iconSize="w-6 h-6" textSize="text-[18px]" />
+            </div>
+            <h1 className="text-[18px] font-medium text-[#F1F2F4] hidden lg:block">Leadler</h1>
             <span className="text-[13px] text-[#7C8090] hidden sm:inline">{leads.length} lead</span>
           </div>
           
@@ -283,7 +283,7 @@ const Leads = () => {
         <div className="flex-1 flex overflow-hidden">
           
           {/* LEFT PANEL (LEAD LIST) */}
-          <div className={`flex flex-col border-r border-[#2A2D35] transition-all duration-300 ${selectedLead ? 'w-[55%]' : 'w-full'}`}>
+          <div className={`flex flex-col border-r border-[#2A2D35] transition-all duration-300 ${selectedLead ? 'hidden lg:flex lg:w-[55%]' : 'w-full'}`}>
             <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
               
               {loading ? (
@@ -307,7 +307,14 @@ const Leads = () => {
                     Bugün
                   </div>
                   
-                  {filteredLeads.map(lead => {
+                  {/* Mobile Card List */}
+                  <div className="lg:hidden">
+                    <AnimatedLeadList leads={filteredLeads} />
+                  </div>
+                  
+                  {/* Desktop Table List */}
+                  <div className="hidden lg:block">
+                    {filteredLeads.map(lead => {
                     const style = getLabelStyle(lead.label);
                     const isSelected = selectedLead?.id === lead.id;
                     
@@ -369,6 +376,7 @@ const Leads = () => {
                       </div>
                     );
                   })}
+                  </div>
                 </div>
               )}
             </div>
@@ -376,7 +384,7 @@ const Leads = () => {
           
           {/* RIGHT PANEL (LEAD DETAIL) */}
           {selectedLead && (
-            <div className="w-[45%] flex flex-col bg-[#0A0B0D]">
+            <div className="fixed inset-0 z-50 lg:relative lg:z-auto w-full lg:w-[45%] flex flex-col bg-[#0A0B0D] animate-in slide-in-from-right-8 duration-300">
               {/* Detail Header */}
               <div className="h-[60px] px-6 border-b border-[#2A2D35] flex items-center justify-between flex-shrink-0">
                 <div className="flex items-center gap-3">
@@ -441,10 +449,7 @@ const Leads = () => {
                     {selectedLead.message}
                   </p>
                   <div className="flex items-center justify-between border-t border-[#2A2D35] pt-3">
-                    <a href={`https://wa.me/${selectedLead.phone.replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-[13px] text-[#25D366] hover:underline font-medium">
-                      <span className="material-symbols-outlined text-[16px]">chat</span>
-                      WhatsApp'ta Aç
-                    </a>
+                    <WhatsAppButton customer={selectedLead} />
                     <button className="flex items-center gap-1.5 text-[12px] text-[#7C8090] hover:text-[#F1F2F4] transition-colors">
                       <span className="material-symbols-outlined text-[14px]">content_copy</span> Kopyala
                     </button>
