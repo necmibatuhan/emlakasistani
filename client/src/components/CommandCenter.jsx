@@ -71,7 +71,7 @@ const ActionCard = ({ action, onActionClick }) => {
       </div>
       
       <button 
-        onClick={(e) => { e.stopPropagation(); /* handle direct action */ }}
+        onClick={(e) => { e.stopPropagation(); onActionClick(action.lead_id); }}
         className="w-full bg-surface-container-lowest hover:bg-outline-variant text-on-surface text-[12px] font-bold py-2 px-3 rounded border border-outline flex items-center justify-center gap-2 transition-colors"
       >
         {action.suggested_action_icon && <span className="material-symbols-outlined text-[16px]">{action.suggested_action_icon}</span>}

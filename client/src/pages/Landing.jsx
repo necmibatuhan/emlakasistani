@@ -102,6 +102,7 @@ const Landing = () => {
           
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-6">
+            <Link to="/ilan-analizi" className="text-on-surface-variant hover:text-primary font-body-sm font-medium transition-colors flex items-center gap-1"><Sparkles size={16}/> İlan Analizi</Link>
             <Link to="/blog" className="text-on-surface-variant hover:text-on-surface font-body-sm font-medium transition-colors">{curr.nav.blog}</Link>
             <a href="#fiyatlar" className="text-on-surface-variant hover:text-on-surface font-body-sm font-medium transition-colors">{curr.nav.pricing}</a>
             <Link to="/auth" className="text-on-surface-variant hover:text-on-surface font-body-sm font-medium transition-colors">{curr.nav.login}</Link>
@@ -133,10 +134,11 @@ const Landing = () => {
 
         {/* Mobile Nav Dropdown */}
         {isMobileMenuOpen && (
-          <div className="md:hidden bg-surface-container-lowest border-b border-outline-variant px-6 py-4 flex flex-col space-y-4">
-            <Link to="/blog" onClick={() => setIsMobileMenuOpen(false)} className="text-on-surface-variant hover:text-on-surface font-body-md font-medium transition-colors py-2">{curr.nav.blog}</Link>
-            <a href="#fiyatlar" onClick={() => setIsMobileMenuOpen(false)} className="text-on-surface-variant hover:text-on-surface font-body-md font-medium transition-colors py-2">{curr.nav.pricing}</a>
-            <div className="flex items-center gap-4 py-2">
+          <div className="md:hidden absolute top-16 left-0 right-0 bg-background/95 backdrop-blur-xl border-b border-outline-variant p-6 flex flex-col gap-4 shadow-xl z-50">
+            <Link to="/ilan-analizi" onClick={() => setIsMobileMenuOpen(false)} className="text-on-surface-variant hover:text-primary font-body-md font-medium flex items-center gap-2"><Sparkles size={18}/> İlan Analizi</Link>
+            <Link to="/blog" onClick={() => setIsMobileMenuOpen(false)} className="text-on-surface-variant hover:text-on-surface font-body-md font-medium">{curr.nav.blog}</Link>
+            <a href="#fiyatlar" onClick={() => setIsMobileMenuOpen(false)} className="text-on-surface-variant hover:text-on-surface font-body-md font-medium">{curr.nav.pricing}</a>
+            <div className="flex items-center gap-4 py-2 border-t border-outline-variant pt-4">
               <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)} className="text-on-surface-variant hover:text-on-surface font-body-md font-medium transition-colors">{curr.nav.login}</Link>
             </div>
             <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)} className="bg-primary hover:bg-primary/90 text-on-primary font-body-md font-medium px-5 py-3 rounded-md transition-colors text-center mt-2">

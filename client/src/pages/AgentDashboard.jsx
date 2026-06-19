@@ -72,7 +72,12 @@ const AgentDashboard = () => {
   });
 
   React.useEffect(() => {
-    const handleOpenDrawer = () => setIsNewLeadDrawerOpen(true);
+    const handleOpenDrawer = (e) => {
+      setIsNewLeadDrawerOpen(true);
+      if (e.detail && e.detail.isDemo) {
+        setMessage('Mehmet Bey aradı. Kadıköy tarafında 3+1 satılık ev bakıyor. Bütçesi 5 milyon TL civarı, nakit ödeyecek. Eşinin onayı kritikmiş, çok acil dönüş bekliyor.');
+      }
+    };
     window.addEventListener('open-new-lead-drawer', handleOpenDrawer);
     return () => window.removeEventListener('open-new-lead-drawer', handleOpenDrawer);
   }, []);
@@ -99,6 +104,20 @@ const AgentDashboard = () => {
     enabled: !!selectedLeadId
   });
 
+  const handleDeleteLead = async () => {
+    if (!window.confirm('Bu müşteriyi silmek istediğinize emin misiniz?')) return;
+    try {
+      await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/${selectedLeadId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      queryClient.invalidateQueries(['leads']);
+      setSelectedLeadId(null);
+    } catch (err) {
+      console.error(err);
+      alert('Lead silinirken hata oluştu.');
+    }
+  };
+
   const handleNewLeadClick = () => {
     setSelectedLeadId(null);
     setName('');
@@ -122,6 +141,10 @@ const AgentDashboard = () => {
 
   const handleAnalyze = async (e) => {
     if (e) e.preventDefault();
+    if (!name.trim() || !phone.trim()) {
+      setAnalyzeError('Lütfen isim ve telefon numarası alanlarını zorunlu olarak doldurun.');
+      return;
+    }
     setAnalyzing(true);
     setAnalyzeError('');
     try {
@@ -282,11 +305,28 @@ const AgentDashboard = () => {
           <div className="flex-1 flex flex-col gap-4 mt-2">
             <h3 className="font-display-sm text-lg text-on-surface">Tüm Müşteriler</h3>
             {leads.length === 0 ? (
-              <EmptyState 
-                icon="Users"
-                title="Henüz müşteri eklemediniz"
-                description="Müşteri eklediğinizde yapay zeka onları puanlayacak ve önceliklendirecektir."
-              />
+              <div className="bg-gradient-to-r from-primary/10 to-surface-container rounded-2xl p-8 border border-primary/20 relative overflow-hidden shadow-xl mt-4">
+                <div className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 bg-primary/20 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+                <div className="relative z-10 flex flex-col md:flex-row items-center gap-6">
+                  <div className="w-16 h-16 shrink-0 bg-primary/20 text-primary rounded-full flex items-center justify-center border border-primary/30">
+                    <span className="material-symbols-outlined text-3xl">mic_double</span>
+                  </div>
+                  <div className="flex-1 text-center md:text-left">
+                    <h4 className="text-xl font-bold text-on-surface mb-2">🔔 Demo Sesli Not Geldi!</h4>
+                    <p className="text-on-surface-variant mb-1">
+                      Danışman Mehmet Bey, Kadıköy'den 3+1 satılık ev arayan acil bir müşteri için not bıraktı.
+                    </p>
+                    <p className="text-sm text-primary font-medium mb-4">Siz manuel veri girmekle uğraşmayın diye, bırakın Kapora'nın yapay zekası bunu saniyeler içinde CRM verisine dönüştürsün!</p>
+                    <button 
+                      onClick={() => window.dispatchEvent(new CustomEvent('open-new-lead-drawer', { detail: { isDemo: true } }))}
+                      className="bg-primary hover:bg-primary/90 text-on-primary font-bold py-3 px-6 rounded-xl transition-all shadow-lg hover:shadow-primary/30 flex items-center gap-2 w-full md:w-auto justify-center"
+                    >
+                      <span className="material-symbols-outlined">auto_awesome</span>
+                      AI'ın Gücünü Test Et
+                    </button>
+                  </div>
+                </div>
+              </div>
             ) : (
               <AnimatedLeadList leads={leads} />
             )}
@@ -316,9 +356,14 @@ const AgentDashboard = () => {
                   </p>
                 </div>
               </div>
-              <button onClick={() => setSelectedLeadId(null)} className="w-8 h-8 flex items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant hover:text-on-surface hover:bg-outline-variant transition-colors border border-outline">
-                <span className="material-symbols-outlined text-[18px]">close</span>
-              </button>
+              <div className="flex items-center gap-2">
+                <button onClick={handleDeleteLead} className="w-8 h-8 flex items-center justify-center rounded-full bg-surface-container-high text-[#EF4444] hover:bg-[#EF4444]/10 transition-colors border border-outline" title="Leadi Sil">
+                  <span className="material-symbols-outlined text-[18px]">delete</span>
+                </button>
+                <button onClick={() => setSelectedLeadId(null)} className="w-8 h-8 flex items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant hover:text-on-surface hover:bg-outline-variant transition-colors border border-outline">
+                  <span className="material-symbols-outlined text-[18px]">close</span>
+                </button>
+              </div>
             </div>
 
             <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6 custom-scrollbar">

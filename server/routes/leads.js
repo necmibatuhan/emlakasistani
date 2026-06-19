@@ -202,6 +202,14 @@ Lütfen çıktını başka hiçbir metin olmadan sadece geçerli bir JSON olarak
 
     const message = "Sesli not üzerinden sisteme eklendi.";
 
+    const userRes = await db.query('SELECT referral_code FROM users WHERE id = $1', [req.user.id]);
+    const refCode = userRes.rows[0]?.referral_code || '';
+    const refUrl = refCode ? `kapora.online/davet/${refCode}` : `kapora.online`;
+    let wpDraft = parsedResult.whatsapp_message || '';
+    if (wpDraft) {
+      wpDraft += `\n\n📋 Bu sunum Kapora AI ile hazırlanmıştır.\n🔗 Ücretsiz deneyin: ${refUrl}`;
+    }
+
     const leadInsert = await db.query(
       `INSERT INTO leads (company_id, office_id, assigned_to, source, name, phone, message, score, label, reasoning, recommended_action, whatsapp_draft, properties) 
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`,
@@ -211,7 +219,7 @@ Lütfen çıktını başka hiçbir metin olmadan sadece geçerli bir JSON olarak
         mappedLabel, 
         reasoningText, 
         parsedResult.next_action || '', 
-        parsedResult.whatsapp_message || '', 
+        wpDraft, 
         JSON.stringify(parsedResult)
       ]
     );
@@ -321,6 +329,14 @@ JSON formatında çıktı ver:
        mappedLabel = 'Ilık';
     }
 
+    const userRes = await db.query('SELECT referral_code FROM users WHERE id = $1', [req.user.id]);
+    const refCode = userRes.rows[0]?.referral_code || '';
+    const refUrl = refCode ? `kapora.online/davet/${refCode}` : `kapora.online`;
+    let wpDraft = parsedResult.whatsapp_message || '';
+    if (wpDraft) {
+      wpDraft += `\n\n📋 Bu sunum Kapora AI ile hazırlanmıştır.\n🔗 Ücretsiz deneyin: ${refUrl}`;
+    }
+
     const leadInsert = await db.query(
       `INSERT INTO leads (company_id, office_id, assigned_to, source, name, phone, message, score, label, reasoning, recommended_action, whatsapp_draft, properties) 
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`,
@@ -330,7 +346,7 @@ JSON formatında çıktı ver:
         mappedLabel, 
         reasoningText, 
         parsedResult.next_action, 
-        parsedResult.whatsapp_message, 
+        wpDraft, 
         JSON.stringify(parsedResult)
       ]
     );
@@ -642,6 +658,36 @@ router.post('/recalculate-all', authMiddleware, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Toplu skorlama başlatılamadı' });
+  }
+});
+
+// Delete lead endpoint
+router.delete('/:id', authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { role, id: user_id } = req.user;
+
+    // Sadece lead'in sahibi veya admin silebilir
+    let query = 'DELETE FROM leads WHERE id = $1';
+    let values = [id];
+
+    if (role === 'agent' || role === 'viewer') {
+      query += ' AND assigned_to = $2';
+      values.push(user_id);
+    }
+
+    query += ' RETURNING id';
+
+    const result = await db.query(query, values);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: 'Lead bulunamadı veya silme yetkiniz yok' });
+    }
+
+    res.json({ message: 'Lead başarıyla silindi' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Sunucu hatası' });
   }
 });
 

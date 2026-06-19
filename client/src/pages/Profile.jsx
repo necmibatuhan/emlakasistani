@@ -117,6 +117,38 @@ const Profile = () => {
                 </form>
               </div>
 
+              {/* Referral Code */}
+              <div className="bg-[#16181D] rounded-[8px] border border-[#2A2D35] p-6">
+                <h3 className="text-[14px] font-medium text-[#F1F2F4] mb-4 border-b border-[#2A2D35] pb-3">Davet Et, Kazan!</h3>
+                <p className="text-[#7C8090] text-[13px] mb-4">Referans kodunuz ile platforma kaydolan her yeni üye için ekstra özellikler kazanın.</p>
+                <div className="flex flex-col md:flex-row gap-3">
+                  <div className="flex-1">
+                    <label className="block text-[11px] font-medium text-[#7C8090] mb-1.5 uppercase tracking-wider">Sizin Referans Linkiniz</label>
+                    <div className="relative">
+                      <input 
+                        type="text" 
+                        className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#F5A623] font-bold rounded-[6px] px-4 p-2.5 min-h-[44px] text-[13px] outline-none" 
+                        value={user?.referral_code ? `kapora.online/davet/${user.referral_code}` : 'Referans kodunuz yükleniyor...'} 
+                        readOnly 
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-end">
+                    <button 
+                      onClick={() => {
+                        if (user?.referral_code) {
+                          navigator.clipboard.writeText(`kapora.online/davet/${user.referral_code}`);
+                          alert('Kopyalandı!');
+                        }
+                      }}
+                      className="w-full md:w-auto bg-[#F5A623] hover:bg-[#d9921e] text-[#0A0B0D] min-h-[44px] px-6 py-2.5 rounded-[6px] text-[13px] font-medium transition-colors"
+                    >
+                      Kopyala
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               {/* Password Change */}
               <div className="bg-[#16181D] rounded-[8px] border border-[#2A2D35] p-6">
                 <h3 className="text-[14px] font-medium text-[#F1F2F4] mb-4 border-b border-[#2A2D35] pb-3">Şifre Değiştir</h3>

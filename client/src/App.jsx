@@ -34,6 +34,7 @@ import VerifyEmail from './pages/VerifyEmail';
 import AydinlatmaMetni from './pages/AydinlatmaMetni';
 import GizlilikPolitikasi from './pages/GizlilikPolitikasi';
 import MockCheckout from './pages/MockCheckout';
+import Analyzer from './pages/Analyzer';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
@@ -88,6 +89,7 @@ const AppRoutes = () => {
       <Route path="/gizlilik-politikasi" element={<GizlilikPolitikasi />} />
       <Route path="/blog" element={<BlogList />} />
       <Route path="/blog/:slug" element={<BlogPost />} />
+      <Route path="/ilan-analizi" element={<Analyzer />} />
       <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
       <Route path="/dashboard" element={<ProtectedRoute><RoleBasedDashboard /></ProtectedRoute>} />
       <Route path="/leads" element={<ProtectedRoute><Leads /></ProtectedRoute>} />

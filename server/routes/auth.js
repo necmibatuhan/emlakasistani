@@ -93,7 +93,7 @@ async function verifyTurnstile(token) {
 
 router.post('/register', async (req, res) => {
   try {
-    const { email, name, password, role = 'agent', turnstileToken } = req.body;
+    const { email, name, password, role = 'agent', turnstileToken, refCode } = req.body;
     
     const isHuman = await verifyTurnstile(turnstileToken);
     if (!isHuman) {
@@ -125,11 +125,25 @@ router.post('/register', async (req, res) => {
     );
     const officeId = officeRes.rows[0].id;
 
+    // Generate referral code for new user
+    const baseCode = name.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().substring(0, 5);
+    const uniqueSuffix = Math.random().toString(36).substring(2, 6).toUpperCase();
+    const newRefCode = `${baseCode}${uniqueSuffix}`;
+
+    // Check if referred by someone
+    let referredById = null;
+    if (refCode) {
+      const refCheck = await db.query('SELECT id FROM users WHERE referral_code = $1', [refCode]);
+      if (refCheck.rows.length > 0) {
+        referredById = refCheck.rows[0].id;
+      }
+    }
+
     const newUser = await db.query(
-      `INSERT INTO users (company_id, office_id, email, name, password_hash, role, verification_token, is_verified) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
-       RETURNING id, company_id, office_id, role, email, name, plan, is_verified`,
-      [companyId, officeId, email, name, password_hash, role, verificationToken, false]
+      `INSERT INTO users (company_id, office_id, email, name, password_hash, role, verification_token, is_verified, referral_code, referred_by_id) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
+       RETURNING id, company_id, office_id, role, email, name, plan, is_verified, referral_code`,
+      [companyId, officeId, email, name, password_hash, role, verificationToken, false, newRefCode, referredById]
     );
 
     const user = newUser.rows[0];
@@ -191,7 +205,7 @@ router.post('/login', async (req, res) => {
     );
 
     res.json({ 
-      user: { id: user.id, role: user.role, company_id: user.company_id, office_id: user.office_id, email: user.email, name: user.name, plan: user.plan, created_at: user.created_at }, 
+      user: { id: user.id, role: user.role, company_id: user.company_id, office_id: user.office_id, email: user.email, name: user.name, plan: user.plan, created_at: user.created_at, referral_code: user.referral_code }, 
       token 
     });
   } catch (err) {
@@ -222,7 +236,7 @@ router.post('/verify-email', async (req, res) => {
     res.json({ 
       message: 'E-postanız başarıyla doğrulandı. Yönlendiriliyorsunuz...',
       token: jwtToken,
-      user: { id: user.id, role: user.role, email: user.email, name: user.name, plan: user.plan, created_at: user.created_at }
+      user: { id: user.id, role: user.role, email: user.email, name: user.name, plan: user.plan, created_at: user.created_at, referral_code: user.referral_code }
     });
   } catch (err) {
     console.error(err);
@@ -399,7 +413,7 @@ router.post('/reset-password', async (req, res) => {
 // GET /me (Get current user)
 router.get('/me', authMiddleware, async (req, res) => {
   try {
-    const user = await db.query('SELECT id, company_id, office_id, role, email, name, plan, is_verified, created_at FROM users WHERE id = $1', [req.user.id]);
+    const user = await db.query('SELECT id, company_id, office_id, role, email, name, plan, is_verified, created_at, referral_code FROM users WHERE id = $1', [req.user.id]);
     if (user.rows.length === 0) return res.status(404).json({ message: 'Kullanıcı bulunamadı' });
     res.json(user.rows[0]);
   } catch (err) {

@@ -391,7 +391,14 @@ ${transcript}
     // I will simply store the AI's result. No need to unmask since we didn't mask it.
     
     const unmaskedAciklama = parsedResult.gerekceler?.aciklama || '';
-    const unmaskedTaslak = parsedResult.yanit_taslak || '';
+    
+    const userRes = await db.query('SELECT referral_code FROM users WHERE id = $1', [req.user.id]);
+    const refCode = userRes.rows[0]?.referral_code || '';
+    const refUrl = refCode ? `kapora.online/davet/${refCode}` : `kapora.online`;
+    let unmaskedTaslak = parsedResult.yanit_taslak || '';
+    if (unmaskedTaslak) {
+      unmaskedTaslak += `\n\n📋 Bu sunum Kapora AI ile hazırlanmıştır.\n🔗 Ücretsiz deneyin: ${refUrl}`;
+    }
     
     // Veritabanına Ekle
     const leadInsert = await db.query(

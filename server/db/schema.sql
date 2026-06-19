@@ -25,6 +25,8 @@ CREATE TABLE users (
   plan TEXT NOT NULL DEFAULT 'free' CHECK (plan IN ('free','pro','proplus')),
   verification_token TEXT,
   is_verified BOOLEAN DEFAULT false,
+  referral_code TEXT UNIQUE,
+  referred_by_id UUID REFERENCES users(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
