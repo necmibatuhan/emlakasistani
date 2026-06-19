@@ -5,6 +5,8 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { Analytics } from "@vercel/analytics/react";
 import GlobalMobileNav from './components/GlobalMobileNav';
+import QuickAddFAB from './components/QuickAddFAB';
+import InstallPrompt from './components/InstallPrompt';
 
 import Landing from './pages/Landing';
 import Auth from './pages/Auth';
@@ -99,7 +101,9 @@ function App() {
         <Router>
           <div className="pb-[56px] lg:pb-0">
             <AppRoutes />
+            <QuickAddFAB />
             <GlobalMobileNav />
+            <InstallPrompt />
           </div>
           <SpeedInsights />
           <Analytics />

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Çevrimdışı - Kapora</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: #0A0B0D;
+      color: #F1F2F4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    .icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+      color: #EF4444;
+    }
+    h1 { margin-bottom: 8px; font-size: 24px; }
+    p { color: #8E929C; margin-bottom: 32px; line-height: 1.5; }
+    button {
+      background-color: #10B981;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    button:hover { background-color: #059669; }
+    .cached-leads {
+      margin-top: 40px;
+      width: 100%;
+      max-width: 400px;
+      text-align: left;
+    }
+    .lead-card {
+      background-color: #1C1E24;
+      border: 1px solid #2A2D35;
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+    .lead-name { font-weight: bold; margin-bottom: 4px; }
+    .lead-phone { color: #8E929C; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="icon">📡</div>
+  <h1>İnternet Bağlantınız Yok</h1>
+  <p>Şu anda çevrimdışısınız. İnternet bağlantısı sağlandığında sayfa otomatik olarak yenilenecektir.</p>
+  <button onclick="window.location.reload()">Tekrar Dene</button>
+
+  <div class="cached-leads" id="cached-leads-container" style="display: none;">
+    <h3 style="margin-bottom: 16px; color: #8E929C; font-size: 14px; text-transform: uppercase;">Son Görüşülen Müşteriler</h3>
+    <div id="leads-list"></div>
+  </div>
+
+  <script>
+    window.addEventListener('online', () => {
+      window.location.reload();
+    });
+
+    // Try to load basic lead info if they exist in some caches or localStorage.
+    // In actual implementation, we might read from IndexedDB/CacheStorage, but here we just show a static placeholder or attempt cache read.
+    async function showCachedLeads() {
+      try {
+        const cache = await caches.open('leads-cache');
+        const keys = await cache.keys();
+        const leadsRes = await cache.match(keys.find(k => k.url.includes('/api/leads')));
+        if (leadsRes) {
+          const leads = await leadsRes.json();
+          if (leads && leads.length > 0) {
+            const container = document.getElementById('cached-leads-container');
+            const list = document.getElementById('leads-list');
+            container.style.display = 'block';
+            list.innerHTML = leads.slice(0, 5).map(l => `
+              <div class="lead-card">
+                <div class="lead-name">${l.name}</div>
+                <div class="lead-phone">${l.phone}</div>
+              </div>
+            `).join('');
+          }
+        }
+      } catch (e) {
+        console.error('Failed to load cached leads', e);
+      }
+    }
+    
+    showCachedLeads();
+  </script>
+</body>
+</html>
