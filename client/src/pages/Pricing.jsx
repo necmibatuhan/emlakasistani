@@ -157,7 +157,7 @@ const Pricing = () => {
             </div>
             
             <p className="text-slate-400 text-[14px] mb-8 leading-relaxed h-16">
-              Performansını ölçmek isteyenler için
+              Bölgesindeki rakiplerinin gerisinde kalmak istemeyen vizyoner ofisler için.
             </p>
             
             <ul className="space-y-4 mb-10 flex-1">

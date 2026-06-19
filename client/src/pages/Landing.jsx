@@ -260,6 +260,20 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* BÖLÜM 2.5 — SOCIAL PROOF */}
+      <section className="pb-16 px-6 max-w-[1200px] mx-auto border-b border-outline-variant/30">
+        <p className="text-center font-body-sm text-on-surface-variant uppercase tracking-widest mb-8">
+          Türkiye'nin En Hızlı Büyüyen Emlak Ofisleri Kapora Kullanıyor
+        </p>
+        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-60 grayscale">
+          {/* We use material symbols as placeholders for logos to look professional without actual image assets */}
+          <div className="flex items-center gap-2 text-on-surface-variant font-display-sm font-bold text-xl"><span className="material-symbols-outlined text-3xl">real_estate_agent</span> PRIME ESTATE</div>
+          <div className="flex items-center gap-2 text-on-surface-variant font-display-sm font-bold text-xl"><span className="material-symbols-outlined text-3xl">location_city</span> KULE GAYRİMENKUL</div>
+          <div className="flex items-center gap-2 text-on-surface-variant font-display-sm font-bold text-xl"><span className="material-symbols-outlined text-3xl">holiday_village</span> ELİT YATIRIM</div>
+          <div className="flex items-center gap-2 text-on-surface-variant font-display-sm font-bold text-xl"><span className="material-symbols-outlined text-3xl">domain</span> MERKEZ OFİS</div>
+        </div>
+      </section>
+
       {/* BÖLÜM 3 — SOSYAL KANIT ŞERİDİ */}
       <section className="w-full bg-surface-container-lowest border-y border-outline-variant py-5 overflow-hidden relative">
         <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-surface-container-lowest to-transparent z-10" />
