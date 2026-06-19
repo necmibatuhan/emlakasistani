@@ -71,7 +71,17 @@ const ActionCard = ({ action, onActionClick }) => {
       </div>
       
       <button 
-        onClick={(e) => { e.stopPropagation(); onActionClick(action.lead_id); }}
+        onClick={(e) => { 
+          e.stopPropagation(); 
+          if (action.action_type === 'call') {
+            window.location.href = `tel:${action.lead_phone || ''}`;
+          } else if (action.action_type === 'whatsapp') {
+            const text = encodeURIComponent(action.whatsapp_draft || 'Merhaba, görüşmemizle ilgili size ulaşmak istedim.');
+            window.open(`https://wa.me/${action.lead_phone?.replace(/[^0-9]/g, '') || ''}?text=${text}`, '_blank');
+          } else {
+            onActionClick(action.lead_id); 
+          }
+        }}
         className="w-full bg-surface-container-lowest hover:bg-outline-variant text-on-surface text-[12px] font-bold py-2 px-3 rounded border border-outline flex items-center justify-center gap-2 transition-colors"
       >
         {action.suggested_action_icon && <span className="material-symbols-outlined text-[16px]">{action.suggested_action_icon}</span>}
@@ -100,45 +110,59 @@ const CommandCenter = ({ leads, onLeadSelect }) => {
         actions.urgent_call.push({
           lead_id: lead.id,
           lead_name: lead.name === '[İsim Belirtilmedi]' ? 'İsimsiz' : lead.name,
+          lead_phone: lead.phone,
           expected_commission: '45.000',
           reason: 'Dün fiyat sormuştu, bugün dönüş bekliyor. Hemen ara.',
           suggested_action_text: 'Hemen Ara',
-          suggested_action_icon: 'call'
+          suggested_action_icon: 'call',
+          action_type: 'call'
         });
       } else if (lead.label === 'Sıcak' && index % 2 !== 0) {
         actions.at_risk.push({
           lead_id: lead.id,
           lead_name: lead.name === '[İsim Belirtilmedi]' ? 'İsimsiz' : lead.name,
+          lead_phone: lead.phone,
           expected_commission: '120.000',
           reason: '8 gündür aranmadı. Başka emlakçıya gidebilir.',
           suggested_action_text: 'Kurtarma Mesajı At',
-          suggested_action_icon: 'chat'
+          suggested_action_icon: 'chat',
+          action_type: 'whatsapp',
+          whatsapp_draft: `Merhaba ${lead.name === '[İsim Belirtilmedi]' ? '' : lead.name}, geçen hafta görüşmüştük. Arayışınız devam ediyor mu?`
         });
       } else if (lead.label === 'Ilık' && index % 3 === 0) {
          actions.high_commission.push({
           lead_id: lead.id,
           lead_name: lead.name === '[İsim Belirtilmedi]' ? 'İsimsiz' : lead.name,
+          lead_phone: lead.phone,
           expected_commission: '350.000',
           reason: 'Bütçesi yüksek, lüks segment arayışında. Yeni fırsat sun.',
           suggested_action_text: 'Özel Portföy Gönder',
-          suggested_action_icon: 'home'
+          suggested_action_icon: 'home',
+          action_type: 'whatsapp',
+          whatsapp_draft: `${lead.name === '[İsim Belirtilmedi]' ? 'Merhaba' : 'Merhaba ' + lead.name}, bütçenize uygun yeni ve çok özel bir portföyümüz var, detayları iletmemi ister misiniz?`
         });
       } else if (index % 4 === 0) {
          actions.new_matches.push({
           lead_id: lead.id,
           lead_name: lead.name === '[İsim Belirtilmedi]' ? 'İsimsiz' : lead.name,
+          lead_phone: lead.phone,
           expected_commission: '60.000',
           reason: 'Dün girdiğiniz Kadıköy 3+1 portföyü ile %92 eşleşiyor.',
           suggested_action_text: 'Eşleşmeyi Gönder',
-          suggested_action_icon: 'send'
+          suggested_action_icon: 'send',
+          action_type: 'whatsapp',
+          whatsapp_draft: `Merhaba ${lead.name === '[İsim Belirtilmedi]' ? '' : lead.name}, aradığınız kriterlere %92 uyan Kadıköy'de 3+1 yeni bir ilanımız portföye eklendi. Linki iletiyorum.`
         });
       } else if (lead.label === 'Soğuk') {
         actions.dormant.push({
           lead_id: lead.id,
           lead_name: lead.name === '[İsim Belirtilmedi]' ? 'İsimsiz' : lead.name,
+          lead_phone: lead.phone,
           reason: '45 gündür işlem yok. Piyasayı yokla.',
           suggested_action_text: 'Uyandırma Mesajı',
-          suggested_action_icon: 'notifications_active'
+          suggested_action_icon: 'notifications_active',
+          action_type: 'whatsapp',
+          whatsapp_draft: `Merhaba ${lead.name === '[İsim Belirtilmedi]' ? '' : lead.name}, piyasa şu an oldukça hareketli. Mevcut arayışınızla ilgili yardımcı olabileceğimiz yeni fırsatlar doğdu, müsait bir zamanda görüşebilir miyiz?`
         });
       }
     });
