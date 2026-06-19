@@ -263,14 +263,13 @@ const Landing = () => {
       {/* BÖLÜM 2.5 — SOCIAL PROOF */}
       <section className="pb-16 px-6 max-w-[1200px] mx-auto border-b border-outline-variant/30">
         <p className="text-center font-body-sm text-on-surface-variant uppercase tracking-widest mb-8">
-          Türkiye'nin En Hızlı Büyüyen Emlak Ofisleri Kapora Kullanıyor
+          Kullandığınız Tüm Araçlarla Tam Uyumlu Çalışır
         </p>
         <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-50 grayscale">
-          <div className="text-on-surface-variant font-display-lg font-black text-2xl tracking-tighter">RE/MAX</div>
-          <div className="text-on-surface-variant font-display-lg font-bold text-xl tracking-widest">COLDWELL BANKER</div>
-          <div className="text-on-surface-variant font-serif italic font-bold text-2xl">Keller Williams</div>
-          <div className="text-on-surface-variant font-display-sm font-black text-2xl tracking-tight">TURYAP</div>
-          <div className="text-on-surface-variant font-display-sm font-bold text-xl tracking-wider">CENTURY 21</div>
+          <div className="flex items-center gap-2 text-on-surface-variant font-display-sm font-bold text-xl"><span className="material-symbols-outlined text-3xl">chat</span> WhatsApp</div>
+          <div className="flex items-center gap-2 text-on-surface-variant font-display-sm font-bold text-xl"><span className="material-symbols-outlined text-3xl">calendar_month</span> Google Takvim</div>
+          <div className="flex items-center gap-2 text-on-surface-variant font-display-sm font-bold text-xl"><span className="material-symbols-outlined text-3xl">table_view</span> MS Excel</div>
+          <div className="flex items-center gap-2 text-on-surface-variant font-display-sm font-bold text-xl"><span className="material-symbols-outlined text-3xl">psychology</span> OpenAI</div>
         </div>
       </section>
 
