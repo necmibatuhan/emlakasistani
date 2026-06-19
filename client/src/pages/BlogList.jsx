@@ -2,32 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Logo } from '../components/Logo';
 
-export const BLOG_POSTS = [
-  {
-    slug: 'emlak-danismanlari-icin-en-iyi-5-musteri-takip-crm-programi',
-    title: 'Emlak Danışmanları İçin En İyi 5 Müşteri Takip (CRM) Programı',
-    excerpt: 'Emlak sektöründe müşteri takibi, portföy yönetimi ve satış kapatma hızınızı artıracak en iyi 5 CRM programını inceledik. Neden Kapora AI 1 numara?',
-    date: '2026-06-15',
-    readTime: '4 dk',
-    category: 'CRM & Teknoloji'
-  },
-  {
-    slug: 'gayrimenkul-satislarinda-yapay-zeka-donemi-sesli-crm-nedir',
-    title: 'Gayrimenkul Satışlarında Yapay Zeka Dönemi: Sesli CRM Nedir?',
-    excerpt: 'Manuel veri girişinden kurtulun. Sesli notlarınızı saniyeler içinde analiz edip akıllı müşteri kartlarına dönüştüren Sesli CRM teknolojisini keşfedin.',
-    date: '2026-06-12',
-    readTime: '3 dk',
-    category: 'Yapay Zeka'
-  },
-  {
-    slug: 'emlak-ofislerinde-zaman-yonetimi-ve-manuel-veri-girisinden-kurtulma-yollari',
-    title: 'Emlak Ofislerinde Zaman Yönetimi ve Manuel Veri Girişinden Kurtulma Yolları',
-    excerpt: 'Günde 3 saatinizi Excel tablolarında mı harcıyorsunuz? Emlak ofislerinde operasyonel yükü hafifletmenin ve otomasyona geçmenin pratik yolları.',
-    date: '2026-06-10',
-    readTime: '5 dk',
-    category: 'İş Yönetimi'
-  }
-];
+import { BLOG_POSTS } from '../data/blogPosts';
 
 export default function BlogList() {
   return (
