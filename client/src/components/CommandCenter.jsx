@@ -183,6 +183,7 @@ const CommandCenter = ({ leads, onLeadSelect }) => {
   });
 
   const formattedCommission = totalCommission === 0 ? '0' : totalCommission.toLocaleString('tr-TR');
+  const isDashboardEmpty = Object.values(actionMap).every(list => list.length === 0);
 
   return (
     <div className="w-full h-full flex flex-col gap-6">
@@ -191,10 +192,22 @@ const CommandCenter = ({ leads, onLeadSelect }) => {
            <h2 className="text-2xl font-display-md text-on-surface tracking-tight">Fırsat Radarı</h2>
            <p className="text-sm text-on-surface-variant mt-1">Bugün odaklanmanız gereken komisyon üretecek aksiyonlar.</p>
         </div>
-        <div className="bg-[#10B981]/10 border border-[#10B981]/30 px-4 py-2 rounded-lg flex items-center gap-3">
-           <span className="text-[11px] font-bold text-[#10B981] uppercase tracking-wider">Masadaki Toplam Komisyon</span>
-           <span className="font-mono text-xl font-bold text-[#10B981]">₺{formattedCommission}</span>
-        </div>
+        
+        {isDashboardEmpty ? (
+          <div className="bg-surface-container border border-outline px-4 py-2 rounded-lg flex items-center gap-3 relative overflow-hidden group">
+             <div className="absolute inset-0 bg-background/50 backdrop-blur-[2px] flex items-center justify-center z-10 transition-opacity">
+                <span className="material-symbols-outlined text-on-surface-variant text-[18px] mr-1">lock</span>
+                <span className="text-[10px] font-bold text-on-surface">İlk sesli notunu ekle, komisyonu hesaplayalım</span>
+             </div>
+             <span className="text-[11px] font-bold text-[#10B981] uppercase tracking-wider opacity-30">Masadaki Toplam Komisyon</span>
+             <span className="font-mono text-xl font-bold text-[#10B981] blur-sm opacity-50 select-none">₺145.000</span>
+          </div>
+        ) : (
+          <div className="bg-[#10B981]/10 border border-[#10B981]/30 px-4 py-2 rounded-lg flex items-center gap-3">
+             <span className="text-[11px] font-bold text-[#10B981] uppercase tracking-wider">Masadaki Toplam Komisyon</span>
+             <span className="font-mono text-xl font-bold text-[#10B981]">₺{formattedCommission}</span>
+          </div>
+        )}
       </div>
 
       {/* 5 Sütunlu Yatay Kaydırılabilir Grid */}
@@ -215,9 +228,13 @@ const CommandCenter = ({ leads, onLeadSelect }) => {
             {/* List */}
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3 custom-scrollbar">
               {actionMap[category.id].length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-on-surface-variant/50 gap-2">
-                  <span className="material-symbols-outlined text-[32px]">done_all</span>
-                  <span className="text-[12px] font-medium">Bu liste temiz.</span>
+                <div className="h-full flex flex-col items-center justify-center text-center px-4 gap-3">
+                  <div className="w-12 h-12 rounded-full bg-surface-container-highest flex items-center justify-center">
+                    <span className="material-symbols-outlined text-[24px] text-primary/70">mic</span>
+                  </div>
+                  <span className="text-[13px] font-medium text-on-surface-variant leading-relaxed">
+                    Henüz sesli not girmediniz. <br/>İlk müşterinizi kaydetmek için ses atın.
+                  </span>
                 </div>
               ) : (
                 actionMap[category.id].map((action, i) => (
