@@ -42,16 +42,7 @@ const PrioritiesWidget = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="bg-[#1C1E24] border border-[#2A2D35] rounded-xl p-6 mb-6 animate-pulse">
-        <div className="h-6 bg-[#2A2D35] rounded w-1/4 mb-4"></div>
-        <div className="flex gap-4 overflow-x-auto">
-          {[1, 2, 3].map(i => (
-             <div key={i} className="min-w-[280px] h-[160px] bg-[#2A2D35] rounded-xl flex-shrink-0"></div>
-          ))}
-        </div>
-      </div>
-    );
+    return null;
   }
 
   if (priorities.length === 0) return null;
