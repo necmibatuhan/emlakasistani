@@ -380,8 +380,21 @@ const Leads = () => {
                           </span>
                         </div>
                         
-                        {/* Ok ikonu */}
-                        <div className="w-[32px] flex-shrink-0 flex justify-end">
+                        {/* Aksiyonlar (Ok ve Sil) */}
+                        <div className="w-[60px] flex-shrink-0 flex items-center justify-end gap-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (window.confirm('Bu müşteriyi silmek istediğinize emin misiniz?')) {
+                                handleDeleteLead(lead.id);
+                                if (selectedLead?.id === lead.id) setSelectedLead(null);
+                              }
+                            }}
+                            className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-[#EF4444]/10 text-[#2A2D35] hover:text-[#EF4444] transition-colors"
+                            title="Sil"
+                          >
+                            <span className="material-symbols-outlined text-[16px]">delete</span>
+                          </button>
                           <span className={`material-symbols-outlined text-[18px] transition-colors ${isSelected ? 'text-[#F1F2F4]' : 'text-[#2A2D35]'}`}>
                             arrow_forward
                           </span>
