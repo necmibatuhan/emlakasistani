@@ -301,7 +301,10 @@ router.post('/create-lead', authMiddleware, upload.single('audio'), async (req, 
     if (!audioFile) return res.status(400).json({ error: 'Ses dosyası bulunamadı' });
 
     const audioBase64 = audioFile.buffer.toString('base64');
-    const mimeType = audioFile.mimetype;
+    let mimeType = audioFile.mimetype.split(';')[0];
+    if (mimeType === 'application/octet-stream' || !mimeType.startsWith('audio/')) {
+        mimeType = 'audio/webm';
+    }
 
     let transcript = "";
     if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'mock') {
@@ -405,9 +408,9 @@ ${transcript}
       `INSERT INTO leads (company_id, office_id, assigned_to, source, name, phone, message, score, label, reasoning, recommended_action, whatsapp_draft, properties) 
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`,
       [
-        req.user.company_id, req.user.office_id, req.user.id, 'voice', parsedResult.isim, parsedResult.telefon, transcript, 
-        parsedResult.skor, parsedResult.etiket, unmaskedAciklama, 
-        parsedResult.onerilen_aksiyon, unmaskedTaslak, JSON.stringify(parsedResult.mulk_tercihleri)
+        req.user.company_id || null, req.user.office_id || null, req.user.id, 'voice', parsedResult.isim || 'Bilinmeyen', parsedResult.telefon || null, transcript || '', 
+        parsedResult.skor || null, parsedResult.etiket || null, unmaskedAciklama || '', 
+        parsedResult.onerilen_aksiyon || null, unmaskedTaslak || '', parsedResult.mulk_tercihleri ? JSON.stringify(parsedResult.mulk_tercihleri) : null
       ]
     );
 

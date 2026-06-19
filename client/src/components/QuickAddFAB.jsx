@@ -99,7 +99,7 @@ const QuickAddFAB = () => {
     setIsSaving(true);
     try {
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads`,
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/analyze`,
         { name, phone, message: notes },
         { headers: { Authorization: `Bearer ${token}` } }
       );
