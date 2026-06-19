@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db');
 const { authMiddleware } = require('../middleware/auth');
+const morningBriefing = require('../services/morningBriefing');
 
 router.get('/priorities', authMiddleware, async (req, res) => {
   try {
@@ -61,6 +62,17 @@ router.get('/priorities', authMiddleware, async (req, res) => {
 
   } catch (error) {
     console.error('Priority error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+router.get('/briefing', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const briefing = await morningBriefing.getUserBriefing(userId);
+    res.json(briefing);
+  } catch (error) {
+    console.error('Briefing error:', error);
     res.status(500).json({ error: 'Server error' });
   }
 });

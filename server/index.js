@@ -22,6 +22,7 @@ const socialProofRoutes = require('./routes/socialProof');
 const matchRoutes = require('./routes/match');
 require('./services/queue'); // Start background worker
 require('./services/churnPrevention'); // Start cron job
+require('./services/morningBriefing'); // Start daily briefing job
 
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
