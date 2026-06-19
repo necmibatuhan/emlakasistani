@@ -273,12 +273,6 @@ const Landing = () => {
         <p className="text-center font-body-sm text-on-surface-variant uppercase tracking-widest mb-8">
           Kullandığınız Tüm Araçlarla Tam Uyumlu Çalışır
         </p>
-        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-50 grayscale">
-          <div className="flex items-center gap-2 text-on-surface-variant font-display-sm font-bold text-xl"><span className="material-symbols-outlined text-3xl">chat</span> WhatsApp</div>
-          <div className="flex items-center gap-2 text-on-surface-variant font-display-sm font-bold text-xl"><span className="material-symbols-outlined text-3xl">calendar_month</span> Google Takvim</div>
-          <div className="flex items-center gap-2 text-on-surface-variant font-display-sm font-bold text-xl"><span className="material-symbols-outlined text-3xl">table_view</span> MS Excel</div>
-          <div className="flex items-center gap-2 text-on-surface-variant font-display-sm font-bold text-xl"><span className="material-symbols-outlined text-3xl">psychology</span> OpenAI</div>
-        </div>
       </section>
 
       {/* BÖLÜM 3 — SOSYAL KANIT ŞERİDİ */}
