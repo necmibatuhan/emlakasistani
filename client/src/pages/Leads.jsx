@@ -166,6 +166,17 @@ const Leads = () => {
 
   const handleAddLead = async (e) => {
     if (e) e.preventDefault();
+    
+    if (!newLeadPhone.trim()) {
+      setAnalyzeError('Lütfen telefon numarası girin.');
+      return;
+    }
+    const phoneDigits = newLeadPhone.replace(/\D/g, '');
+    if (phoneDigits.length < 10 || phoneDigits.length > 12) {
+      setAnalyzeError('Lütfen geçerli bir telefon numarası girin (örn: 0555 123 4567).');
+      return;
+    }
+
     setIsAnalyzing(true);
     setAnalyzeError('');
     try {

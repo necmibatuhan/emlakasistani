@@ -95,6 +95,12 @@ const QuickAddFAB = () => {
     if (!name.trim() || !phone.trim()) {
       return;
     }
+
+    const phoneDigits = phone.replace(/\D/g, '');
+    if (phoneDigits.length < 10 || phoneDigits.length > 12) {
+      showToast('Lütfen geçerli bir telefon numarası girin (örn: 0555 123 4567).');
+      return;
+    }
     
     setIsSaving(true);
     try {
