@@ -1,11 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Loader2, Sparkles, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Search, Loader2, Sparkles, CheckCircle2, TrendingUp, Share2, Download, Image as ImageIcon, Zap, Activity } from 'lucide-react';
+import html2canvas from 'html2canvas';
+import ReportTemplate from '../components/ReportTemplate';
+import { AuthContext } from '../contexts/AuthContext';
 
 const Analyzer = () => {
+  const { user } = useContext(AuthContext);
   const [url, setUrl] = useState('');
   const [status, setStatus] = useState('idle'); // idle, analyzing, result
   const [progress, setProgress] = useState(0);
+  const [isExporting, setIsExporting] = useState(false);
+  const reportRef = useRef(null);
 
   const handleAnalyze = (e) => {
     e.preventDefault();
@@ -27,6 +33,39 @@ const Analyzer = () => {
     }, 400);
   };
 
+  const handleDownloadImage = async () => {
+    if (!reportRef.current) return;
+    setIsExporting(true);
+    try {
+      // Geçici olarak report container'ı görünür yap
+      const el = reportRef.current;
+      el.style.display = 'block';
+      el.style.position = 'absolute';
+      el.style.left = '-9999px';
+      
+      const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#0A0B0D' });
+      const image = canvas.toDataURL('image/jpeg', 0.9);
+      
+      const link = document.createElement('a');
+      link.href = image;
+      link.download = 'kapora_ilan_analizi.jpg';
+      link.click();
+      
+      el.style.display = 'none';
+      el.style.position = 'static';
+    } catch (err) {
+      console.error('Export failed', err);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleWhatsAppShare = () => {
+    const message = `Merhaba,\n\nEv ilanınızı inceledim ve yapay zeka tabanlı "Kapora İlan Analizi" sistemimizden geçirdim.\n\nMevcut İlan Skorunuz: 42/100 (Kayıp Riski Yüksek)\n\nNeden satılmıyor?\n❌ Görsel açı ve aydınlatma yetersiz.\n❌ Açıklama metni alıcıda duygu ve aciliyet yaratmıyor.\n\nEğer portföyünüzü bana emanet ederseniz, Kapora AI teknolojileriyle evinizin "Piyasa Çekicilik Skorunu" 82/100'e çıkarıp %40 daha hızlı satılmasını sağlayabilirim.\n\nDetaylı analiz görselini inceleyebilirsiniz.\nİyi günler dilerim,\n${user?.name || "Kapora Danışmanı"}`;
+    const encoded = encodeURIComponent(message);
+    window.open(`https://wa.me/?text=${encoded}`, '_blank');
+  };
+
   return (
     <div className="min-h-screen bg-[#0A0B0D] flex flex-col font-sans selection:bg-[#F5A623] selection:text-white">
       {/* Header */}
@@ -40,30 +79,22 @@ const Analyzer = () => {
               Kapora <span className="text-[#F5A623]">AI</span>
             </span>
           </Link>
-          <div className="hidden md:flex items-center gap-4">
-            <Link to="/auth" className="text-[#F1F2F4] hover:text-[#F5A623] font-medium text-sm transition-colors">
-              Giriş Yap
-            </Link>
-            <Link to="/auth" className="bg-[#F5A623] hover:bg-[#d9921e] text-[#0A0B0D] px-6 py-2.5 rounded-full text-sm font-bold transition-all shadow-lg hover:shadow-[#F5A623]/25 hover:-translate-y-0.5">
-              Ücretsiz Deneyin
-            </Link>
-          </div>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="flex-1 pt-32 pb-20 px-6">
-        <div className="max-w-3xl mx-auto w-full">
+        <div className="max-w-4xl mx-auto w-full">
           
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#F5A623]/10 border border-[#F5A623]/20 text-[#F5A623] text-sm font-semibold mb-6">
-              <Sparkles size={16} /> Ücretsiz İlan Analizi
+              <Sparkles size={16} /> Gelişmiş İlan Analizi
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-[#F1F2F4] mb-6 leading-tight">
-              Bayat İlanlarınızı <br/> <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F5A623] to-[#FF8B00]">Satışa Çevirin</span>
+              Portföy Almanın <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F5A623] to-[#FF8B00]">En Teknolojik Yolu</span>
             </h1>
             <p className="text-lg text-[#7C8090] max-w-2xl mx-auto">
-              İlanınız 60 günden uzun süredir yayında mı? Sahibinden veya HepsiEmlak linkini yapıştırın, yapay zeka saniyeler içinde zayıf noktaları bulup açıklamanızı baştan yazsın.
+              Evini kendisi satmaya çalışan mülk sahiplerinin ilan linkini yapıştırın. Onlara yapay zeka destekli, profesyonel bir "İyileştirme Raporu" göndererek farkınızı gösterin.
             </p>
           </div>
 
@@ -75,7 +106,7 @@ const Analyzer = () => {
                   type="url" 
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
-                  placeholder="https://www.sahibinden.com/ilan/..." 
+                  placeholder="Sahibinden veya HepsiEmlak ilan linki..." 
                   className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#F1F2F4] rounded-xl pl-12 pr-4 py-4 text-base focus:border-[#F5A623] focus:ring-1 focus:ring-[#F5A623] outline-none transition-all placeholder:text-[#7C8090]"
                   required
                 />
@@ -83,12 +114,12 @@ const Analyzer = () => {
               <button 
                 type="submit" 
                 disabled={status === 'analyzing'}
-                className="bg-[#F5A623] hover:bg-[#FF8B00] disabled:opacity-50 disabled:cursor-not-allowed text-[#0A0B0D] px-8 py-4 rounded-xl font-bold text-base transition-all flex items-center justify-center gap-2 shrink-0"
+                className="bg-[#F5A623] hover:bg-[#FF8B00] disabled:opacity-50 disabled:cursor-not-allowed text-[#0A0B0D] px-8 py-4 rounded-xl font-bold text-base transition-all flex items-center justify-center gap-2 shrink-0 shadow-[0_0_15px_rgba(245,166,35,0.3)]"
               >
                 {status === 'analyzing' ? (
-                  <><Loader2 className="animate-spin" size={20} /> Analiz Ediliyor...</>
+                  <><Loader2 className="animate-spin" size={20} /> Analiz Ediliyor</>
                 ) : (
-                  <><Sparkles size={20} /> Hemen Analiz Et</>
+                  <><Activity size={20} /> Rapor Oluştur</>
                 )}
               </button>
             </form>
@@ -96,7 +127,7 @@ const Analyzer = () => {
 
           {/* Loading State */}
           {status === 'analyzing' && (
-            <div className="mt-12 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="mt-12 text-center animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-lg mx-auto">
               <div className="w-full h-2 bg-[#2A2D35] rounded-full overflow-hidden mb-4">
                 <div 
                   className="h-full bg-gradient-to-r from-[#F5A623] to-[#FF8B00] transition-all duration-300"
@@ -105,61 +136,149 @@ const Analyzer = () => {
               </div>
               <p className="text-[#7C8090] font-medium flex items-center justify-center gap-2">
                 <Loader2 className="animate-spin" size={16} /> 
-                {progress < 30 ? 'İlan verileri çekiliyor...' : progress < 70 ? 'Açıklama dili ve anahtar kelimeler analiz ediliyor...' : 'Yapay zeka optimizasyon raporu hazırlanıyor...'}
+                {progress < 30 ? 'İlan görselleri taranıyor...' : progress < 70 ? 'Açıklama dili ve nöropazarlama analizi yapılıyor...' : 'Müşteri raporu PDF/Görsel olarak hazırlanıyor...'}
               </p>
             </div>
           )}
 
-          {/* Result State */}
+          {/* Result Dashboard */}
           {status === 'result' && (
-            <div className="mt-12 bg-gradient-to-br from-[#16181D] to-[#0A0B0D] border border-[#F5A623]/30 rounded-2xl p-8 shadow-2xl animate-in fade-in slide-in-from-bottom-8 duration-700 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-[#F5A623]/5 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="mt-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                
+                {/* Score Widget */}
+                <div className="bg-[#16181D] border border-[#2A2D35] rounded-3xl p-6 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                  <div className="absolute top-0 right-0 p-4 opacity-10"><Target size={60} /></div>
+                  <h3 className="text-sm font-bold text-[#7C8090] tracking-wider uppercase mb-4">Piyasa Uygunluk Skoru</h3>
+                  
+                  {/* Fake Radial Progress */}
+                  <div className="relative w-32 h-32 flex items-center justify-center rounded-full border-8 border-[#EF4444]/20 mb-4">
+                    <div className="absolute inset-0 rounded-full border-8 border-[#EF4444] border-t-transparent border-r-transparent -rotate-45"></div>
+                    <span className="text-4xl font-black text-[#EF4444]">42</span>
+                  </div>
+                  
+                  <p className="text-sm text-[#EF4444] bg-[#EF4444]/10 px-3 py-1 rounded-full font-medium">Satış İhtimali Düşük</p>
+                </div>
+
+                {/* Visual Quality Widget */}
+                <div className="bg-[#16181D] border border-[#2A2D35] rounded-3xl p-6 relative overflow-hidden">
+                  <h3 className="text-sm font-bold text-[#7C8090] tracking-wider uppercase mb-6 flex items-center gap-2">
+                    <ImageIcon size={16}/> Görsel Kalite
+                  </h3>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex justify-between text-xs font-medium text-[#F1F2F4] mb-1">
+                        <span>Aydınlatma & Renk</span>
+                        <span className="text-[#F5A623]">60%</span>
+                      </div>
+                      <div className="h-2 w-full bg-[#2A2D35] rounded-full overflow-hidden">
+                        <div className="h-full bg-[#F5A623] w-[60%] rounded-full"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-xs font-medium text-[#F1F2F4] mb-1">
+                        <span>Fotoğraf Açısı</span>
+                        <span className="text-[#EF4444]">40%</span>
+                      </div>
+                      <div className="h-2 w-full bg-[#2A2D35] rounded-full overflow-hidden">
+                        <div className="h-full bg-[#EF4444] w-[40%] rounded-full"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-xs font-medium text-[#F1F2F4] mb-1">
+                        <span>Oda Düzeni (Staging)</span>
+                        <span className="text-[#EF4444]">35%</span>
+                      </div>
+                      <div className="h-2 w-full bg-[#2A2D35] rounded-full overflow-hidden">
+                        <div className="h-full bg-[#EF4444] w-[35%] rounded-full"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Text Appeal Widget */}
+                <div className="bg-[#16181D] border border-[#2A2D35] rounded-3xl p-6 relative overflow-hidden">
+                  <h3 className="text-sm font-bold text-[#7C8090] tracking-wider uppercase mb-6 flex items-center gap-2">
+                    <Zap size={16}/> Açıklama Çekiciliği
+                  </h3>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex justify-between text-xs font-medium text-[#F1F2F4] mb-1">
+                        <span>Duygusal Bağ Kurma</span>
+                        <span className="text-[#EF4444]">20%</span>
+                      </div>
+                      <div className="h-2 w-full bg-[#2A2D35] rounded-full overflow-hidden">
+                        <div className="h-full bg-[#EF4444] w-[20%] rounded-full"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-xs font-medium text-[#F1F2F4] mb-1">
+                        <span>Aciliyet / Kıtlık Algısı</span>
+                        <span className="text-[#EF4444]">10%</span>
+                      </div>
+                      <div className="h-2 w-full bg-[#2A2D35] rounded-full overflow-hidden">
+                        <div className="h-full bg-[#EF4444] w-[10%] rounded-full"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-xs font-medium text-[#F1F2F4] mb-1">
+                        <span>Fayda Odaklılık</span>
+                        <span className="text-[#F5A623]">50%</span>
+                      </div>
+                      <div className="h-2 w-full bg-[#2A2D35] rounded-full overflow-hidden">
+                        <div className="h-full bg-[#F5A623] w-[50%] rounded-full"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Area */}
+              <div className="bg-gradient-to-r from-[#F5A623]/20 to-transparent border border-[#F5A623]/30 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+                 <div className="absolute top-0 right-0 w-64 h-64 bg-[#F5A623]/10 rounded-full blur-3xl pointer-events-none"></div>
+                 <div className="relative z-10 flex-1">
+                   <h2 className="text-xl md:text-2xl font-bold text-[#F1F2F4] mb-2">Müşteriye Raporu Gönder!</h2>
+                   <p className="text-[#7C8090] text-sm">
+                     Müşterinize bu analiz sonuçlarını, üzerinde adınızın ve kendi logonuzun olduğu premium bir PDF/Görsel şablonla anında WhatsApp'tan iletin.
+                   </p>
+                 </div>
+                 
+                 <div className="relative z-10 flex items-center gap-4 w-full md:w-auto">
+                    <button 
+                      onClick={handleDownloadImage}
+                      disabled={isExporting}
+                      className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-[#2A2D35] hover:bg-[#353945] text-white px-6 py-3 rounded-xl font-medium transition-colors"
+                    >
+                      {isExporting ? <Loader2 className="animate-spin" size={18} /> : <Download size={18} />}
+                      Görseli İndir
+                    </button>
+                    
+                    <button 
+                      onClick={handleWhatsAppShare}
+                      className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-[#10B981] hover:bg-[#059669] text-white px-6 py-3 rounded-xl font-bold transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+                    >
+                      <Share2 size={18} />
+                      WhatsApp ile Gönder
+                    </button>
+                 </div>
+              </div>
               
-              <div className="flex items-start gap-4 mb-8">
-                <div className="w-12 h-12 rounded-full bg-[#EF4444]/10 flex items-center justify-center text-[#EF4444] shrink-0 border border-[#EF4444]/20">
-                  <span className="font-bold text-xl">42</span>
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-[#F1F2F4] mb-1">İlan Skorunuz Oldukça Düşük</h3>
-                  <p className="text-[#7C8090]">Bu ilan mevcut metniyle %65 potansiyel müşteri kaybediyor.</p>
-                </div>
-              </div>
-
-              <div className="space-y-4 mb-8">
-                <div className="p-4 rounded-xl bg-[#0A0B0D] border border-[#2A2D35] flex gap-3">
-                  <div className="text-[#EF4444] mt-0.5"><CheckCircle2 size={18} /></div>
-                  <div>
-                    <h4 className="text-sm font-bold text-[#F1F2F4]">Aciliyet Eksikliği</h4>
-                    <p className="text-xs text-[#7C8090] mt-1">İlan açıklamasında alıcıyı harekete geçirecek (Call-to-Action) ve kıtlık/aciliyet hissi yaratacak hiçbir cümle bulunmuyor.</p>
-                  </div>
-                </div>
-                <div className="p-4 rounded-xl bg-[#0A0B0D] border border-[#2A2D35] flex gap-3">
-                  <div className="text-[#EF4444] mt-0.5"><CheckCircle2 size={18} /></div>
-                  <div>
-                    <h4 className="text-sm font-bold text-[#F1F2F4]">Duygusal Bağ Kurulmuyor</h4>
-                    <p className="text-xs text-[#7C8090] mt-1">Sadece oda sayısı ve m2 yazılmış. Müşteri evi değil, evin sunduğu "yaşam tarzını" satın alır. Özellikler faydaya çevrilmemiş.</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-[#10B981]/10 border border-[#10B981]/20 rounded-xl p-5 mb-8">
-                <h4 className="text-[#10B981] font-bold text-sm mb-3 flex items-center gap-2"><Sparkles size={16}/> Kapora AI Optimizasyon Örneği:</h4>
-                <p className="text-sm text-[#F1F2F4] italic leading-relaxed">
-                  "Sadece bir ev değil, hafta sonu kahvelerinizi deniz esintisiyle yudumlayacağınız yeni bir yaşam alanı... Bölgedeki benzer mülkler ortalama 14 günde satılmaktadır. Randevu için hemen iletişime geçin."
-                </p>
-              </div>
-
-              <div className="text-center pt-6 border-t border-[#2A2D35]">
-                <h3 className="text-lg font-bold text-[#F1F2F4] mb-3">Tüm Portföyünüzü Otomatik Optimize Edin</h3>
-                <p className="text-sm text-[#7C8090] mb-6">Kapora AI CRM ile tüm müşterilerinizi ve portföylerinizi tek tıkla eşleştirin, satışları hızlandırın.</p>
-                <Link to="/auth" className="inline-flex items-center gap-2 bg-[#F5A623] hover:bg-[#FF8B00] text-[#0A0B0D] px-8 py-4 rounded-xl font-bold text-base transition-all shadow-lg hover:shadow-[#F5A623]/30 hover:-translate-y-1">
-                  Ücretsiz Hesabınızı Oluşturun <ArrowRight size={20} />
-                </Link>
-              </div>
+              <p className="text-xs text-[#7C8090] text-center mt-4">
+                Not: WhatsApp üzerinden doğrudan görsel atılamadığından, lütfen önce "Görseli İndir" butonuna tıklayıp, ardından WhatsApp'tan açılan mesaja görseli ekleyerek yollayınız.
+              </p>
             </div>
           )}
+
         </div>
       </main>
+
+      {/* Hidden container for rendering the image/pdf export */}
+      <div style={{ display: 'none' }}>
+         <ReportTemplate reportRef={reportRef} />
+      </div>
+
     </div>
   );
 };
