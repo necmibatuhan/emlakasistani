@@ -185,13 +185,13 @@ router.post('/login', async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user.id, role: user.role, company_id: user.company_id, office_id: user.office_id, plan: user.plan },
+      { id: user.id, role: user.role, company_id: user.company_id, office_id: user.office_id, plan: user.plan, created_at: user.created_at },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
 
     res.json({ 
-      user: { id: user.id, role: user.role, company_id: user.company_id, office_id: user.office_id, email: user.email, name: user.name, plan: user.plan }, 
+      user: { id: user.id, role: user.role, company_id: user.company_id, office_id: user.office_id, email: user.email, name: user.name, plan: user.plan, created_at: user.created_at }, 
       token 
     });
   } catch (err) {
@@ -214,7 +214,7 @@ router.post('/verify-email', async (req, res) => {
     
     const user = userRes.rows[0];
     const jwtToken = jwt.sign(
-      { id: user.id, role: user.role, company_id: user.company_id, office_id: user.office_id, plan: user.plan },
+      { id: user.id, role: user.role, company_id: user.company_id, office_id: user.office_id, plan: user.plan, created_at: user.created_at },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
@@ -222,7 +222,7 @@ router.post('/verify-email', async (req, res) => {
     res.json({ 
       message: 'E-postanız başarıyla doğrulandı. Yönlendiriliyorsunuz...',
       token: jwtToken,
-      user: { id: user.id, role: user.role, email: user.email, name: user.name, plan: user.plan }
+      user: { id: user.id, role: user.role, email: user.email, name: user.name, plan: user.plan, created_at: user.created_at }
     });
   } catch (err) {
     console.error(err);
@@ -282,13 +282,13 @@ router.post('/google', async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user.id, role: user.role, company_id: user.company_id, office_id: user.office_id, plan: user.plan },
+      { id: user.id, role: user.role, company_id: user.company_id, office_id: user.office_id, plan: user.plan, created_at: user.created_at },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
 
     res.json({ 
-      user: { id: user.id, role: user.role, company_id: user.company_id, office_id: user.office_id, email: user.email, name: user.name, plan: user.plan }, 
+      user: { id: user.id, role: user.role, company_id: user.company_id, office_id: user.office_id, email: user.email, name: user.name, plan: user.plan, created_at: user.created_at }, 
       token 
     });
   } catch (err) {
@@ -399,7 +399,7 @@ router.post('/reset-password', async (req, res) => {
 // GET /me (Get current user)
 router.get('/me', authMiddleware, async (req, res) => {
   try {
-    const user = await db.query('SELECT id, company_id, office_id, role, email, name, plan, is_verified FROM users WHERE id = $1', [req.user.id]);
+    const user = await db.query('SELECT id, company_id, office_id, role, email, name, plan, is_verified, created_at FROM users WHERE id = $1', [req.user.id]);
     if (user.rows.length === 0) return res.status(404).json({ message: 'Kullanıcı bulunamadı' });
     res.json(user.rows[0]);
   } catch (err) {

@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Logo } from '../components/Logo';
 
 const Pricing = () => {
   const [isAnnual, setIsAnnual] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const isExpired = queryParams.get('expired') === 'true';
 
   const handleStart = () => {
     navigate('/register?plan=pro');
@@ -54,6 +57,16 @@ const Pricing = () => {
       {/* Main Content */}
       <main className="pt-32 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col items-center">
         
+        {isExpired && (
+          <div className="w-full max-w-2xl bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl mb-8 flex items-start gap-3 animate-in slide-in-from-top-4">
+            <span className="material-symbols-outlined shrink-0 mt-0.5">error</span>
+            <div>
+              <h3 className="font-bold text-[15px] mb-1">14 Günlük Ücretsiz Deneme Süreniz Doldu</h3>
+              <p className="text-[14px]">Sistemi kullanmaya devam edebilmek için bir plan seçerek üyeliğinizi başlatmanız gerekmektedir.</p>
+            </div>
+          </div>
+        )}
+
         {/* Header Text */}
         <div className="text-center max-w-2xl mx-auto mb-16 animate-in slide-in-from-bottom-4 duration-700 fade-in">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#10B981]/10 text-[#10B981] text-[13px] font-medium mb-6">
