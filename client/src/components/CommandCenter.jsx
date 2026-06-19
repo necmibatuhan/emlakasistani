@@ -194,13 +194,15 @@ const CommandCenter = ({ leads, onLeadSelect }) => {
         </div>
         
         {isDashboardEmpty ? (
-          <div className="bg-surface-container border border-outline px-4 py-2 rounded-lg flex items-center gap-3 relative overflow-hidden group">
-             <div className="absolute inset-0 bg-background/50 backdrop-blur-[2px] flex items-center justify-center z-10 transition-opacity">
-                <span className="material-symbols-outlined text-on-surface-variant text-[18px] mr-1">lock</span>
-                <span className="text-[10px] font-bold text-on-surface">İlk sesli notunu ekle, komisyonu hesaplayalım</span>
+          <div className="bg-surface-container border border-outline px-4 py-2 rounded-lg flex flex-col md:flex-row items-center justify-center gap-2 relative overflow-hidden group min-w-[250px]">
+             <div className="absolute inset-0 bg-background/60 backdrop-blur-sm flex items-center justify-center z-10 p-2 text-center leading-tight">
+                <span className="material-symbols-outlined text-on-surface-variant text-[16px] mr-1">lock</span>
+                <span className="text-[11px] font-bold text-on-surface whitespace-nowrap">İlk sesli notu gir, komisyon hesaplansın</span>
              </div>
-             <span className="text-[11px] font-bold text-[#10B981] uppercase tracking-wider opacity-30">Masadaki Toplam Komisyon</span>
-             <span className="font-mono text-xl font-bold text-[#10B981] blur-sm opacity-50 select-none">₺145.000</span>
+             <div className="flex items-center gap-3">
+               <span className="text-[11px] font-bold text-[#10B981] uppercase tracking-wider opacity-30">Masadaki Toplam Komisyon</span>
+               <span className="font-mono text-xl font-bold text-[#10B981] blur-[3px] opacity-40 select-none">₺145.000</span>
+             </div>
           </div>
         ) : (
           <div className="bg-[#10B981]/10 border border-[#10B981]/30 px-4 py-2 rounded-lg flex items-center gap-3">
@@ -228,12 +230,12 @@ const CommandCenter = ({ leads, onLeadSelect }) => {
             {/* List */}
             <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3 custom-scrollbar">
               {actionMap[category.id].length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-center px-4 gap-3">
-                  <div className="w-12 h-12 rounded-full bg-surface-container-highest flex items-center justify-center">
-                    <span className="material-symbols-outlined text-[24px] text-primary/70">mic</span>
+                <div className="h-full flex flex-col items-center justify-center text-center px-2 gap-2 opacity-60">
+                  <div className="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center">
+                    <span className="material-symbols-outlined text-[20px] text-on-surface">mic</span>
                   </div>
-                  <span className="text-[13px] font-medium text-on-surface-variant leading-relaxed">
-                    Henüz sesli not girmediniz. <br/>İlk müşterinizi kaydetmek için ses atın.
+                  <span className="text-[12px] font-medium text-on-surface-variant">
+                    Kayıt yok. Eklemek için ses atın.
                   </span>
                 </div>
               ) : (
