@@ -4,10 +4,12 @@ import { User, Mail, Building, Key, Shield, LogOut, Trash2, AlertTriangle, X } f
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import axios from 'axios';
+import CancelFlowModal from '../components/cancel-flow/CancelFlowModal';
 
 const Profile = () => {
   const { user, logout } = useContext(AuthContext);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const getRoleLabel = (role) => {
@@ -65,11 +67,10 @@ const Profile = () => {
                 </div>
               </div>
               <div className="bg-[#16181D] rounded-[8px] border border-[#2A2D35] p-6 mt-6">
-                <h3 className="text-[14px] font-medium text-[#EF4444] mb-3">Hesap Yönetimi</h3>
-                <p className="text-[12px] text-[#7C8090] mb-4 leading-relaxed">Hesabınızı sildiğinizde size ait tüm veriler (müşteriler, istatistikler, portföyler) kalıcı olarak silinir. Bu işlem geri alınamaz.</p>
-                <button onClick={() => setIsDeleteModalOpen(true)} className="w-full flex justify-center items-center space-x-2 text-[#EF4444] bg-[#EF4444]/5 hover:bg-[#EF4444]/10 min-h-[44px] px-4 py-2.5 rounded-[6px] text-[13px] font-medium transition-colors border border-[#EF4444]/20">
-                  <Trash2 size={14} />
-                  <span>Hesabımı Kalıcı Olarak Sil</span>
+                <h3 className="text-[14px] font-medium text-[#F1F2F4] mb-3">Abonelik Yönetimi</h3>
+                <p className="text-[12px] text-[#7C8090] mb-4 leading-relaxed">Mevcut aboneliğinizi dilediğiniz zaman iptal edebilirsiniz. İptal işlemi bir sonraki fatura döneminden itibaren geçerli olur.</p>
+                <button onClick={() => setIsCancelModalOpen(true)} className="w-full flex justify-center items-center space-x-2 text-[#F1F2F4] bg-[#2A2D35] hover:bg-[#343741] min-h-[44px] px-4 py-2.5 rounded-[6px] text-[13px] font-medium transition-colors border border-[#343741]">
+                  <span>Aboneliği İptal Et</span>
                 </button>
               </div>
             </div>
@@ -190,6 +191,13 @@ const Profile = () => {
 
         </div>
       </div>
+
+      {/* Cancel Flow Modal */}
+      <CancelFlowModal 
+        isOpen={isCancelModalOpen} 
+        onClose={() => setIsCancelModalOpen(false)} 
+        token={localStorage.getItem('token')} 
+      />
 
       {/* Delete Confirmation Modal */}
       {isDeleteModalOpen && (

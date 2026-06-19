@@ -27,7 +27,37 @@ CREATE TABLE users (
   is_verified BOOLEAN DEFAULT false,
   referral_code TEXT UNIQUE,
   referred_by_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  subscription_status VARCHAR(20) DEFAULT 'trial',
+  cancel_reason VARCHAR(100),
+  cancel_feedback TEXT,
+  discount_offered BOOLEAN DEFAULT false,
+  discount_accepted BOOLEAN DEFAULT false,
+  cancelled_at TIMESTAMPTZ,
+  grace_period_ends TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE subscriptions (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  stripe_customer_id TEXT,
+  stripe_subscription_id TEXT,
+  plan_id TEXT NOT NULL,
+  status TEXT NOT NULL,
+  current_period_start TIMESTAMPTZ,
+  current_period_end TIMESTAMPTZ,
+  cancel_at_period_end BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE cancel_flow_events (
+  id SERIAL PRIMARY KEY,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  step VARCHAR(50),
+  action VARCHAR(50),
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMP DEFAULT NOW()
 );
 
 CREATE TABLE leads (

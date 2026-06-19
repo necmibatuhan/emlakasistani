@@ -17,6 +17,7 @@ const templatesRoutes = require('./routes/templates');
 const contactsRoutes = require('./routes/contacts');
 const analyticsRoutes = require('./routes/analytics');
 const notificationsRoutes = require('./routes/notifications');
+const subscriptionRoutes = require('./routes/subscription');
 require('./services/queue'); // Start background worker
 require('./services/churnPrevention'); // Start cron job
 
@@ -78,6 +79,7 @@ app.use('/api/templates', templatesRoutes);
 app.use('/api/contacts', contactsRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/notifications', notificationsRoutes);
+app.use('/api/subscription', subscriptionRoutes);
 
 app.get('/', (req, res) => {
   res.send('Kapora API');

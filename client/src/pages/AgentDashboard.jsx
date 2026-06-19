@@ -104,14 +104,22 @@ const AgentDashboard = () => {
     enabled: !!selectedLeadId
   });
 
-  const handleDeleteLead = async () => {
-    if (!window.confirm('Bu müşteriyi silmek istediğinize emin misiniz?')) return;
+  const handleDeleteLead = async (idToDelete) => {
+    const targetId = idToDelete || selectedLeadId;
+    if (!targetId) return;
+    
+    // We already confirmed in AnimatedLeadList, but if called from drawer, we should confirm.
+    // Let's just let the caller confirm or confirm here if it's from the drawer.
+    if (!idToDelete) {
+      if (!window.confirm('Bu müşteriyi silmek istediğinize emin misiniz?')) return;
+    }
+    
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/${selectedLeadId}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads/${targetId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       queryClient.invalidateQueries(['leads']);
-      setSelectedLeadId(null);
+      if (selectedLeadId === targetId) setSelectedLeadId(null);
     } catch (err) {
       console.error(err);
       alert('Lead silinirken hata oluştu.');
@@ -328,7 +336,7 @@ const AgentDashboard = () => {
                 </div>
               </div>
             ) : (
-              <AnimatedLeadList leads={leads} />
+              <AnimatedLeadList leads={leads} onDeleteLead={(id) => handleDeleteLead(id)} />
             )}
           </div>
         </div>
@@ -357,8 +365,8 @@ const AgentDashboard = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <button onClick={handleDeleteLead} className="w-8 h-8 flex items-center justify-center rounded-full bg-surface-container-high text-[#EF4444] hover:bg-[#EF4444]/10 transition-colors border border-outline" title="Leadi Sil">
-                  <span className="material-symbols-outlined text-[18px]">delete</span>
+                <button onClick={() => handleDeleteLead(leadDetails.id)} className="w-8 h-8 flex items-center justify-center rounded-full bg-surface-container-high text-[#EF4444] hover:bg-[#EF4444]/10 transition-colors border border-outline" title="Leadi Sil">
+                  <span className="material-symbols-outlined text-[16px]">delete</span>
                 </button>
                 <button onClick={() => setSelectedLeadId(null)} className="w-8 h-8 flex items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant hover:text-on-surface hover:bg-outline-variant transition-colors border border-outline">
                   <span className="material-symbols-outlined text-[18px]">close</span>

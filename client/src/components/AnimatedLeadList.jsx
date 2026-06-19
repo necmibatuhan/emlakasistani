@@ -21,7 +21,7 @@ const itemVariants = {
 /**
  * Premium karanlık temalı, Layout animasyonlu Lead Kartı Bileşeni
  */
-function AnimatedLeadCard({ lead }) {
+function AnimatedLeadCard({ lead, onDelete }) {
   // Kartın açık/genişlemiş olup olmadığını tutar
   const [isExpanded, setIsExpanded] = useState(false);
   
@@ -114,6 +114,21 @@ function AnimatedLeadCard({ lead }) {
                   {lead.summary || 'Ses kaydı özeti bulunmuyor.'}
                 </p>
               </div>
+
+              <div className="flex justify-end mt-2">
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (window.confirm('Bu müşteriyi silmek istediğinize emin misiniz?')) {
+                      onDelete(lead.id);
+                    }
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-md text-xs font-medium transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[14px]">delete</span>
+                  Sil
+                </button>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -126,7 +141,7 @@ function AnimatedLeadCard({ lead }) {
 /**
  * Ana Liste Bileşeni
  */
-export default function AnimatedLeadList({ leads = [] }) {
+export default function AnimatedLeadList({ leads = [], onDeleteLead }) {
   if (!leads || leads.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-64 bg-surface-container/30 border border-outline/30 rounded-2xl p-8 text-center mt-2">
@@ -149,7 +164,7 @@ export default function AnimatedLeadList({ leads = [] }) {
       className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 w-full"
     >
       {leads.map((lead) => (
-        <AnimatedLeadCard key={lead.id} lead={lead} />
+        <AnimatedLeadCard key={lead.id} lead={lead} onDelete={onDeleteLead} />
       ))}
     </motion.div>
   );
