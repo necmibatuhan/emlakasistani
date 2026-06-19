@@ -1,6 +1,8 @@
 export const t = {
   tr: {
     nav: {
+      features: "Özellikler",
+      howItWorks: "Nasıl Çalışır",
       blog: "Blog",
       pricing: "Fiyatlar",
       login: "Giriş Yap",
@@ -141,6 +143,8 @@ export const t = {
   },
   en: {
     nav: {
+      features: "Features",
+      howItWorks: "How It Works",
       blog: "Blog",
       pricing: "Pricing",
       login: "Sign In",

@@ -45,9 +45,9 @@ const Pricing = () => {
             <Logo />
           </Link>
           <nav className="hidden md:flex items-center gap-8 text-[14px] font-medium text-slate-400">
-            <Link to="/#ozellikler" className="hover:text-white transition-colors">Özellikler</Link>
-            <Link to="/#nasil-calisir" className="hover:text-white transition-colors">Nasıl Çalışır</Link>
-            <Link to="/pricing" className="text-white">Fiyatlandırma</Link>
+            <a href="#ozellikler" className="hover:text-white transition-colors">Özellikler</a>
+            <a href="#nasil-calisir" className="hover:text-white transition-colors">Nasıl Çalışır</a>
+            <a href="#pricing" className="text-white">Fiyatlandırma</a>
           </nav>
           <div className="flex items-center gap-4">
             <Link to="/login" className="text-[14px] font-medium text-white hover:text-[#FDE047] transition-colors hidden sm:block">Giriş Yap</Link>
@@ -223,8 +223,106 @@ const Pricing = () => {
 
         </div>
 
+        {/* Yeni: NASIL ÇALIŞIR */}
+        <div id="nasil-calisir" className="w-full max-w-6xl mt-32 mb-16 pt-16 border-t border-white/10 animate-in slide-in-from-bottom-8 duration-700">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-white mb-4">Nasıl Çalışır?</h2>
+            <p className="text-slate-400 max-w-2xl mx-auto">Yapay zeka asistanınız sizin yerinize lead'leri takip eder, uygun portföyleri bulur ve müşterilerle iletişime geçer.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-[#1e293b]/50 border border-white/5 p-8 rounded-2xl flex flex-col items-center text-center">
+              <div className="w-16 h-16 bg-blue-500/20 text-blue-400 rounded-full flex items-center justify-center mb-6">
+                <span className="material-symbols-outlined text-3xl">mic</span>
+              </div>
+              <h3 className="text-lg font-bold text-white mb-3">1. Sesli Not Bırakın</h3>
+              <p className="text-slate-400 text-sm">Müşteri talebini sesli olarak Kapora'ya söyleyin. AI anında fişler, bütçe ve konumu analiz eder.</p>
+            </div>
+            <div className="bg-[#1e293b]/50 border border-white/5 p-8 rounded-2xl flex flex-col items-center text-center relative">
+              <div className="hidden md:block absolute top-1/2 -left-4 w-8 h-0.5 bg-white/10"></div>
+              <div className="hidden md:block absolute top-1/2 -right-4 w-8 h-0.5 bg-white/10"></div>
+              <div className="w-16 h-16 bg-purple-500/20 text-purple-400 rounded-full flex items-center justify-center mb-6">
+                <span className="material-symbols-outlined text-3xl">psychology</span>
+              </div>
+              <h3 className="text-lg font-bold text-white mb-3">2. Akıllı Eşleşme</h3>
+              <p className="text-slate-400 text-sm">Gelişmiş algoritmamız portföyünüzdeki uygun evleri bulur ve WhatsApp için profesyonel sunum mesajını hazırlar.</p>
+            </div>
+            <div className="bg-[#1e293b]/50 border border-white/5 p-8 rounded-2xl flex flex-col items-center text-center">
+              <div className="w-16 h-16 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center mb-6">
+                <span className="material-symbols-outlined text-3xl">send</span>
+              </div>
+              <h3 className="text-lg font-bold text-white mb-3">3. Tek Tıkla Gönder</h3>
+              <p className="text-slate-400 text-sm">Hazırlanan mesajı WhatsApp üzerinden müşteriye iletin. Yanıt geldiğinde asistanınız size haber verir.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Yeni: ÖZELLİKLER */}
+        <div id="ozellikler" className="w-full max-w-6xl mt-16 mb-24 pt-16 border-t border-white/10 animate-in slide-in-from-bottom-8 duration-700">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-white mb-4">Tüm Özellikler</h2>
+            <p className="text-slate-400 max-w-2xl mx-auto">Gayrimenkul danışmanları için özel olarak tasarlanmış yapay zeka özellikleri.</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+            <div className="flex gap-4">
+              <div className="w-10 h-10 rounded-lg bg-[#FDE047]/10 flex items-center justify-center shrink-0">
+                <span className="material-symbols-outlined text-[#FDE047]">smart_toy</span>
+              </div>
+              <div>
+                <h4 className="text-white font-bold mb-1">Yapay Zeka Müşteri Kaydı</h4>
+                <p className="text-slate-400 text-sm">Manuel veri girişini unutun. Whatsapp mesajlarından veya sesli notlardan otomatik lead oluşturun.</p>
+              </div>
+            </div>
+            <div className="flex gap-4">
+              <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
+                <span className="material-symbols-outlined text-blue-400">add_business</span>
+              </div>
+              <div>
+                <h4 className="text-white font-bold mb-1">Portföy ve İlan Analizi</h4>
+                <p className="text-slate-400 text-sm">Eklediğiniz portföyün ilan metnini AI ile yazdırın. Zayıf ilanları analiz edip düzeltme önerileri alın.</p>
+              </div>
+            </div>
+            <div className="flex gap-4">
+              <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center shrink-0">
+                <span className="material-symbols-outlined text-green-400">notifications_active</span>
+              </div>
+              <div>
+                <h4 className="text-white font-bold mb-1">Akıllı Hatırlatıcılar</h4>
+                <p className="text-slate-400 text-sm">"Şu müşteriyi yarın ara", "Tapu işlemleri için belgeleri iste" gibi notları AI otomatik takvime ekler.</p>
+              </div>
+            </div>
+            <div className="flex gap-4">
+              <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center shrink-0">
+                <span className="material-symbols-outlined text-purple-400">forum</span>
+              </div>
+              <div>
+                <h4 className="text-white font-bold mb-1">WhatsApp Entegrasyonu</h4>
+                <p className="text-slate-400 text-sm">Müşterilerinize tek tıkla profesyonel teklif, sunum ve karşılama mesajları gönderin.</p>
+              </div>
+            </div>
+            <div className="flex gap-4">
+              <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center shrink-0">
+                <span className="material-symbols-outlined text-orange-400">query_stats</span>
+              </div>
+              <div>
+                <h4 className="text-white font-bold mb-1">Gelişmiş Performans Raporları</h4>
+                <p className="text-slate-400 text-sm">Ofis ve bireysel bazda satış, lead dönüşümü ve komisyon istatistiklerinizi analiz edin.</p>
+              </div>
+            </div>
+            <div className="flex gap-4">
+              <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center shrink-0">
+                <span className="material-symbols-outlined text-red-400">team_dashboard</span>
+              </div>
+              <div>
+                <h4 className="text-white font-bold mb-1">Ekip ve Ofis Yönetimi</h4>
+                <p className="text-slate-400 text-sm">Alt danışmanlarınızın lead havuzlarını yönetin, onlara görev atayın ve performanslarını izleyin.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* FAQs */}
-        <div className="w-full max-w-3xl mt-32">
+        <div className="w-full max-w-3xl mt-16 pt-16 border-t border-white/5">
           <h3 className="text-2xl font-bold text-white mb-10 text-center">Sıkça Sorulan Sorular</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {faqs.map((faq, index) => (

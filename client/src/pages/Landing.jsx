@@ -102,6 +102,8 @@ const Landing = () => {
           
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-6">
+            <a href="#ozellikler" className="text-on-surface-variant hover:text-on-surface font-body-sm font-medium transition-colors">{curr.nav.features}</a>
+            <a href="#nasil-calisir" className="text-on-surface-variant hover:text-on-surface font-body-sm font-medium transition-colors">{curr.nav.howItWorks}</a>
             <Link to="/ilan-analizi" className="text-on-surface-variant hover:text-primary font-body-sm font-medium transition-colors flex items-center gap-1"><Sparkles size={16}/> İlan Analizi</Link>
             <Link to="/blog" className="text-on-surface-variant hover:text-on-surface font-body-sm font-medium transition-colors">{curr.nav.blog}</Link>
             <a href="#fiyatlar" className="text-on-surface-variant hover:text-on-surface font-body-sm font-medium transition-colors">{curr.nav.pricing}</a>
@@ -135,6 +137,8 @@ const Landing = () => {
         {/* Mobile Nav Dropdown */}
         {isMobileMenuOpen && (
           <div className="md:hidden absolute top-16 left-0 right-0 bg-background/95 backdrop-blur-xl border-b border-outline-variant p-6 flex flex-col gap-4 shadow-xl z-50">
+            <a href="#ozellikler" onClick={() => setIsMobileMenuOpen(false)} className="text-on-surface-variant hover:text-on-surface font-body-md font-medium">{curr.nav.features}</a>
+            <a href="#nasil-calisir" onClick={() => setIsMobileMenuOpen(false)} className="text-on-surface-variant hover:text-on-surface font-body-md font-medium">{curr.nav.howItWorks}</a>
             <Link to="/ilan-analizi" onClick={() => setIsMobileMenuOpen(false)} className="text-on-surface-variant hover:text-primary font-body-md font-medium flex items-center gap-2"><Sparkles size={18}/> İlan Analizi</Link>
             <Link to="/blog" onClick={() => setIsMobileMenuOpen(false)} className="text-on-surface-variant hover:text-on-surface font-body-md font-medium">{curr.nav.blog}</Link>
             <a href="#fiyatlar" onClick={() => setIsMobileMenuOpen(false)} className="text-on-surface-variant hover:text-on-surface font-body-md font-medium">{curr.nav.pricing}</a>
@@ -313,7 +317,7 @@ const Landing = () => {
       </section>
 
       {/* BÖLÜM 4 — LIVE UI FLOW */}
-      <section className="py-24 px-6 max-w-[1200px] mx-auto">
+      <section id="nasil-calisir" className="py-24 px-6 max-w-[1200px] mx-auto">
         <div className="flex flex-col md:flex-row items-center gap-12 md:gap-20">
           {/* Sol: Adımlar */}
           <div className="w-full md:w-1/2 space-y-8">
@@ -393,7 +397,7 @@ const Landing = () => {
       </section>
 
       {/* BÖLÜM 5 — DASHBOARD MOCKUP */}
-      <section className="py-24 px-6 bg-surface-container-lowest relative border-t border-outline-variant">
+      <section id="ozellikler" className="py-24 px-6 bg-surface-container-lowest relative border-t border-outline-variant">
         <div className="max-w-[1200px] mx-auto">
           <div className="text-center mb-16">
             <h2 className="font-display-md text-[36px] lg:text-[42px] font-semibold text-on-surface mb-4">
