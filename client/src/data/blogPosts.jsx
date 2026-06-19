@@ -82,6 +82,87 @@ export const BLOG_POSTS = [
     readTime: '5 dk',
     category: 'Yapay Zeka'
   }
+,
+  {
+    slug: 'emlak-danismanlari-icin-musteri-takibini-kolaylastiran-7-yontem',
+    title: 'Emlak Danışmanları İçin Müşteri Takibini Kolaylaştıran 7 Yöntem',
+    excerpt: 'Pipeline görünümü, haftalık kontrol, zaman sınırı ve otomatik takip mantığı ile satışlarınızı artırın.',
+    date: '2026-06-20',
+    readTime: '4 dk',
+    category: 'Müşteri Takibi'
+  },
+  {
+    slug: 'musteri-hangi-asamada-takiliyor-crm-ile-satis-asamalarini-gorun',
+    title: 'Müşteri Hangi Aşamada Takılıyor? CRM ile Satış Aşamalarını Görün',
+    excerpt: 'CRM ile hangi aşamada kaybedildiğini analiz etmek, dönüşüm oranını artırmak için kritik stratejiler.',
+    date: '2026-06-20',
+    readTime: '5 dk',
+    category: 'Satış Kapatma'
+  },
+  {
+    slug: 'kapora-crm-ile-musteri-yonetimini-tek-platforma-toplama',
+    title: 'Kapora CRM İle Müşteri Yönetimini Tek Platforma Toplama',
+    excerpt: 'Excel ve not defterinden CRM geçişi, modern arayüz avantajları ve yapay zeka entegrasyonu.',
+    date: '2026-06-21',
+    readTime: '3 dk',
+    category: 'İş Yönetimi'
+  },
+  {
+    slug: 'emlakta-referans-yonetimi-musteriyi-yeni-satisa-nasil-donusturursunuz',
+    title: 'Emlakta Referans Yönetimi: Müşteriyi Yeni Satışa Nasıl Dönüştürürsünüz?',
+    excerpt: 'Mutlu müşteriden otomatik yeni satış ve kazanç elde etmenin dijital yolları.',
+    date: '2026-06-21',
+    readTime: '4 dk',
+    category: 'Müşteri Takibi'
+  },
+  {
+    slug: 'emlak-danismanlarinda-musteri-iliskileri-yonetimi-nasil-kurulur',
+    title: 'Emlak Danışmanlarında Müşteri İlişkileri Yönetimi Nasıl Kurulur?',
+    excerpt: 'İlk temas, iletişim süreci, randevu yönetimi ve referans zinciri oluşturmanın adımları.',
+    date: '2026-06-22',
+    readTime: '6 dk',
+    category: 'Müşteri Takibi'
+  },
+  {
+    slug: 'emlak-ilanlarini-seo-uyumlu-yazmanin-6-temel-kurali',
+    title: 'Emlak İlanlarını SEO Uyumlu Yazmanın 6 Temel Kuralı',
+    excerpt: 'Bölge odaklı başlıklar, kullanıcı soruları, yerel içerik ve meta açıklamalarla ilanlarınızı öne çıkarın.',
+    date: '2026-06-22',
+    readTime: '5 dk',
+    category: 'Dijital Pazarlama'
+  },
+  {
+    slug: 'gayrimenkul-ilanlarinda-yerel-seo-neden-kritik',
+    title: 'Gayrimenkul İlanlarında Yerel SEO Neden Kritik?',
+    excerpt: 'Mahalle, ulaşım, sosyal alanlar ve bölge avantajlarının ilan performansına doğrudan etkisi.',
+    date: '2026-06-23',
+    readTime: '4 dk',
+    category: 'Dijital Pazarlama'
+  },
+  {
+    slug: 'kucuk-emlak-sitelerinde-ilan-gorunurlugunu-artirmak-icin-5-seo-teknigi',
+    title: 'Küçük Emlak Sitelerinde İlan Görünürlüğünü Artırmak İçin 5 SEO Tekniği',
+    excerpt: 'Büyük portallarla rekabet etmek için anahtar kelime seçimi, teknik SEO ve içerik pazarlaması.',
+    date: '2026-06-23',
+    readTime: '5 dk',
+    category: 'Dijital Pazarlama'
+  },
+  {
+    slug: 'satilik-daire-ve-kiralik-ev-icin-en-iyi-seo-anahtar-kelimeler',
+    title: 'Satılık Daire ve Kiralık Ev İçin En İyi SEO Anahtar Kelimeler',
+    excerpt: 'Arama hacmi yüksek terimlerin doğru kullanımı ve bölgesel entegrasyonu.',
+    date: '2026-06-24',
+    readTime: '4 dk',
+    category: 'Dijital Pazarlama'
+  },
+  {
+    slug: 'ilan-yonetiminde-yapilan-5-kritik-hata-ve-cozum-yollari',
+    title: 'İlan Yönetiminde Yapılan 5 Kritik Hata ve Çözüm Yolları',
+    excerpt: 'Başlık, açıklama, fotoğraf, fiyat ve bölge bilgisi hatalarıyla nasıl para kaybediyorsunuz?',
+    date: '2026-06-24',
+    readTime: '6 dk',
+    category: 'Portföy Yönetimi'
+  }
 ];
 
 export const getBlogPostContent = (slug) => {
@@ -250,6 +331,66 @@ export const getBlogPostContent = (slug) => {
           <p>
             <Link to="/" className="text-primary hover:underline font-bold">Kapora Emlak Asistanı</Link> sizi işsiz bırakmak için değil, sizi angarya işlerden kurtarmak için var. Siz sahada insan ilişkileri kurarken, Kapora arka planda Excel tablolarınızı tutar, eşleştirmeleri yapar, WhatsApp mesajlarınızı hazırlar. Sektördeki yenilikleri yakalamak ve rakiplerinize fark atmak için hemen bugün teknolojiye adapte olun!
           </p>
+        </div>
+      );
+    case 'emlak-danismanlari-icin-musteri-takibini-kolaylastiran-7-yontem':
+      return (
+        <div className="prose prose-invert prose-lg max-w-none prose-p:text-on-surface-variant prose-headings:text-on-surface">
+          <p>Müşteri takibi, gayrimenkul satışında başarının anahtarıdır. Birçok danışman ilk temastan sonra müşteriyi unutur veya yanlış zamanda arar.</p><h2>Pipeline Görünümü ve Aşama Analizi</h2><p>Bir <Link to="/" className="text-primary hover:underline font-bold">emlak CRM programı</Link> kullanarak müşterilerinizi "Yeni", "Sunum Yapıldı", "Pazarlık" gibi aşamalara ayırın. Görsel bir pipeline (huni) yönetimi, hangi aşamada tıkanıklık yaşadığınızı anında gösterir.</p><h2>Zaman Sınırları Belirleyin</h2><p>Her müşteri aşamasının bir bekleme süresi olmalıdır. Eğer bir müşteri "Düşünüyor" aşamasında 7 günden fazla kalıyorsa, sistem sizi otomatik olarak uyarmalıdır. Kapora'nın akıllı hatırlatıcıları sayesinde hiçbir müşteriyi soğutmadan doğru zamanda arayabilirsiniz.</p>
+        </div>
+      );
+    case 'musteri-hangi-asamada-takiliyor-crm-ile-satis-asamalarini-gorun':
+      return (
+        <div className="prose prose-invert prose-lg max-w-none prose-p:text-on-surface-variant prose-headings:text-on-surface">
+          <p>Aylık 100 müşteriyle görüşüp sadece 2 satış kapatıyorsanız, sorunun nerede olduğunu bulmalısınız. Acaba sunumdan sonra mı kaybediyorsunuz, yoksa pazarlık aşamasında mı?</p><h2>Veriye Dayalı Analiz</h2><p>Modern bir <strong>gayrimenkul CRM programı</strong>, size sadece rehberlik yapmaz, aynı zamanda kayıp nedenlerinizi analiz eder. Kapora'nın sağladığı detaylı raporlar sayesinde "Bütçe Yetersizliği" veya "Bölge Uyuşmazlığı" gibi ret sebeplerini grafikle görebilir, pazarlama bütçenizi doğru yönlendirebilirsiniz.</p>
+        </div>
+      );
+    case 'kapora-crm-ile-musteri-yonetimini-tek-platforma-toplama':
+      return (
+        <div className="prose prose-invert prose-lg max-w-none prose-p:text-on-surface-variant prose-headings:text-on-surface">
+          <p>Parçalanmış veriler, kayıp müşteriler demektir. Not defterindeki numaralar, telefondaki WhatsApp mesajları ve bilgisayardaki Excel dosyası arasında mekik dokumak zaman kaybıdır.</p><h2>Tek Platform, Sınırsız Kontrol</h2><p><Link to="/" className="text-primary hover:underline font-bold">Kapora</Link> ile müşteriniz ilk aradığı andan tapu teslimine kadar geçen tüm süreci tek ekrandan yönetin. Sesli notlarla giriş yapın, yapay zeka portföyünüzdeki uygun daireleri saniyeler içinde WhatsApp'tan paylaşılabilir bir sunuma dönüştürsün.</p>
+        </div>
+      );
+    case 'emlakta-referans-yonetimi-musteriyi-yeni-satisa-nasil-donusturursunuz':
+      return (
+        <div className="prose prose-invert prose-lg max-w-none prose-p:text-on-surface-variant prose-headings:text-on-surface">
+          <p>En ucuz ve en kaliteli lead, eski müşterinizin size yönlendirdiği kişidir. Ancak çoğu emlakçı, tapu satışı bittikten sonra müşterisini unutur.</p><h2>Otomatik Hatırlatıcılar ve Doğum Günleri</h2><p>Bir <Link to="/" className="text-primary hover:underline font-bold">emlak takip programı</Link> üzerinden eski müşterilerinize evlilik yıldönümü, tapu alım yıldönümü gibi özel günlerde otomatik mesajlar gönderin. Mutlu bir müşteri, çevresindeki potansiyel alıcı ve satıcıları doğrudan size yönlendirecek, referans zinciriniz kartopu gibi büyüyecektir.</p>
+        </div>
+      );
+    case 'emlak-danismanlarinda-musteri-iliskileri-yonetimi-nasil-kurulur':
+      return (
+        <div className="prose prose-invert prose-lg max-w-none prose-p:text-on-surface-variant prose-headings:text-on-surface">
+          <p>Başarılı bir gayrimenkul danışmanı olmak, sadece ev göstermek değil, bir ilişki ağı (network) yönetmektir.</p><h2>Güven İnşası</h2><p>İlk temasınızda müşteriyi dinleyin ve Kapora'nın sesli not özelliği ile tüm taleplerini sisteme kaydedin. Ertesi gün müşteriyi aradığınızda, "Kızınızın okulu için Beşiktaş'ta ev bakıyorduk" diyebilmek, ona değer verdiğinizi hissettirir ve güven bağını kurar.</p>
+        </div>
+      );
+    case 'emlak-ilanlarini-seo-uyumlu-yazmanin-6-temel-kurali':
+      return (
+        <div className="prose prose-invert prose-lg max-w-none prose-p:text-on-surface-variant prose-headings:text-on-surface">
+          <p>İlan başlığınıza sadece "3+1 Satılık" yazıyorsanız, Google aramalarında bulunma şansınızı sıfıra indiriyorsunuz. Emlak ilanlarında <strong>SEO (Arama Motoru Optimizasyonu)</strong> hayati önem taşır.</p><h2>Bölgesel Anahtar Kelimeler Kullanın</h2><p>İlan başlığınız "Kadıköy Moda'da Deniz Manzaralı 3+1 Satılık Daire - Metroya 5 Dk" gibi spesifik, kullanıcıların tam olarak Google'da aratacağı kelime öbeklerini içermelidir. Açıklama kısmında bölgenin sosyal olanaklarından (okul, hastane, AVM) bahsederek ilanınızın yerel aramalarda (Local SEO) üst sıralara çıkmasını sağlayın.</p>
+        </div>
+      );
+    case 'gayrimenkul-ilanlarinda-yerel-seo-neden-kritik':
+      return (
+        <div className="prose prose-invert prose-lg max-w-none prose-p:text-on-surface-variant prose-headings:text-on-surface">
+          <p>İnsanlar ev ararken sadece metrekareye değil, yaşayacakları mahalleye de odaklanırlar. Yerel SEO stratejisi uygulamak, doğrudan o mahalleyi arayan sıcak müşteriyi bulmanızı sağlar.</p><h2>Yakın Çevre Faktörü</h2><p>İlan açıklamalarınızda "Marmaray istasyonuna 200 metre", "X İlkokuluna yürüme mesafesinde" gibi lokasyon belirten terimler kullanın. Ayrıca Google Benim İşletmem hesabınızı aktif tutarak, ofisinizin o bölgedeki aramalarında haritalarda üst sıralarda çıkmasını garantileyin.</p>
+        </div>
+      );
+    case 'kucuk-emlak-sitelerinde-ilan-gorunurlugunu-artirmak-icin-5-seo-teknigi':
+      return (
+        <div className="prose prose-invert prose-lg max-w-none prose-p:text-on-surface-variant prose-headings:text-on-surface">
+          <p>Sahibinden veya Hepsiemlak gibi devlerle bütçe yarıştırmak imkansızdır ancak niş ve uzun kuyruklu (long-tail) anahtar kelimelerle kendi sitenize yüksek nitelikli trafik çekebilirsiniz.</p><h2>Uzun Kuyruklu Anahtar Kelimeler (Long-Tail Keywords)</h2><p>"Satılık ev" yerine "Beşiktaş Akaretler'de ofis kullanımlı kiralık tarihi bina" gibi spesifik aramaları hedefleyin. Bu aramaların hacmi düşüktür ancak dönüşüm oranları (satın alma ihtimalleri) devasa boyuttadır.</p>
+        </div>
+      );
+    case 'satilik-daire-ve-kiralik-ev-icin-en-iyi-seo-anahtar-kelimeler':
+      return (
+        <div className="prose prose-invert prose-lg max-w-none prose-p:text-on-surface-variant prose-headings:text-on-surface">
+          <p>İlan girerken doğru kelimeleri seçmek, reklam bütçenizi yarı yarıya düşürebilir. Peki ama hangi kelimeler?</p><h2>Kullanıcı Niyetini Anlamak</h2><p>Sadece "Satılık" yazmak yetmez. "Acilden satılık", "Krediye uygun", "Sahibinden", "Metroya yakın" gibi ek terimler, alıcıların en çok arattığı varyasyonlardır. Kapora'nın akıllı ilan şablonları, ilanlarınızı otomatik olarak SEO uyumlu hale getirecek yapay zeka önerileri sunmayı hedeflemektedir.</p>
+        </div>
+      );
+    case 'ilan-yonetiminde-yapilan-5-kritik-hata-ve-cozum-yollari':
+      return (
+        <div className="prose prose-invert prose-lg max-w-none prose-p:text-on-surface-variant prose-headings:text-on-surface">
+          <p>Harika bir portföyünüz var ama haftalardır arayan yok mu? Muhtemelen ilanınızı girerken kritik hatalar yaptınız.</p><h2>Görsel ve Metin Uyumu</h2><p>Düşük çözünürlüklü fotoğraflar, eksik m² bilgisi veya yanıltıcı "deniz manzaralı" ibareleri müşterinin güvenini anında kırar. Tüm portföylerinizi tek bir <Link to="/" className="text-primary hover:underline font-bold">emlak CRM sistemi</Link> üzerinden profesyonelce yönetin ve ilan verilerinizi standardize ederek müşteri kaçaklarını önleyin.</p>
         </div>
       );
     default:
