@@ -667,26 +667,42 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     const { id } = req.params;
     const { role, id: user_id } = req.user;
 
-    // Sadece lead'in sahibi veya admin silebilir
-    let query = 'DELETE FROM leads WHERE id = $1';
-    let values = [id];
-
-    if (role === 'agent' || role === 'viewer') {
-      query += ' AND assigned_to = $2';
-      values.push(user_id);
+    let leadCheckQuery = 'SELECT id FROM leads WHERE id = $1';
+    let leadCheckValues = [id];
+    
+    if (role === 'company_admin') {
+      leadCheckQuery += ' AND company_id = $2';
+      leadCheckValues.push(req.user.company_id);
+    } else if (role === 'office_manager') {
+      leadCheckQuery += ' AND office_id = $2';
+      leadCheckValues.push(req.user.office_id);
+    } else if (role === 'agent' || role === 'viewer') {
+      leadCheckQuery += ' AND assigned_to = $2';
+      leadCheckValues.push(user_id);
     }
 
-    query += ' RETURNING id';
-
-    const result = await db.query(query, values);
-
-    if (result.rowCount === 0) {
+    const leadCheck = await db.query(leadCheckQuery, leadCheckValues);
+    if (leadCheck.rowCount === 0) {
       return res.status(404).json({ message: 'Lead bulunamadı veya silme yetkiniz yok' });
     }
 
+    await db.query('BEGIN');
+    
+    // Explicitly delete related records to bypass any missing ON DELETE CASCADE
+    await db.query('DELETE FROM lead_notes WHERE lead_id = $1', [id]);
+    await db.query('DELETE FROM lead_property_matches WHERE lead_id = $1', [id]);
+    await db.query('DELETE FROM lead_events WHERE lead_id = $1', [id]).catch(() => {});
+    await db.query('DELETE FROM whatsapp_messages WHERE lead_id = $1', [id]).catch(() => {});
+    await db.query('DELETE FROM contact_logs WHERE lead_id = $1', [id]).catch(() => {});
+    
+    await db.query('DELETE FROM leads WHERE id = $1', [id]);
+    
+    await db.query('COMMIT');
+
     res.json({ message: 'Lead başarıyla silindi' });
   } catch (err) {
-    console.error(err);
+    await db.query('ROLLBACK');
+    console.error('Delete Lead Error:', err);
     res.status(500).json({ message: 'Sunucu hatası' });
   }
 });

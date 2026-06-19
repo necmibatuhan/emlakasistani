@@ -153,6 +153,11 @@ const AgentDashboard = () => {
       setAnalyzeError('Lütfen isim ve telefon numarası alanlarını zorunlu olarak doldurun.');
       return;
     }
+    const phoneDigits = phone.replace(/\D/g, '');
+    if (phoneDigits.length < 10 || phoneDigits.length > 12) {
+      setAnalyzeError('Lütfen geçerli bir telefon numarası girin (örn: 0555 123 4567).');
+      return;
+    }
     setAnalyzing(true);
     setAnalyzeError('');
     try {
