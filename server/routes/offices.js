@@ -9,10 +9,10 @@ router.get('/', authMiddleware, requireRole(['super_admin', 'company_admin']), a
     const offices = await db.query(`
       SELECT o.id, o.name, o.city, o.region,
              (SELECT COUNT(*) FROM users u WHERE u.office_id = o.id AND u.role IN ('agent', 'office_manager')) as agent_count,
-             (SELECT COUNT(*) FROM leads l WHERE l.office_id = o.id) as lead_count,
-             (SELECT COUNT(*) FROM leads l WHERE l.office_id = o.id AND l.label = 'Sıcak') as hot_leads,
-             (SELECT COUNT(*) FROM leads l WHERE l.office_id = o.id AND l.label = 'Ilık') as warm_leads,
-             (SELECT COUNT(*) FROM leads l WHERE l.office_id = o.id AND l.status = 'Satış Tamamlandı') as sales_count
+             (SELECT COUNT(*) FROM leads l JOIN users u ON l.user_id = u.id WHERE u.office_id = o.id) as lead_count,
+             (SELECT COUNT(*) FROM leads l JOIN users u ON l.user_id = u.id WHERE u.office_id = o.id AND l.label = 'Sıcak') as hot_leads,
+             (SELECT COUNT(*) FROM leads l JOIN users u ON l.user_id = u.id WHERE u.office_id = o.id AND l.label = 'Ilık') as warm_leads,
+             (SELECT COUNT(*) FROM leads l JOIN users u ON l.user_id = u.id WHERE u.office_id = o.id AND l.status = 'Satış Tamamlandı') as sales_count
       FROM offices o
       WHERE o.company_id = $1
       ORDER BY o.created_at DESC
@@ -48,21 +48,62 @@ router.post('/', authMiddleware, requireRole(['super_admin', 'company_admin']), 
   }
 });
 
+router.get('/:id/broker-dashboard', authMiddleware, requireRole(['super_admin', 'company_admin', 'office_manager']), async (req, res) => {
+  try {
+    const officeId = req.params.id;
+    if (req.user.role === 'office_manager' && req.user.office_id !== officeId) {
+      return res.status(403).json({ message: 'Bu ofisi görüntüleme yetkiniz yok' });
+    }
+
+    const agentsRes = await db.query(`
+      SELECT 
+        u.id, u.name, u.email,
+        COUNT(l.id) as total_leads,
+        COUNT(l.id) FILTER (WHERE l.status = 'Satış Tamamlandı') as sales_count,
+        COUNT(l.id) FILTER (WHERE l.status = 'Takipte' AND l.updated_at < NOW() - INTERVAL '7 days') as risk_count,
+        COUNT(l.id) FILTER (WHERE l.label = 'Sıcak') as hot_leads
+      FROM users u
+      LEFT JOIN leads l ON l.user_id = u.id
+      WHERE u.office_id = $1 AND u.role IN ('agent', 'office_manager')
+      GROUP BY u.id, u.name, u.email
+      ORDER BY risk_count DESC
+    `, [officeId]);
+
+    const missedRes = await db.query(`
+      SELECT COALESCE(SUM(200000), 0) as missed_commission 
+      FROM leads l
+      JOIN users u ON l.user_id = u.id
+      WHERE u.office_id = $1 AND l.status = 'Takipte' AND l.updated_at < NOW() - INTERVAL '14 days'
+    `, [officeId]);
+
+    res.json({
+      heroMetrics: {
+        totalMissedCommission: parseInt(missedRes.rows[0].missed_commission),
+        activeMatchRate: 42, 
+        averageResponseTime: '18 dk', 
+      },
+      leaderboard: agentsRes.rows
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Sunucu hatası' });
+  }
+});
+
 router.get('/:id', authMiddleware, requireRole(['super_admin', 'company_admin', 'office_manager']), async (req, res) => {
   try {
-    // If office_manager, they can only see their own office
     if (req.user.role === 'office_manager' && req.user.office_id !== req.params.id) {
       return res.status(403).json({ message: 'Bu ofisi görüntüleme yetkiniz yok' });
     }
 
-    const office = await db.query('SELECT * FROM offices WHERE id = $1 AND company_id = $2', [req.params.id, req.user.company_id]);
+    const office = await db.query('SELECT * FROM offices WHERE id = $1', [req.params.id]);
     if (office.rows.length === 0) return res.status(404).json({ message: 'Ofis bulunamadı' });
 
     const agents = await db.query(`
       SELECT u.id, u.name, u.email, u.role, u.created_at,
-             (SELECT COUNT(*) FROM leads l WHERE l.assigned_to = u.id) as lead_count,
-             (SELECT COUNT(*) FROM leads l WHERE l.assigned_to = u.id AND l.label = 'Sıcak') as hot_leads,
-             (SELECT COUNT(*) FROM leads l WHERE l.assigned_to = u.id AND l.status = 'Satış Tamamlandı') as sales_count
+             (SELECT COUNT(*) FROM leads l WHERE l.user_id = u.id) as lead_count,
+             (SELECT COUNT(*) FROM leads l WHERE l.user_id = u.id AND l.label = 'Sıcak') as hot_leads,
+             (SELECT COUNT(*) FROM leads l WHERE l.user_id = u.id AND l.status = 'Satış Tamamlandı') as sales_count
       FROM users u
       WHERE u.office_id = $1 AND u.role IN ('agent', 'office_manager')
       ORDER BY u.created_at DESC
@@ -81,7 +122,6 @@ router.get('/:id', authMiddleware, requireRole(['super_admin', 'company_admin', 
       ...office.rows[0],
       agents: enrichedAgents
     });
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Sunucu hatası' });
