@@ -21,6 +21,7 @@ import AnimatedLeadList from '../components/AnimatedLeadList';
 import PricingModal from '../components/PricingModal';
 import { EmptyState } from '../components/EmptyState';
 import PrioritiesWidget from '../components/PrioritiesWidget';
+import ScoreExplanation from '../components/ScoreExplanation';
 
 const AgentDashboard = () => {
   const { token, user } = useContext(AuthContext);
@@ -295,9 +296,12 @@ const AgentDashboard = () => {
                   {leadDetails.name === '[İsim Belirtilmedi]' ? '?' : leadDetails.name?.substring(0,2).toUpperCase()}
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-on-surface leading-tight">
-                    {leadDetails.name === '[İsim Belirtilmedi]' ? 'İsimsiz Lead' : leadDetails.name}
-                  </h2>
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-xl font-bold text-on-surface leading-tight">
+                      {leadDetails.name === '[İsim Belirtilmedi]' ? 'İsimsiz Lead' : leadDetails.name}
+                    </h2>
+                    <ScoreExplanation lead={leadDetails} />
+                  </div>
                   <p className="text-sm text-on-surface-variant mt-0.5">
                     {format(new Date(leadDetails.created_at), 'dd MMM yyyy, HH:mm', { locale: tr })}
                   </p>

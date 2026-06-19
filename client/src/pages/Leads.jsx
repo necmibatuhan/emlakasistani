@@ -6,6 +6,7 @@ import { UIContext } from '../contexts/UIContext';
 import Sidebar from '../components/Sidebar';
 import { format, isToday } from 'date-fns';
 import { EmptyState } from '../components/EmptyState';
+import ScoreExplanation from '../components/ScoreExplanation';
 
 // MOCK_LEADS removed, will fetch from backend
 
@@ -338,8 +339,10 @@ const Leads = () => {
                         </div>
                         
                         {/* Skor */}
-                        <div className="w-[60px] flex-shrink-0 pr-4 text-[13px] font-mono">
-                          <span className={style.text}>{lead.score}/10</span>
+                        <div className="w-[80px] flex-shrink-0 pr-4">
+                          <div onClick={e => e.stopPropagation()}>
+                            <ScoreExplanation lead={lead} />
+                          </div>
                         </div>
                         
                         {/* Bölge/Tip */}

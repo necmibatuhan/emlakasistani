@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Flame, Clock, User, Phone, MapPin, Building, Banknote, FileText, AlertTriangle } from 'lucide-react';
 import clsx from 'clsx';
+import ScoreExplanation from './ScoreExplanation';
 
 // Stagger Ayarları (Sayfa açılışında kartların sırayla yukarıdan gelmesi)
 const containerVariants = {
@@ -62,19 +63,9 @@ function AnimatedLeadCard({ lead }) {
             </div>
           </div>
           
-          <motion.div 
-            layout
-            // Acil ise (skor >= 90) hafif nabız atma efekti uygula
-            animate={isUrgent ? { scale: [1, 1.05, 1], boxShadow: ["0px 0px 0px rgba(251,191,36,0)", "0px 0px 15px rgba(251,191,36,0.2)", "0px 0px 0px rgba(251,191,36,0)"] } : {}}
-            transition={isUrgent ? { duration: 2, repeat: Infinity, ease: "easeInOut" } : {}}
-            className={clsx(
-              "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border",
-              isUrgent ? "bg-amber-500/10 text-amber-400 border-amber-500/20" : "bg-zinc-800/50 text-zinc-300 border-zinc-700"
-            )}
-          >
-            {isUrgent ? <Flame className="w-3.5 h-3.5" /> : <Clock className="w-3.5 h-3.5" />}
-            <span>% {score}</span>
-          </motion.div>
+          <div onClick={(e) => e.stopPropagation()}>
+            <ScoreExplanation lead={lead} />
+          </div>
         </motion.div>
         
         {/* Risk Badge (Red Flag) */}

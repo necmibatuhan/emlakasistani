@@ -4,6 +4,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const db = require('../db');
 const { authMiddleware } = require('../middleware/auth');
 const PrivacyPipeline = require('../utils/PrivacyPipeline');
+const scoreService = require('../services/scoreService');
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } }); // 10MB limit
@@ -568,6 +569,79 @@ Geçmiş Notları/İhtiyacı: ${lead.message} | ${notesStr}
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Sunucu hatası' });
+  }
+});
+
+// Calculate score for single lead
+router.post('/:id/calculate-score', authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { role, id: user_id } = req.user;
+
+    let query = 'SELECT * FROM leads WHERE id = $1';
+    let values = [id];
+    if (role === 'agent' || role === 'viewer') {
+      query += ' AND assigned_to = $2';
+      values.push(user_id);
+    }
+
+    const leadRes = await db.query(query, values);
+    if (leadRes.rows.length === 0) {
+      return res.status(404).json({ message: 'Lead bulunamadı' });
+    }
+
+    const lead = leadRes.rows[0];
+    const scoreData = await scoreService.calculateScoreForLead(lead);
+    
+    await scoreService.updateLeadScore(id, scoreData);
+
+    res.json({ success: true, scoreData });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Skor hesaplanırken hata oluştu' });
+  }
+});
+
+// Recalculate scores for all leads of user
+router.post('/recalculate-all', authMiddleware, async (req, res) => {
+  try {
+    const { role, id: user_id } = req.user;
+    
+    let query = 'SELECT * FROM leads WHERE ';
+    let values = [];
+    if (role === 'agent' || role === 'viewer') {
+      query += 'assigned_to = $1';
+      values.push(user_id);
+    } else {
+      // Sadece manager/admin ise onlara ait ofisteki vs olabilir ama şimdilik assigned_to
+      query += 'assigned_to = $1';
+      values.push(user_id);
+    }
+
+    const leads = await db.query(query, values);
+
+    // Background job instead of blocking (simplified)
+    const jobId = Date.now().toString();
+    res.json({ success: true, message: 'Toplu skorlama başlatıldı', job_id: jobId, total: leads.rows.length });
+
+    // Process in background
+    (async () => {
+      for (const lead of leads.rows) {
+        try {
+          const scoreData = await scoreService.calculateScoreForLead(lead);
+          await scoreService.updateLeadScore(lead.id, scoreData);
+          // Rate limiting sleep 1s
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        } catch (e) {
+          console.error(\`Failed to calculate score for lead \${lead.id}\`);
+        }
+      }
+      console.log(\`Finished recalculating scores for job \${jobId}\`);
+    })();
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Toplu skorlama başlatılamadı' });
   }
 });
 

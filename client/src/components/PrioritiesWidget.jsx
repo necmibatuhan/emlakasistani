@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
 import { Link } from 'react-router-dom';
+import WhatsAppButton from './WhatsAppButton';
 
 const PrioritiesWidget = () => {
   const { token, user } = useContext(AuthContext);
@@ -37,10 +38,7 @@ const PrioritiesWidget = () => {
   };
 
   const handleWaClick = (lead) => {
-    const defaultMsg = `Merhaba ${lead.name || 'Efendim'}, ${user?.name || 'Danışman'} arıyorum. Aradığınız gayrimenkul konusunda güncel bilgi vermek istedim.`;
-    const msg = lead.whatsapp_draft || defaultMsg;
-    const phone = formatPhoneForWa(lead.phone);
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+    // Moved to WhatsAppButton
   };
 
   if (isLoading) {
@@ -98,12 +96,9 @@ const PrioritiesWidget = () => {
             </div>
 
             <div className="flex items-center gap-2 mt-4 pt-4 border-t border-[#2A2D35]">
-              <button 
-                onClick={() => handleWaClick(lead)}
-                className="flex-1 bg-[#10B981]/10 hover:bg-[#10B981]/20 text-[#10B981] border border-[#10B981]/20 rounded-lg py-2 flex items-center justify-center gap-1.5 text-[13px] font-bold transition-colors"
-              >
-                <i className="fab fa-whatsapp text-[15px]"></i> WhatsApp
-              </button>
+              <div className="flex-1">
+                <WhatsAppButton customer={lead} className="w-full h-full py-2" />
+              </div>
               
               <button 
                 onClick={() => {
