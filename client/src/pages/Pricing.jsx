@@ -148,12 +148,12 @@ const Pricing = () => {
             <h2 className="text-[#3b82f6] font-medium text-lg mb-6">Pro+</h2>
             
             <div className="mb-4">
-              <span className="text-3xl font-bold text-white">{isAnnual ? '3.490 ₺' : '349 ₺'}</span>
+              <span className="text-3xl font-bold text-white">{isAnnual ? '4.990 ₺' : '499 ₺'}</span>
               <span className="text-slate-400 text-sm ml-1">{isAnnual ? '/yıl' : '/ay'}</span>
             </div>
             
             <div className="h-6 mb-4">
-              {isAnnual && <p className="text-slate-400 text-[13px]">Yıllık ödemede 3.490 ₺</p>}
+              {isAnnual && <p className="text-slate-400 text-[13px]">Yıllık ödemede 4.990 ₺</p>}
             </div>
             
             <p className="text-slate-400 text-[14px] mb-8 leading-relaxed h-16">
