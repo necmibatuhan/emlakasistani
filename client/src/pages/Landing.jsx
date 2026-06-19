@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Play, X, Menu, Sun, Moon, Globe, Sparkles } from 'lucide-react';
 import { Logo } from '../components/Logo';
 import SocialProofToast from '../components/SocialProofToast';
-import { BLOG_POSTS } from './BlogList';
+import { BLOG_POSTS } from '../data/blogPosts';
 import { t } from '../locales/landingTranslations';
 
 const MOCK_LEADS = [
@@ -720,8 +720,8 @@ const Landing = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {BLOG_POSTS.map((post) => (
-              <div key={post.id} className="bg-surface-container border border-outline-variant rounded-xl p-6 flex flex-col hover:border-primary/50 transition-colors shadow-lg">
+            {BLOG_POSTS.slice(0, 3).map((post) => (
+              <div key={post.slug} className="bg-surface-container border border-outline-variant rounded-xl p-6 flex flex-col hover:border-primary/50 transition-colors shadow-lg">
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-[11px] font-bold text-primary uppercase tracking-wider bg-primary/10 px-2.5 py-1 rounded-full">
                     {post.category}
