@@ -10,8 +10,8 @@ export const t = {
     },
     hero: {
       stat: "Türkiye'de 180.000 emlak danışmanı",
-      title1: "Müşteri Kaçırma",
-      title2: "Döneminiz Bitti.",
+      title1: "Kapora: Emlak Danışmanları İçin",
+      title2: "Yapay Zeka Satış Asistanı ve CRM",
       title3: "",
       title4: "",
       desc: "Kapora'nın Yapay Zeka Satış Koçu ile günlük işlerinizi %40 hızlandırın. Unutulan müşterileri ve masada kalan komisyonları sıfıra indirin.",
@@ -31,12 +31,12 @@ export const t = {
       loc4: "Nilüfer, Bursa"
     },
     flow: {
-      title: "Sesli Asistan ve Dijital Sekreter ile Hız Kazanın",
-      step1Title: "1. Sesli Not Bırakın",
-      step1Desc: "Sahadayken sadece konuşun. Sistem müşteri kriterlerini (bütçe, bölge, aciliyet) saniyeler içinde fişler ve ajandanıza işler.",
-      step2Title: "2. Akıllı Satış Koçu ile Eşleştirin",
-      step2Desc: "Müşteriniz daha telefonu kapatmadan portföy eşleşmesi hazır. Müşteri WhatsApp'tan yazıp telefonu cebine koyana kadar, Kapora uygun evi bulur ve teklif mesajını hazırlar.",
-      step3Title: "3. Tek Tıkla Sunum Gönderin",
+      title: "Emlak Asistanı Kapora CRM Sistemi Nasıl Çalışır?",
+      step1Title: "1. Sesli Not ile Müşteri (Lead) Takibi",
+      step1Desc: "Sahadayken sadece konuşun. Emlak asistanı sistemimiz müşteri kriterlerini (bütçe, bölge, aciliyet) saniyeler içinde fişler ve CRM ajandanıza işler.",
+      step2Title: "2. Yapay Zeka Emlak Asistanı ile Eşleştirin",
+      step2Desc: "Müşteriniz daha telefonu kapatmadan gayrimenkul portföy eşleşmesi hazır. Müşteri WhatsApp'tan yazıp telefonu cebine koyana kadar, Kapora uygun evi bulur ve teklif mesajını hazırlar.",
+      step3Title: "3. Tek Tıkla WhatsApp Entegrasyonu",
       step3Desc: "Eşleşen portföylerin profesyonel WhatsApp sunum taslağı hazır. Sadece gönder tuşuna basarak müşteriye ulaşın.",
       newRequest: "Yeni Talep:",
       draftReady: "Taslak Mesajınız Hazır",
@@ -44,7 +44,7 @@ export const t = {
       autoReplied: "Otomatik Yanıtlandı"
     },
     mockup: {
-      title: "Bugün Hangi Müşteriyi Aramalısın? Kapora Söyler.",
+      title: "Emlak Asistanı Kapora ile Neler Yapabilirsiniz?",
       desc: "Karmaşık Excel tablolarını unutun. Her şey tek bir ekranda, satışa dönmeye hazır şekilde sizi bekliyor.",
       preview: "Panel Önizlemesi",
       tabs: ["Savaş Odası", "Saldırı Planı", "Eşleşmeler"],
@@ -70,7 +70,7 @@ export const t = {
       }
     },
     pricing: {
-      title: "Basit fiyatlandırma. Gizli ücret yok.",
+      title: "Emlak Danışmanlarına Özel Fiyatlandırma ve Paketler",
       desc1: "14 Günlük Sınırsız Deneme Süresi (14-Day Free Trial).",
       desc2: "Kredi kartı gerekmez. Deneme süresi bittiğinde müşteri havuzunuzu ve eşleşmeleri kaybetmemek için Pro'ya geçin.",
       monthly: "Aylık",
