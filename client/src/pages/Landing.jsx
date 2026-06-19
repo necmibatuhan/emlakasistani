@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Play, X, Menu, Sun, Moon, Globe } from 'lucide-react';
+import { Play, X, Menu, Sun, Moon, Globe, Sparkles } from 'lucide-react';
 import { Logo } from '../components/Logo';
 import { BLOG_POSTS } from './BlogList';
 import { t } from '../locales/landingTranslations';

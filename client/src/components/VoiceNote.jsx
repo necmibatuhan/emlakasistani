@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { Mic, X, Check, Loader2, AlertCircle } from 'lucide-react';
+import { clsx } from 'clsx';
 
 const VoiceNote = ({ leadId, onSaved }) => {
   const [isOpen, setIsOpen] = useState(false);
