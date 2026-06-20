@@ -11,6 +11,33 @@ const Profile = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [whatsappPhone, setWhatsappPhone] = useState(user?.whatsapp_phone || '');
+  const [isSavingPhone, setIsSavingPhone] = useState(false);
+
+  // Sync state if user changes
+  React.useEffect(() => {
+    if (user?.whatsapp_phone) {
+      // Remove any leading '+' for display if desired, or keep it.
+      setWhatsappPhone(user.whatsapp_phone.replace('+', ''));
+    }
+  }, [user]);
+
+  const handleSavePhone = async () => {
+    try {
+      setIsSavingPhone(true);
+      const token = localStorage.getItem('token');
+      await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/auth/profile`, 
+        { whatsapp_phone: whatsappPhone },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      alert('WhatsApp numarası başarıyla kaydedildi!');
+    } catch (error) {
+      console.error('Numara kaydedilemedi:', error);
+      alert('Numara kaydedilirken bir hata oluştu.');
+    } finally {
+      setIsSavingPhone(false);
+    }
+  };
 
   const getRoleLabel = (role) => {
     switch(role) {
@@ -99,7 +126,34 @@ const Profile = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
+                    <div className="md:col-span-2">
+                      <label className="block text-[11px] font-medium text-[#7C8090] mb-1.5 uppercase tracking-wider">WhatsApp Numarası (Twilio Entegrasyonu İçin)</label>
+                      <div className="relative flex items-center">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#7C8090]">
+                          <span className="text-[13px]">+</span>
+                        </div>
+                        <input 
+                          type="text" 
+                          placeholder="905551234567"
+                          className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#F1F2F4] rounded-[6px] pl-8 p-2.5 min-h-[44px] text-[13px] focus:border-[#F5A623] outline-none transition-colors" 
+                          value={whatsappPhone} 
+                          onChange={(e) => setWhatsappPhone(e.target.value)}
+                        />
+                        <button 
+                          type="button"
+                          onClick={handleSavePhone}
+                          disabled={isSavingPhone}
+                          className="ml-3 bg-[#F5A623] hover:bg-[#d9921e] disabled:opacity-50 text-[#0A0B0D] px-4 py-2 rounded-[6px] text-[13px] font-medium transition-colors"
+                        >
+                          {isSavingPhone ? 'Kaydediliyor...' : 'Kaydet'}
+                        </button>
+                      </div>
+                      <p className="text-[11px] text-[#7C8090] mt-1.5">Panele WhatsApp üzerinden direkt mesaj gönderebilmek için numaranızı ülke koduyla (örn: 905...) ekleyin.</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
                     <div>
                       <label className="block text-[11px] font-medium text-[#7C8090] mb-1.5 uppercase tracking-wider">Şirket ID</label>
                       <div className="relative">

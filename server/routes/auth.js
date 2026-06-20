@@ -425,9 +425,36 @@ router.post('/reset-password', async (req, res) => {
 // GET /me (Get current user)
 router.get('/me', authMiddleware, async (req, res) => {
   try {
-    const user = await db.query('SELECT id, company_id, office_id, role, email, name, plan, is_verified, created_at, referral_code FROM users WHERE id = $1', [req.user.id]);
+    const user = await db.query('SELECT id, company_id, office_id, role, email, name, plan, is_verified, created_at, referral_code, whatsapp_phone FROM users WHERE id = $1', [req.user.id]);
     if (user.rows.length === 0) return res.status(404).json({ message: 'Kullanıcı bulunamadı' });
     res.json(user.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Sunucu hatası' });
+  }
+});
+
+// PUT /profile (Update current user profile)
+router.put('/profile', authMiddleware, async (req, res) => {
+  try {
+    const { whatsapp_phone } = req.body;
+    let phoneToSave = whatsapp_phone;
+    
+    if (phoneToSave) {
+      // Basic formatting: ensure it starts with '+' and remove spaces
+      phoneToSave = phoneToSave.replace(/\s+/g, '');
+      if (!phoneToSave.startsWith('+')) {
+        phoneToSave = '+' + phoneToSave;
+      }
+    }
+
+    const updateRes = await db.query(
+      'UPDATE users SET whatsapp_phone = $1 WHERE id = $2 RETURNING id, email, name, whatsapp_phone',
+      [phoneToSave || null, req.user.id]
+    );
+
+    if (updateRes.rows.length === 0) return res.status(404).json({ message: 'Kullanıcı bulunamadı' });
+    res.json(updateRes.rows[0]);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Sunucu hatası' });

@@ -48,6 +48,7 @@ CREATE TABLE users (
   plan TEXT DEFAULT 'free',
   verification_token TEXT,
   is_verified BOOLEAN DEFAULT false,
+  whatsapp_phone TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
