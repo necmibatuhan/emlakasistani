@@ -117,11 +117,20 @@ const Analyzer = () => {
       el.style.position = 'absolute';
       el.style.left = '-9999px';
       
+      // Safari/iOS cihazlarda ilk render'ın siyah/boş çıkması kronik bir sorundur.
+      // Bunu aşmak için "ısınma" turu atıyoruz:
+      await toJpeg(el, { quality: 0.1, backgroundColor: '#0A0B0D' });
+      
       // html-to-image, Tailwind v4 CSS (oklab) renkleriyle kusursuz çalışır
       const imgData = await toJpeg(el, { 
         quality: 0.85, 
         backgroundColor: '#0A0B0D',
-        pixelRatio: 1.5
+        pixelRatio: 1.5,
+        cacheBust: true, // Cache sorunlarını önle
+        style: {
+          transform: 'scale(1)', // Transform hatalarını önle
+          transformOrigin: 'top left'
+        }
       });
       
       // Genişlik ve yükseklik almak için html elementinin boyutlarını kullanabiliriz

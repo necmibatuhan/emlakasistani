@@ -26,8 +26,8 @@ const ReportTemplate = ({ reportRef, data }) => {
       style={{ fontFamily: 'Inter, sans-serif', color: '#F1F2F4' }}
     >
       {/* Background elements for premium look */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-[#F5A623]/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20"></div>
-      <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#10B981]/10 rounded-full blur-3xl pointer-events-none -ml-20 -mb-20"></div>
+      <div className="absolute top-0 right-0 w-64 h-64 bg-[#F5A623]/5 rounded-full pointer-events-none -mr-20 -mt-20"></div>
+      <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#10B981]/5 rounded-full pointer-events-none -ml-20 -mb-20"></div>
 
       {/* Header */}
       <div className="flex justify-between items-center border-b border-[#2A2D35] pb-6 mb-8 relative z-10">
