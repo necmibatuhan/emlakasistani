@@ -117,13 +117,21 @@ const Analyzer = () => {
       el.style.position = 'absolute';
       el.style.left = '-9999px';
       
-      const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#0A0B0D' });
-      const imgData = canvas.toDataURL('image/jpeg', 0.9);
+      // Daha hızlı ve sorunsuz render için optimizasyon
+      const canvas = await html2canvas(el, { 
+        scale: 1.5, 
+        useCORS: true, 
+        logging: false,
+        backgroundColor: '#0A0B0D' 
+      });
+      
+      const imgData = canvas.toDataURL('image/jpeg', 0.8);
       
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'px',
-        format: [canvas.width, canvas.height]
+        format: [canvas.width, canvas.height],
+        compress: true // PDF boyutunu optimize et
       });
       
       pdf.addImage(imgData, 'JPEG', 0, 0, canvas.width, canvas.height);
@@ -133,6 +141,7 @@ const Analyzer = () => {
       el.style.position = 'static';
     } catch (err) {
       console.error('Export failed', err);
+      alert('PDF oluşturulurken bir sorun oluştu. Lütfen tekrar deneyin.');
     } finally {
       setIsExporting(false);
     }
@@ -368,7 +377,7 @@ const Analyzer = () => {
       </main>
 
       {/* Hidden container for rendering the image/pdf export */}
-      <div style={{ display: 'none' }}>
+      <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
          <ReportTemplate reportRef={reportRef} data={analysisResult} />
       </div>
 
