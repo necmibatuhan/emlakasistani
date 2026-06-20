@@ -108,15 +108,15 @@ function AnimatedLeadCard({ lead, onDelete }) {
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div className="flex items-center gap-2 text-zinc-300">
                   <MapPin className="w-4 h-4 text-zinc-500" />
-                  {lead.location || 'Lokasyon Belirsiz'}
+                  {lead.location || props?.locations || 'Lokasyon Belirsiz'}
                 </div>
                 <div className="flex items-center gap-2 text-zinc-300">
                   <Building className="w-4 h-4 text-zinc-500" />
-                  {lead.propertyType || 'Ev Tipi Belirsiz'}
+                  {lead.propertyType || props?.propertyType || 'Ev Tipi Belirsiz'}
                 </div>
                 <div className="flex items-center gap-2 text-zinc-300 col-span-2">
                   <Banknote className="w-4 h-4 text-zinc-500" />
-                  {lead.budgetStr || 'Bütçe Belirtilmedi'}
+                  {lead.budgetStr || props?.budgetStr || (props?.budgetMin ? `${props.budgetMin} - ${props.budgetMax}` : 'Bütçe Belirtilmedi')}
                 </div>
               </div>
 
@@ -124,8 +124,8 @@ function AnimatedLeadCard({ lead, onDelete }) {
                 <div className="flex items-center gap-2 text-zinc-400 mb-1.5 text-xs font-medium uppercase tracking-wider">
                   <FileText className="w-3.5 h-3.5" /> AI Özeti & Notlar
                 </div>
-                <p className="text-zinc-300 text-sm leading-relaxed">
-                  {lead.summary || 'Ses kaydı özeti bulunmuyor.'}
+                <p className="text-zinc-300 text-sm leading-relaxed whitespace-pre-wrap">
+                  {lead.reasoning || props?.ai_insight || lead.message || 'Özet bulunmuyor.'}
                 </p>
               </div>
 
