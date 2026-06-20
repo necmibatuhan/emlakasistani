@@ -9,6 +9,22 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response && error.response.status === 401) {
+          localStorage.removeItem('token');
+          setToken('');
+          setUser(null);
+          window.location.href = '/?expired=true';
+        }
+        return Promise.reject(error);
+      }
+    );
+    return () => axios.interceptors.response.eject(interceptor);
+  }, []);
+
+  useEffect(() => {
     if (token) {
       axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/auth/me`, {
         headers: { Authorization: `Bearer ${token}` }
