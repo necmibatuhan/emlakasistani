@@ -32,9 +32,11 @@ export const AuthProvider = ({ children }) => {
       .then(res => {
         setUser(res.data);
       })
-      .catch(() => {
-        setToken('');
-        localStorage.removeItem('token');
+      .catch((error) => {
+        if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+          setToken('');
+          localStorage.removeItem('token');
+        }
       })
       .finally(() => setLoading(false));
     } else {
