@@ -8,7 +8,7 @@ import ReportTemplate from '../components/ReportTemplate';
 import { AuthContext } from '../contexts/AuthContext';
 
 const Analyzer = () => {
-  const { user } = useContext(AuthContext);
+  const { user, token } = useContext(AuthContext);
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [status, setStatus] = useState('idle'); // idle, analyzing, result
@@ -89,7 +89,10 @@ const Analyzer = () => {
       };
 
       const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/properties/analyze-listing`, payload, {
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         withCredentials: true
       });
 
