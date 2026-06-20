@@ -3,6 +3,12 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import obfuscatorPlugin from 'vite-plugin-javascript-obfuscator'
 import { VitePWA } from 'vite-plugin-pwa'
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -67,6 +73,33 @@ export default defineConfig({
       }
     })
   ],
+  ssgOptions: {
+    script: 'async',
+    formatting: 'none',
+    mock: true,
+    includedRoutes(paths, routes) {
+      const blogPostsContent = fs.readFileSync(path.resolve(__dirname, 'src/data/blogPosts.jsx'), 'utf-8');
+      const slugRegex = /slug:\s*['"]([^'"]+)['"]/g;
+      const slugs = [];
+      let match;
+      while ((match = slugRegex.exec(blogPostsContent)) !== null) {
+        slugs.push(match[1]);
+      }
+
+      return paths.flatMap(routePath => {
+        if (routePath === '/blog/:slug') {
+          return slugs.map(slug => `/blog/${slug}`);
+        }
+        if (routePath.includes(':') || routePath === '*') {
+          return []; // Ignore other dynamic or wildcard routes
+        }
+        return routePath;
+      });
+    },
+    onFinished(dir) {
+      console.log('SSG finished! Output to', dir);
+    }
+  },
   build: {
     sourcemap: false, // Ensure source maps are strictly disabled for security
   }

@@ -1,5 +1,7 @@
 import React, { useContext } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { UIProvider } from './contexts/UIContext';
+import { Navigate, Outlet } from 'react-router-dom';
 import { AuthContext, AuthProvider } from './contexts/AuthContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { SpeedInsights } from "@vercel/speed-insights/react";
@@ -58,8 +60,6 @@ const RoleBasedDashboard = () => {
   if (loading) return null;
   if (!user) return <Navigate to="/" />;
 
-
-
   if (user.role === 'company_admin' || user.role === 'super_admin') {
     return <CompanyDashboard />;
   } else if (user.role === 'office_manager') {
@@ -69,60 +69,77 @@ const RoleBasedDashboard = () => {
   }
 };
 
-const AppRoutes = () => {
+const HomeRoute = () => {
   const { user, loading } = useContext(AuthContext);
-
   if (loading) return <div className="min-h-screen flex items-center justify-center">Yükleniyor...</div>;
+  return user ? <Navigate to="/dashboard" /> : <Landing />;
+};
 
+const LoginRoute = () => {
+  const { user, loading } = useContext(AuthContext);
+  if (loading) return <div className="min-h-screen flex items-center justify-center">Yükleniyor...</div>;
+  return user ? <Navigate to="/dashboard" /> : <Auth />;
+};
+
+const queryClient = new QueryClient();
+
+const RootLayout = () => {
   return (
-    <Routes>
-      <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Landing />} />
-      <Route path="/pricing" element={<Pricing />} />
-      <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Auth />} />
-      <Route path="/auth" element={user ? <Navigate to="/dashboard" /> : <Auth />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/verify-email" element={<VerifyEmail />} />
-      <Route path="/aydinlatma-metni" element={<AydinlatmaMetni />} />
-      <Route path="/gizlilik-politikasi" element={<GizlilikPolitikasi />} />
-      <Route path="/blog" element={<BlogList />} />
-      <Route path="/blog/:slug" element={<BlogPost />} />
-      <Route path="/sehir/:slug-emlak-asistani" element={<RegionalLanding />} />
-      <Route path="/ilan-analizi" element={<Analyzer />} />
-      <Route path="/dashboard" element={<ProtectedRoute><RoleBasedDashboard /></ProtectedRoute>} />
-      <Route path="/leads" element={<ProtectedRoute><Leads /></ProtectedRoute>} />
-      <Route path="/integrations" element={<ProtectedRoute><Integrations /></ProtectedRoute>} />
-      <Route path="/whatsapp" element={<ProtectedRoute><WhatsApp /></ProtectedRoute>} />
-      <Route path="/properties" element={<ProtectedRoute><Properties /></ProtectedRoute>} />
-      <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-      <Route path="/offices" element={<ProtectedRoute><Offices /></ProtectedRoute>} />
-      <Route path="/offices/:id" element={<ProtectedRoute><OfficeDetail /></ProtectedRoute>} />
-      <Route path="/agents" element={<ProtectedRoute><Agents /></ProtectedRoute>} />
-      <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
-      <Route path="/stats" element={<ProtectedRoute><Stats /></ProtectedRoute>} />
-      <Route path="/plans" element={<ProtectedRoute><Plans /></ProtectedRoute>} />
-      <Route path="/payment-result" element={<ProtectedRoute><PaymentResult /></ProtectedRoute>} />
-      <Route path="/mock-checkout" element={<ProtectedRoute><MockCheckout /></ProtectedRoute>} />
-    </Routes>
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || 'GIRILECEK_GOOGLE_CLIENT_ID'}>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <UIProvider>
+            <div className="pb-[56px] lg:pb-0">
+              <Outlet />
+              <QuickAddFAB />
+              <GlobalMobileNav />
+              <InstallPrompt />
+            </div>
+            <SpeedInsights />
+            <Analytics />
+          </UIProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </GoogleOAuthProvider>
   );
 };
 
-function App() {
-  return (
-    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || 'GIRILECEK_GOOGLE_CLIENT_ID'}>
-      <AuthProvider>
-        <Router>
-          <div className="pb-[56px] lg:pb-0">
-            <AppRoutes />
-            <QuickAddFAB />
-            <GlobalMobileNav />
-            <InstallPrompt />
-          </div>
-          <SpeedInsights />
-          <Analytics />
-        </Router>
-      </AuthProvider>
-    </GoogleOAuthProvider>
-  );
-}
+export const routes = [
+  {
+    path: '/',
+    element: <RootLayout />,
+    children: [
+      { index: true, element: <HomeRoute /> },
+      { path: '/pricing', element: <Pricing /> },
+      { path: '/login', element: <LoginRoute /> },
+      { path: '/auth', element: <LoginRoute /> },
+      { path: '/reset-password', element: <ResetPassword /> },
+      { path: '/verify-email', element: <VerifyEmail /> },
+      { path: '/aydinlatma-metni', element: <AydinlatmaMetni /> },
+      { path: '/gizlilik-politikasi', element: <GizlilikPolitikasi /> },
+      { path: '/blog', element: <BlogList /> },
+      { path: '/blog/:slug', element: <BlogPost /> },
+      { path: '/sehir/:slug-emlak-asistani', element: <RegionalLanding /> },
+      { path: '/ilan-analizi', element: <Analyzer /> },
+      { path: '/dashboard', element: <ProtectedRoute><RoleBasedDashboard /></ProtectedRoute> },
+      { path: '/leads', element: <ProtectedRoute><Leads /></ProtectedRoute> },
+      { path: '/integrations', element: <ProtectedRoute><Integrations /></ProtectedRoute> },
+      { path: '/whatsapp', element: <ProtectedRoute><WhatsApp /></ProtectedRoute> },
+      { path: '/properties', element: <ProtectedRoute><Properties /></ProtectedRoute> },
+      { path: '/profile', element: <ProtectedRoute><Profile /></ProtectedRoute> },
+      { path: '/offices', element: <ProtectedRoute><Offices /></ProtectedRoute> },
+      { path: '/offices/:id', element: <ProtectedRoute><OfficeDetail /></ProtectedRoute> },
+      { path: '/agents', element: <ProtectedRoute><Agents /></ProtectedRoute> },
+      { path: '/reports', element: <ProtectedRoute><Reports /></ProtectedRoute> },
+      { path: '/stats', element: <ProtectedRoute><Stats /></ProtectedRoute> },
+      { path: '/plans', element: <ProtectedRoute><Plans /></ProtectedRoute> },
+      { path: '/payment-result', element: <ProtectedRoute><PaymentResult /></ProtectedRoute> },
+      { path: '/mock-checkout', element: <ProtectedRoute><MockCheckout /></ProtectedRoute> },
+      { path: '*', element: <Navigate to="/" /> }
+    ]
+  }
+];
 
-export default App;
+export default function App() {
+  return null; // For standard vite run, main.jsx will handle rendering routes.
+}

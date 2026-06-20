@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+import { Head } from 'vite-react-ssg';
 import { Logo } from '../components/Logo';
 import { ArrowRight, MapPin, Target, Zap, Bot, Smartphone, CheckCircle2 } from 'lucide-react';
 import districtsData from '../data/districts.json';
@@ -37,14 +37,14 @@ export default function RegionalLanding() {
 
   return (
     <div className="min-h-screen bg-background text-on-surface font-sans">
-      <Helmet>
+      <Head>
         <title>Kapora AI: {district.name} Emlak Asistanı ve CRM Programı</title>
         <meta name="description" content={`${district.name} bölgesinde ${district.target} satışlarınızı yapay zeka destekli emlak asistanı ile ${district.verb}. Manuel Excel takibine son verin!`} />
         <meta name="keywords" content={`${district.name} emlak programı, ${district.name} gayrimenkul crm, emlak asistanı, portföy takip`} />
         <script type="application/ld+json">
           {JSON.stringify(schemaMarkup)}
         </script>
-      </Helmet>
+      </Head>
 
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-outline-variant">

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+import { Head } from 'vite-react-ssg';
 import { Logo } from '../components/Logo';
 
 import { BLOG_POSTS } from '../data/blogPosts';
@@ -8,13 +8,13 @@ import { BLOG_POSTS } from '../data/blogPosts';
 export default function BlogList() {
   return (
     <div className="min-h-screen bg-background text-on-surface font-sans">
-      <Helmet>
+      <Head>
         <title>Kapora Blog | Emlak Profesyonelleri İçin Satış ve Teknoloji Taktikleri</title>
         <meta name="description" content="Gayrimenkul sektöründeki en son yapay zeka trendleri, CRM stratejileri ve satış artırma taktiklerini keşfedin." />
         <meta property="og:title" content="Kapora Blog | Emlak Sektörü Taktikleri" />
         <meta property="og:description" content="Emlak danışmanları için teknoloji ve satış rehberi." />
         <link rel="canonical" href="https://kapora.online/blog" />
-      </Helmet>
+      </Head>
 
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-outline-variant">
