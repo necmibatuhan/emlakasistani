@@ -17,8 +17,8 @@ class TwilioService {
   }
 
   async sendWhatsAppMessage(to, body) {
-    if (!this.client) {
-      console.warn(`[TwilioService] Simulating send to ${to}: ${body}`);
+    if (!this.client || !this.fromNumber) {
+      console.warn(`[TwilioService] Simulating send to ${to} (credentials or fromNumber missing): ${body}`);
       return { sid: 'simulated_sid' };
     }
 
