@@ -61,9 +61,9 @@ export default function OnboardingWidget({ token }) {
   }
 
   return (
-    <div className="bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/20 rounded-xl p-4 shadow-sm mb-2 flex flex-col md:flex-row items-center gap-6">
+    <div className="bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/20 rounded-xl p-4 shadow-sm mb-2 flex flex-col lg:flex-row items-start lg:items-center gap-6 w-full overflow-hidden">
       {/* Badge & Level */}
-      <div className="flex flex-col items-center justify-center shrink-0">
+      <div className="flex flex-col items-center justify-center shrink-0 mx-auto lg:mx-0">
         <div className="w-16 h-16 rounded-full bg-surface-container border-[3px] border-primary flex items-center justify-center text-2xl shadow-md">
           {currentLevel === 1 && '🌱'}
           {currentLevel === 2 && '📱'}
@@ -73,10 +73,10 @@ export default function OnboardingWidget({ token }) {
         <span className="text-[11px] font-bold text-primary uppercase mt-2 tracking-wider">Level {currentLevel}</span>
       </div>
 
-      <div className="flex-1 w-full">
+      <div className="flex-1 min-w-0 w-full">
         <div className="flex justify-between items-center mb-2">
-          <h3 className="font-bold text-on-surface text-lg">{levelNames[currentLevel]}</h3>
-          <span className="text-xs font-medium text-on-surface-variant bg-surface-container px-2 py-1 rounded-full">
+          <h3 className="font-bold text-on-surface text-lg truncate pr-2">{levelNames[currentLevel]}</h3>
+          <span className="text-xs font-medium text-on-surface-variant bg-surface-container px-2 py-1 rounded-full shrink-0">
             {currentLevel}/{maxLevel}
           </span>
         </div>
@@ -90,10 +90,10 @@ export default function OnboardingWidget({ token }) {
         </div>
 
         {currentLevel < maxLevel && (
-          <div className="flex flex-wrap gap-4 text-sm font-medium">
-            <span className="text-on-surface-variant mr-1">Sonraki Seviye Görevleri:</span>
+          <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm font-medium">
+            <span className="text-on-surface-variant mr-1 shrink-0">Sonraki Seviye Görevleri:</span>
             {currentTasks.map((t, i) => (
-              <div key={i} className={clsx("flex items-center gap-1.5", t.done ? "text-status-hot" : "text-on-surface")}>
+              <div key={i} className={clsx("flex items-center gap-1.5 shrink-0", t.done ? "text-status-hot" : "text-on-surface")}>
                 <span className="material-symbols-outlined text-[16px]">
                   {t.done ? 'check_circle' : 'radio_button_unchecked'}
                 </span>
@@ -104,8 +104,8 @@ export default function OnboardingWidget({ token }) {
         )}
 
         <div className="mt-3 text-xs text-on-surface-variant italic bg-surface-container p-2 rounded border border-outline/50 flex items-start gap-2">
-          <span className="material-symbols-outlined text-[14px] text-[#F5A623]">lightbulb</span>
-          <p>{teaser}</p>
+          <span className="material-symbols-outlined text-[14px] text-[#F5A623] shrink-0 mt-0.5">lightbulb</span>
+          <p className="break-words min-w-0 flex-1">{teaser}</p>
         </div>
       </div>
     </div>
