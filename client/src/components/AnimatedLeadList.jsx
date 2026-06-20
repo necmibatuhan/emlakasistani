@@ -30,8 +30,9 @@ function AnimatedLeadCard({ lead, onDelete }) {
   
   let hasRedFlag = false;
   let redFlagReason = '';
+  let props = {};
   try {
-    const props = typeof lead.properties === 'string' ? JSON.parse(lead.properties) : lead.properties;
+    props = typeof lead.properties === 'string' ? JSON.parse(lead.properties) : (lead.properties || {});
     hasRedFlag = props?.risk_analysis?.has_red_flag === true;
     redFlagReason = props?.risk_analysis?.risk_reason || '';
   } catch(e) {}

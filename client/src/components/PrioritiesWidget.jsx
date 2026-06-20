@@ -69,9 +69,10 @@ const PrioritiesWidget = () => {
             </div>
 
             <div>
-              <div className="flex justify-between items-start mb-2">
-                <div className="font-bold text-[#F1F2F4] text-[15px] truncate pr-8">{lead.name || 'İsimsiz Müşteri'}</div>
-                <div className={`font-bold text-2xl ${getScoreColor(lead.score)} leading-none`}>
+              <div className="flex justify-between items-start mb-2 pr-10">
+                <div className="font-bold text-[#F1F2F4] text-[15px] truncate">{lead.name || 'İsimsiz Müşteri'}</div>
+                <div className={`font-bold text-2xl ${getScoreColor(lead.score)} leading-none flex items-center gap-1.5`}>
+                  <span className="text-[10px] text-[#7C8090] font-normal tracking-wider mt-1">SKOR</span>
                   {lead.score || 0}
                 </div>
               </div>
