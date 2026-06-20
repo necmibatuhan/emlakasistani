@@ -1,6 +1,6 @@
 const express = require('express');
 const multer = require('multer');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { getGenAI, hasValidAiConfig } = require('../utils/ai');
 const db = require('../db');
 const { authMiddleware } = require('../middleware/auth');
 const PrivacyPipeline = require('../utils/PrivacyPipeline');
@@ -8,8 +8,6 @@ const scoreService = require('../services/scoreService');
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } }); // 10MB limit
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || 'mock');
 
 const analyzeRateLimitMap = new Map();
 
@@ -136,7 +134,7 @@ router.post('/analyze-voice', authMiddleware, upload.single('audio'), async (req
       return res.status(429).json({ message: 'Rate limit aşıldı.' });
     }
 
-    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'mock') {
+    if (!hasValidAiConfig()) {
       return res.status(500).json({ message: 'Yapay zeka yapılandırması eksik.' });
     }
 
@@ -299,7 +297,7 @@ JSON formatında çıktı ver:
 }
 `;
 
-    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'mock') {
+    if (!hasValidAiConfig()) {
       return res.status(500).json({ message: 'Yapay zeka (GEMINI_API_KEY) yapılandırması eksik.' });
     }
 
@@ -425,7 +423,7 @@ JSON formatında çıktı ver:
 }
 `;
 
-    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'mock') {
+    if (!hasValidAiConfig()) {
       return res.status(500).json({ message: 'Yapay zeka (GEMINI_API_KEY) yapılandırması eksik.' });
     }
     
@@ -485,7 +483,7 @@ router.get('/:id/external-matches', authMiddleware, async (req, res) => {
     if (lead.rows.length === 0) return res.json([]);
     
     // Dinamik AI Portföy Eşleştirme Motoru
-    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'mock') {
+    if (!hasValidAiConfig()) {
       return res.status(500).json({ message: 'Yapay zeka yapılandırması eksik. Lütfen GEMINI_API_KEY ayarlayın.' });
     }
 
@@ -527,7 +525,7 @@ SADECE AŞAĞIDAKİ JSON ARRAY FORMATINDA YANIT DÖN:
 
     try {
       const { GoogleGenerativeAI } = require('@google/generative-ai');
-      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+      const genAI = getGenAI();
       const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash", generationConfig: { responseMimeType: "application/json", temperature: 0.4 } });
       const aiResult = await model.generateContent(aiPrompt);
       let respText = aiResult.response.text().trim();
@@ -566,7 +564,7 @@ Geçmiş Notları/İhtiyacı: ${lead.message} | ${notesStr}
 `;
 
     let generatedMessage = '';
-    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'mock') {
+    if (!hasValidAiConfig()) {
       generatedMessage = `Merhaba ${lead.name} Bey, [Emlakçı Adı] ben. Rehberimde tam sizin kriterlerinize uygun, güncel piyasa koşullarında satılabilir fiyat öngörüsü çok doğru olan bir yer yakaladım. Kısa sürede satışa dönecek bir fırsat. Detaylar için arıyorum.`;
     } else {
       try {

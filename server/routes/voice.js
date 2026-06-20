@@ -1,13 +1,13 @@
 const express = require('express');
 const multer = require('multer');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { getGenAI, hasValidAiConfig } = require('../utils/ai');
 const db = require('../db');
 const { authMiddleware } = require('../middleware/auth');
 const PrivacyPipeline = require('../utils/PrivacyPipeline');
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } }); // 10MB limit
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || 'mock');
+const genAI = getGenAI();
 
 // POST /api/voice/transcribe
 router.post('/transcribe', authMiddleware, upload.single('audio'), async (req, res) => {
@@ -21,7 +21,7 @@ router.post('/transcribe', authMiddleware, upload.single('audio'), async (req, r
         mimeType = 'audio/webm'; // Fallback for Gemini
     }
 
-    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'mock') {
+    if (!hasValidAiConfig()) {
       return res.status(500).json({ error: 'Yapay zeka (GEMINI_API_KEY) yapılandırması eksik.' });
     }
 
@@ -141,7 +141,7 @@ Danışmanın sesli notu:
 `;
 
     let analysis;
-    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'mock') {
+    if (!hasValidAiConfig()) {
       analysis = getMockAnalysis();
     } else {
       try {
@@ -307,7 +307,7 @@ router.post('/create-lead', authMiddleware, upload.single('audio'), async (req, 
     }
 
     let transcript = "";
-    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'mock') {
+    if (!hasValidAiConfig()) {
       transcript = "Ahmet Bey aradı, 0532 123 45 67, Kadıköy'den 5 milyona ev bakıyor.";
     } else {
       try {
@@ -345,7 +345,7 @@ ${transcript}
 }`;
 
     let parsedResult;
-    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'mock') {
+    if (!hasValidAiConfig()) {
       parsedResult = getMockNewLead();
     } else {
       try {

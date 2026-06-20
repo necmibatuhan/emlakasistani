@@ -1,7 +1,7 @@
 // Mock Queue Service (In-memory) for development without Redis
 const db = require('../db');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || 'mock');
+const { getGenAI, hasValidAiConfig } = require('../utils/ai');
+const genAI = getGenAI();
 
 const matchQueue = [];
 

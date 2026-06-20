@@ -20,6 +20,7 @@ const notificationsRoutes = require('./routes/notifications');
 const subscriptionRoutes = require('./routes/subscription');
 const socialProofRoutes = require('./routes/socialProof');
 const matchRoutes = require('./routes/match');
+const onboardingRoutes = require('./routes/onboarding');
 require('./services/queue'); // Start background worker
 require('./services/churnPrevention'); // Start cron job
 require('./services/morningBriefing'); // Start daily briefing job

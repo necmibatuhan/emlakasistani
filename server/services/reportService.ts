@@ -1,7 +1,7 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+const { getGenAI, hasValidAiConfig } = require('../utils/ai');
 import db from '../db.js'; // PostgreSQL db instance
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+const genAI = getGenAI();
 
 export interface LandlordReport {
   property_title: string;
@@ -56,7 +56,7 @@ export async function generateLandlordReport(propertyId: string): Promise<Landlo
     let reportText = "";
     
     // 4. Gemini API'ye Raporu Yazdır
-    if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'mock') {
+    if (hasValidAiConfig()) {
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { temperature: 0.3 } });
       
       const rawDataContext = JSON.stringify({

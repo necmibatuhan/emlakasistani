@@ -22,7 +22,7 @@ Görevlerin:
 
 Müşteri Talebi: "${rawQuery}"
 
-Lütfen sadece aşağıdaki JSON formatında bir cevap döndür (```json etiketlerini kullanma, sadece JSON'u ver):
+Lütfen sadece aşağıdaki JSON formatında bir cevap döndür (\`\`\`json etiketlerini kullanma, sadece JSON'u ver):
 {
   "explicitFilters": {
     "location": "string | null",

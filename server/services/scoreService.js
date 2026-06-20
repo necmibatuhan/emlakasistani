@@ -1,10 +1,10 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { getGenAI, hasValidAiConfig } = require('../utils/ai');
 const pool = require('../db');
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || 'mock');
+const genAI = getGenAI();
 
 async function calculateScoreForLead(lead) {
-  if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'mock') {
+  if (!hasValidAiConfig()) {
     return {
       score: Math.floor(Math.random() * 40) + 60,
       reason: "Mock AI gerekçesi: Yüksek bütçeli müşteri, acil arama.",

@@ -65,7 +65,7 @@ router.get('/feed', async (req, res) => {
         if (u.plan === 'premium' || u.plan === 'pro') action = "premium plana geçti";
 
         return {
-          id: \`real-\${u.name}-\${Date.now()}\`,
+          id: `real-${u.name}-${Date.now()}`,
           display_name: displayName,
           city: "Türkiye",
           action: action,
@@ -78,7 +78,7 @@ router.get('/feed', async (req, res) => {
     if (mode === 'seeded' || (mode === 'hybrid' && items.length < 5)) {
       const randomSeed = seededEvents.sort(() => 0.5 - Math.random()).slice(0, 10);
       const mappedSeeds = randomSeed.map(s => ({
-        id: \`seed-\${s.name}-\${Date.now()}-\${Math.random()}\`,
+        id: `seed-${s.name}-${Date.now()}-${Math.random()}`,
         display_name: s.name,
         city: s.city,
         action: s.action,
