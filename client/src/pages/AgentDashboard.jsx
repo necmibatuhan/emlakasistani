@@ -293,7 +293,7 @@ const AgentDashboard = () => {
           </div>
         )}
 
-        <div className="flex-1 flex flex-col p-4 md:p-6 gap-6 overflow-y-auto overflow-x-hidden custom-scrollbar relative w-full max-w-full min-w-0">
+        <div className="flex-1 flex flex-col p-4 md:p-6 gap-6 overflow-y-auto overflow-x-hidden custom-scrollbar relative w-full max-w-full min-w-0 min-h-0">
           
           <div className="w-full">
             <OnboardingWidget token={token} />
