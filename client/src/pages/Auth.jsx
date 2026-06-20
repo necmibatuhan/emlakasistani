@@ -21,7 +21,7 @@ const Auth = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [captchaToken, setCaptchaToken] = useState(null);
   
-  const { login, register, setUser } = useContext(AuthContext);
+  const { login, register, setUser, setToken } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleGoogleSuccess = async (credentialResponse) => {
@@ -30,6 +30,7 @@ const Auth = () => {
         credential: credentialResponse.credential
       });
       setUser(res.data.user);
+      setToken(res.data.token); // FIX: Update AuthContext state
       localStorage.setItem('token', res.data.token);
       navigate('/dashboard');
     } catch (err) {
