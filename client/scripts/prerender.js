@@ -1,4 +1,4 @@
-import puppeteer from 'puppeteer';
+
 import express from 'express';
 import fs from 'fs';
 import path from 'path';
@@ -45,11 +45,31 @@ async function run() {
   const server = app.listen(PORT, async () => {
     console.log(`Server listening on port ${PORT}`);
     
-    console.log('Launching Puppeteer...');
-    const browser = await puppeteer.launch({
-      headless: 'new',
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
+    console.log('Launching Puppeteer with Vercel support...');
+    let browser;
+    try {
+      if (process.env.VERCEL) {
+        const chromium = (await import('@sparticuz/chromium')).default;
+        const puppeteerCore = (await import('puppeteer-core')).default;
+        browser = await puppeteerCore.launch({
+          args: chromium.args,
+          defaultViewport: chromium.defaultViewport,
+          executablePath: await chromium.executablePath(),
+          headless: chromium.headless,
+          ignoreHTTPSErrors: true,
+        });
+      } else {
+        const puppeteer = (await import('puppeteer')).default;
+        browser = await puppeteer.launch({
+          headless: 'new',
+          args: ['--no-sandbox', '--disable-setuid-sandbox']
+        });
+      }
+    } catch (e) {
+      console.error("Failed to launch browser:", e);
+      server.close();
+      return;
+    }
 
     for (const route of routesToPrerender) {
       console.log(`Prerendering ${route}...`);
