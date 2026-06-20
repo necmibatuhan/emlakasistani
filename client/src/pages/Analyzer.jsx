@@ -1,55 +1,83 @@
 import React, { useState, useRef, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Loader2, Sparkles, CheckCircle2, TrendingUp, Share2, Download, Image as ImageIcon, Zap, Activity } from 'lucide-react';
+import { UploadCloud, Loader2, Sparkles, CheckCircle2, TrendingUp, Share2, Download, Image as ImageIcon, Zap, Activity, Target } from 'lucide-react';
 import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+import axios from 'axios';
 import ReportTemplate from '../components/ReportTemplate';
 import { AuthContext } from '../contexts/AuthContext';
 
 const Analyzer = () => {
   const { user } = useContext(AuthContext);
-  const [url, setUrl] = useState('');
+  const [file, setFile] = useState(null);
+  const [preview, setPreview] = useState(null);
   const [status, setStatus] = useState('idle'); // idle, analyzing, result
   const [progress, setProgress] = useState(0);
   const [isExporting, setIsExporting] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState(null);
   const reportRef = useRef(null);
+  const fileInputRef = useRef(null);
 
-  const handleAnalyze = (e) => {
-    e.preventDefault();
-    if (!url) return;
-
-    setStatus('analyzing');
-    setProgress(0);
-
-    // Mock progress
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setStatus('result');
-          return 100;
-        }
-        return prev + 15;
-      });
-    }, 400);
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+      const objectUrl = URL.createObjectURL(selectedFile);
+      setPreview(objectUrl);
+    }
   };
 
-  const handleDownloadImage = async () => {
+  const handleAnalyze = async (e) => {
+    e.preventDefault();
+    if (!file) return;
+
+    setStatus('analyzing');
+    setProgress(10);
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const progressInterval = setInterval(() => {
+        setProgress(p => (p < 90 ? p + 5 : p));
+      }, 500);
+
+      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/properties/analyze-listing`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        withCredentials: true
+      });
+
+      clearInterval(progressInterval);
+      setProgress(100);
+      setAnalysisResult(res.data);
+      setStatus('result');
+    } catch (err) {
+      console.error(err);
+      setStatus('idle');
+      alert('Analiz sırasında bir hata oluştu.');
+    }
+  };
+
+  const handleDownloadPDF = async () => {
     if (!reportRef.current) return;
     setIsExporting(true);
     try {
-      // Geçici olarak report container'ı görünür yap
       const el = reportRef.current;
       el.style.display = 'block';
       el.style.position = 'absolute';
       el.style.left = '-9999px';
       
       const canvas = await html2canvas(el, { scale: 2, backgroundColor: '#0A0B0D' });
-      const image = canvas.toDataURL('image/jpeg', 0.9);
+      const imgData = canvas.toDataURL('image/jpeg', 0.9);
       
-      const link = document.createElement('a');
-      link.href = image;
-      link.download = 'kapora_ilan_analizi.jpg';
-      link.click();
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'px',
+        format: [canvas.width, canvas.height]
+      });
+      
+      pdf.addImage(imgData, 'JPEG', 0, 0, canvas.width, canvas.height);
+      pdf.save('kapora_ilan_analizi.pdf');
       
       el.style.display = 'none';
       el.style.position = 'static';
@@ -94,27 +122,42 @@ const Analyzer = () => {
               Portföy Almanın <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F5A623] to-[#FF8B00]">En Teknolojik Yolu</span>
             </h1>
             <p className="text-lg text-[#7C8090] max-w-2xl mx-auto">
-              Evini kendisi satmaya çalışan mülk sahiplerinin ilan linkini yapıştırın. Onlara yapay zeka destekli, profesyonel bir "İyileştirme Raporu" göndererek farkınızı gösterin.
+              Evini kendisi satmaya çalışan mülk sahiplerinin ilan ekran görüntüsünü yükleyin. Onlara yapay zeka destekli, profesyonel bir "İyileştirme Raporu" göndererek farkınızı gösterin.
             </p>
           </div>
 
-          <div className="bg-[#16181D] border border-[#2A2D35] rounded-2xl p-2 shadow-2xl relative z-10">
-            <form onSubmit={handleAnalyze} className="flex flex-col md:flex-row gap-2 relative">
-              <div className="relative flex-1">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#7C8090]" size={20} />
+          <div className="bg-[#16181D] border border-[#2A2D35] rounded-2xl p-6 shadow-2xl relative z-10 text-center">
+            <form onSubmit={handleAnalyze} className="flex flex-col gap-4">
+              <div 
+                className="border-2 border-dashed border-[#2A2D35] hover:border-[#F5A623] rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer transition-colors relative"
+                onClick={() => fileInputRef.current?.click()}
+              >
                 <input 
-                  type="url" 
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  placeholder="Sahibinden veya HepsiEmlak ilan linki..." 
-                  className="w-full bg-[#0A0B0D] border border-[#2A2D35] text-[#F1F2F4] rounded-xl pl-12 pr-4 py-4 text-base focus:border-[#F5A623] focus:ring-1 focus:ring-[#F5A623] outline-none transition-all placeholder:text-[#7C8090]"
-                  required
+                  type="file" 
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  accept="image/png, image/jpeg, image/jpg, image/webp" 
+                  className="hidden"
                 />
+                {preview ? (
+                  <div className="relative w-full max-w-sm mx-auto h-48 rounded-lg overflow-hidden border border-[#2A2D35]">
+                    <img src={preview} alt="İlan Önizleme" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                      <span className="text-white font-medium">Değiştir</span>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <UploadCloud size={48} className="text-[#7C8090] mb-4" />
+                    <h3 className="text-[#F1F2F4] font-medium text-lg mb-1">İlan ekran görüntüsünü seçin</h3>
+                    <p className="text-[#7C8090] text-sm">Sürükleyip bırakın veya tıklayarak dosya seçin (.jpg, .png)</p>
+                  </>
+                )}
               </div>
               <button 
                 type="submit" 
-                disabled={status === 'analyzing'}
-                className="bg-[#F5A623] hover:bg-[#FF8B00] disabled:opacity-50 disabled:cursor-not-allowed text-[#0A0B0D] px-8 py-4 rounded-xl font-bold text-base transition-all flex items-center justify-center gap-2 shrink-0 shadow-[0_0_15px_rgba(245,166,35,0.3)]"
+                disabled={status === 'analyzing' || !file}
+                className="w-full md:w-auto self-center bg-[#F5A623] hover:bg-[#FF8B00] disabled:opacity-50 disabled:cursor-not-allowed text-[#0A0B0D] px-10 py-4 rounded-xl font-bold text-base transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(245,166,35,0.3)]"
               >
                 {status === 'analyzing' ? (
                   <><Loader2 className="animate-spin" size={20} /> Analiz Ediliyor</>
@@ -247,12 +290,12 @@ const Analyzer = () => {
                  
                  <div className="relative z-10 flex items-center gap-4 w-full md:w-auto">
                     <button 
-                      onClick={handleDownloadImage}
+                      onClick={handleDownloadPDF}
                       disabled={isExporting}
-                      className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-[#2A2D35] hover:bg-[#353945] text-white px-6 py-3 rounded-xl font-medium transition-colors"
+                      className="bg-[#0A0B0D] border border-[#2A2D35] hover:border-[#F5A623] text-[#F1F2F4] disabled:opacity-50 px-6 py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors w-full md:w-auto"
                     >
                       {isExporting ? <Loader2 className="animate-spin" size={18} /> : <Download size={18} />}
-                      Görseli İndir
+                      {isExporting ? 'Hazırlanıyor...' : 'PDF İndir'}
                     </button>
                     
                     <button 
@@ -276,7 +319,7 @@ const Analyzer = () => {
 
       {/* Hidden container for rendering the image/pdf export */}
       <div style={{ display: 'none' }}>
-         <ReportTemplate reportRef={reportRef} />
+         <ReportTemplate reportRef={reportRef} data={analysisResult} />
       </div>
 
     </div>

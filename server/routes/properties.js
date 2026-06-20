@@ -1,9 +1,12 @@
 const express = require('express');
+const multer = require('multer');
 const db = require('../db');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 const semanticSearch = require('../services/semanticSearch');
+const { getGenAI, hasValidAiConfig } = require('../utils/ai');
 
 const router = express.Router();
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } }); // 10MB limit
 
 // GET all properties
 router.get('/', authMiddleware, async (req, res) => {
@@ -75,6 +78,56 @@ router.put('/:id', authMiddleware, requireRole(['company_admin', 'office_manager
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Sunucu hatası' });
+  }
+});
+
+// Analyze listing image
+router.post('/analyze-listing', authMiddleware, upload.single('image'), async (req, res) => {
+  try {
+    const imageFile = req.file;
+    if (!imageFile) return res.status(400).json({ message: 'Görsel dosyası eksik.' });
+    if (!hasValidAiConfig()) return res.status(500).json({ message: 'Yapay zeka yapılandırması eksik.' });
+
+    const imageBase64 = imageFile.buffer.toString('base64');
+    let mimeType = imageFile.mimetype;
+    
+    // Fallback if mimeType is somehow octet-stream
+    if (mimeType === 'application/octet-stream' || !mimeType.startsWith('image/')) {
+        mimeType = 'image/jpeg';
+    }
+
+    const promptText = `Sen usta bir emlak danışmanısın. Ekip arkadaşın sana bir emlak sitesindeki ilanın ekran görüntüsünü (screenshot) yolladı.
+Bu ilanı incele ve bana sadece aşağıdaki formatta geçerli bir JSON dön:
+{
+  "score": 0-100 arası bir tamsayı (İlanın satılma ihtimali ve çekiciliği),
+  "weaknesses": ["Zayıf yön 1", "Zayıf yön 2", "Örn: Fotoğraf karanlık", "Örn: Açıklama yetersiz"],
+  "strengths": ["Güçlü yön 1", "Güçlü yön 2"],
+  "improved_description": "Bu ilanın daha hızlı satılması için kullanılabilecek SEO uyumlu, dikkat çekici, harika bir taslak ilan başlığı ve açıklaması."
+}`;
+
+    const genAI = getGenAI();
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { responseMimeType: "application/json", temperature: 0.3 } });
+    
+    const aiResult = await model.generateContent([
+      { inlineData: { mimeType, data: imageBase64 } },
+      { text: promptText }
+    ]);
+
+    let respText = aiResult.response.text().trim();
+    if (respText.startsWith('\`\`\`json')) respText = respText.replace('\`\`\`json', '').replace('\`\`\`', '').trim();
+    
+    const parsedResult = JSON.parse(respText);
+
+    // Update onboarding progress
+    try {
+      const { triggerListingAnalyzed } = require('../services/onboardingService');
+      await triggerListingAnalyzed(req.user.id);
+    } catch (e) { console.error('Onboarding update err:', e); }
+
+    res.json(parsedResult);
+  } catch (err) {
+    console.error('Analyze Listing API Error:', err);
+    res.status(500).json({ message: 'İlan analizi başarısız oldu' });
   }
 });
 

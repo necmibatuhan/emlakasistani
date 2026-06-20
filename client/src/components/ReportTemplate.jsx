@@ -2,19 +2,27 @@ import React, { useContext } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { Target, TrendingUp, Sparkles, CheckCircle2 } from 'lucide-react';
 
-const ReportTemplate = ({ reportRef }) => {
+const ReportTemplate = ({ reportRef, data }) => {
   const { user } = useContext(AuthContext);
   const agentName = user?.name || "Kapora Danışmanı";
   
-  // Örnek veriler - Normalde props ile Analyzer'dan gelecek
-  const marketScore = 82;
-  const visualScore = 65;
-  const oldScore = 42;
+  // Dinamik veriler
+  const oldScore = data?.score || 42;
+  const marketScore = Math.min(oldScore + 40, 98); 
+  
+  const weaknesses = data?.weaknesses || [
+    "Mevcut fotoğrafların aydınlatma ve açısı düşük. Görseller profesyonel değil.",
+    "Açıklama yetersiz ve duygusal bağ kurmuyor."
+  ];
+
+  const strengths = data?.strengths || [
+    "Lokasyon avantajı", "Geniş kullanım alanı"
+  ];
 
   return (
     <div 
       ref={reportRef} 
-      className="bg-[#0A0B0D] w-[600px] p-8 border-4 border-[#2A2D35] rounded-3xl relative overflow-hidden"
+      className="bg-[#0A0B0D] w-[800px] p-8 border-4 border-[#2A2D35] rounded-3xl relative overflow-hidden"
       style={{ fontFamily: 'Inter, sans-serif', color: '#F1F2F4' }}
     >
       {/* Background elements for premium look */}
@@ -49,14 +57,14 @@ const ReportTemplate = ({ reportRef }) => {
              <span className="text-sm text-[#7C8090] mb-1">/100</span>
            </div>
            <p className="text-xs text-[#EF4444] mt-2 bg-[#EF4444]/10 inline-block px-2 py-1 rounded font-medium w-fit">
-             Kayıp Riski Yüksek
+             Satış İhtimali Düşük
            </p>
         </div>
 
         {/* New Expected Score */}
         <div className="bg-gradient-to-br from-[#16181D] to-[#0A0B0D] border border-[#F5A623]/30 rounded-2xl p-5 flex flex-col justify-center relative overflow-hidden shadow-[0_0_20px_rgba(245,166,35,0.1)]">
            <div className="absolute top-2 right-2 opacity-20 text-[#F5A623]"><Sparkles size={40}/></div>
-           <p className="text-xs font-bold text-[#F5A623] uppercase tracking-wider mb-2">Optimizasyon Sonrası</p>
+           <p className="text-xs font-bold text-[#F5A623] uppercase tracking-wider mb-2">Hedeflenen Kapora AI Skoru</p>
            <div className="flex items-end gap-2">
              <span className="text-4xl font-black text-[#10B981] leading-none">{marketScore}</span>
              <span className="text-sm text-[#7C8090] mb-1">/100</span>
@@ -72,21 +80,26 @@ const ReportTemplate = ({ reportRef }) => {
         <h3 className="text-sm font-bold text-white uppercase tracking-wider border-b border-[#2A2D35] pb-2 mb-4">Tespitler ve İyileştirmeler</h3>
         
         <div className="flex items-start gap-3">
-          <div className="text-[#F5A623] mt-0.5"><TrendingUp size={18} /></div>
+          <div className="text-[#EF4444] mt-0.5"><TrendingUp size={18} /></div>
           <div>
-            <h4 className="text-sm font-bold text-white">Görsel Kalite Optimizasyonu</h4>
-            <p className="text-xs text-[#7C8090] mt-1 leading-relaxed">
-              Mevcut fotoğrafların aydınlatma ve açısı (%{visualScore}) düşük. Yapay zeka destekli iyileştirme ile daha ferah ve dikkat çekici görseller oluşturulacak.
-            </p>
+            <h4 className="text-sm font-bold text-white">İlanın Zayıf Yönleri</h4>
+            <ul className="text-xs text-[#7C8090] mt-1 space-y-1">
+              {weaknesses.map((w, i) => <li key={i}>- {w}</li>)}
+            </ul>
           </div>
         </div>
 
-        <div className="flex items-start gap-3">
+        <div className="flex items-start gap-3 mt-4">
           <div className="text-[#10B981] mt-0.5"><CheckCircle2 size={18} /></div>
           <div>
-            <h4 className="text-sm font-bold text-white">Metin Çekiciliği ve Aciliyet</h4>
+            <h4 className="text-sm font-bold text-white">Yapay Zeka Destekli Satış Stratejisi</h4>
             <p className="text-xs text-[#7C8090] mt-1 leading-relaxed">
-              İlan açıklamanız teknik bilgilerden arındırılıp, alıcıda "hemen aramalıyım" hissi uyandıracak duygusal ve fayda odaklı bir yapıya kavuşturulacak.
+              Mevcut ilanınızdaki bu eksiklikler giderilip, alıcıda "hemen aramalıyım" hissi uyandıracak duygusal ve fayda odaklı bir yapıya kavuşturulacaktır.
+              {data?.improved_description && (
+                <span className="block mt-2 p-2 bg-[#2A2D35]/50 rounded italic border-l-2 border-[#10B981]">
+                  "{data.improved_description}"
+                </span>
+              )}
             </p>
           </div>
         </div>
