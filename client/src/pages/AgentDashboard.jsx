@@ -282,7 +282,7 @@ const AgentDashboard = () => {
     <div className="flex min-h-screen bg-background"> {/* Premium Fintech Background */}
       <Sidebar />
 
-      <div className="lg:ml-[240px] flex-1 flex flex-col h-screen w-full overflow-hidden">
+      <div className="lg:ml-[240px] flex-1 flex flex-col h-screen overflow-hidden">
         <Header />
 
         {/* Alert Banner */}

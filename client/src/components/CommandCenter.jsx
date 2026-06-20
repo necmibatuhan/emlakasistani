@@ -105,6 +105,10 @@ const CommandCenter = ({ leads, onLeadSelect }) => {
     };
 
     leads.forEach((lead, index) => {
+      let parsedProps = {};
+      try { parsedProps = typeof lead.properties === 'string' ? JSON.parse(lead.properties) : (lead.properties || {}); } catch(e){}
+      const actualReason = lead.reasoning || parsedProps.ai_insight || lead.message;
+
       // Mock distribution
       if (lead.label === 'Sıcak' && index % 2 === 0) {
         actions.urgent_call.push({
@@ -112,7 +116,7 @@ const CommandCenter = ({ leads, onLeadSelect }) => {
           lead_name: lead.name === '[İsim Belirtilmedi]' ? 'İsimsiz' : lead.name,
           lead_phone: lead.phone,
           expected_commission: '45.000',
-          reason: 'Dün fiyat sormuştu, bugün dönüş bekliyor. Hemen ara.',
+          reason: actualReason || 'Dün fiyat sormuştu, bugün dönüş bekliyor. Hemen ara.',
           suggested_action_text: 'Hemen Ara',
           suggested_action_icon: 'call',
           action_type: 'call'
@@ -123,7 +127,7 @@ const CommandCenter = ({ leads, onLeadSelect }) => {
           lead_name: lead.name === '[İsim Belirtilmedi]' ? 'İsimsiz' : lead.name,
           lead_phone: lead.phone,
           expected_commission: '120.000',
-          reason: '8 gündür aranmadı. Başka emlakçıya gidebilir.',
+          reason: actualReason || '8 gündür aranmadı. Başka emlakçıya gidebilir.',
           suggested_action_text: 'Kurtarma Mesajı At',
           suggested_action_icon: 'chat',
           action_type: 'whatsapp',
@@ -135,7 +139,7 @@ const CommandCenter = ({ leads, onLeadSelect }) => {
           lead_name: lead.name === '[İsim Belirtilmedi]' ? 'İsimsiz' : lead.name,
           lead_phone: lead.phone,
           expected_commission: '350.000',
-          reason: 'Bütçesi yüksek, lüks segment arayışında. Yeni fırsat sun.',
+          reason: actualReason || 'Bütçesi yüksek, lüks segment arayışında. Yeni fırsat sun.',
           suggested_action_text: 'Özel Portföy Gönder',
           suggested_action_icon: 'home',
           action_type: 'whatsapp',
@@ -147,7 +151,7 @@ const CommandCenter = ({ leads, onLeadSelect }) => {
           lead_name: lead.name === '[İsim Belirtilmedi]' ? 'İsimsiz' : lead.name,
           lead_phone: lead.phone,
           expected_commission: '60.000',
-          reason: 'Dün girdiğiniz Kadıköy 3+1 portföyü ile %92 eşleşiyor.',
+          reason: actualReason || 'Dün girdiğiniz Kadıköy 3+1 portföyü ile %92 eşleşiyor.',
           suggested_action_text: 'Eşleşmeyi Gönder',
           suggested_action_icon: 'send',
           action_type: 'whatsapp',
@@ -158,7 +162,7 @@ const CommandCenter = ({ leads, onLeadSelect }) => {
           lead_id: lead.id,
           lead_name: lead.name === '[İsim Belirtilmedi]' ? 'İsimsiz' : lead.name,
           lead_phone: lead.phone,
-          reason: '45 gündür işlem yok. Piyasayı yokla.',
+          reason: actualReason || '45 gündür işlem yok. Piyasayı yokla.',
           suggested_action_text: 'Uyandırma Mesajı',
           suggested_action_icon: 'notifications_active',
           action_type: 'whatsapp',

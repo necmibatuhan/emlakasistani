@@ -239,7 +239,7 @@ const Leads = () => {
     <div className="flex h-screen bg-[#0A0B0D] text-[#F1F2F4] font-sans overflow-hidden">
       <Sidebar />
       
-      <main className="lg:ml-[240px] flex-1 flex flex-col h-screen w-full overflow-hidden">
+      <main className="lg:ml-[240px] flex-1 flex flex-col h-screen overflow-hidden">
         
         {/* PAGE HEADER */}
         <header className="h-[72px] flex-shrink-0 border-b border-[#2A2D35] px-4 lg:px-6 flex items-center justify-between">

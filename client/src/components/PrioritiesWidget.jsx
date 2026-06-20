@@ -77,7 +77,7 @@ const PrioritiesWidget = () => {
               </div>
               
               <div className="text-[12px] text-[#7C8090] min-h-[36px] line-clamp-2 leading-snug">
-                {lead.score_reasons && lead.score_reasons.length > 0 ? lead.score_reasons.join(' · ') : 'Yapay zeka önerisi'}
+                {lead.reasoning || (typeof lead.properties === 'string' ? JSON.parse(lead.properties)?.ai_insight : lead.properties?.ai_insight) || lead.message || (lead.score_reasons && lead.score_reasons.length > 0 ? lead.score_reasons.join(' · ') : 'Yapay zeka önerisi')}
               </div>
               
               <div className="text-[11px] text-[#8E929C] mt-2 flex items-center gap-1">
