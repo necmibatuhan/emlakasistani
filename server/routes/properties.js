@@ -106,7 +106,7 @@ Bu ilanı incele ve bana sadece aşağıdaki formatta geçerli bir JSON dön:
 }`;
 
     const genAI = getGenAI();
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { responseMimeType: "application/json", temperature: 0.3 } });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash", generationConfig: { responseMimeType: "application/json", temperature: 0.3 } });
     
     const aiResult = await model.generateContent([
       { inlineData: { mimeType, data: imageBase64 } },
@@ -114,7 +114,14 @@ Bu ilanı incele ve bana sadece aşağıdaki formatta geçerli bir JSON dön:
     ]);
 
     let respText = aiResult.response.text().trim();
-    if (respText.startsWith('\`\`\`json')) respText = respText.replace('\`\`\`json', '').replace('\`\`\`', '').trim();
+    
+    // Robust JSON extraction
+    const jsonMatch = respText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+    if (jsonMatch) {
+      respText = jsonMatch[1];
+    } else if (respText.startsWith('```')) {
+      respText = respText.replace(/^```(json)?/, '').replace(/```$/, '').trim();
+    }
     
     const parsedResult = JSON.parse(respText);
 

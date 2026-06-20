@@ -57,7 +57,7 @@ export async function generateLandlordReport(propertyId: string): Promise<Landlo
     
     // 4. Gemini API'ye Raporu Yazdır
     if (hasValidAiConfig()) {
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { temperature: 0.3 } });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash", generationConfig: { temperature: 0.3 } });
       
       const rawDataContext = JSON.stringify({
         property_details: property,

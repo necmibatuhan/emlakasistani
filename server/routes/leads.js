@@ -165,7 +165,7 @@ Lütfen çıktını başka hiçbir metin olmadan sadece geçerli bir JSON olarak
 
     let parsedResult;
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { responseMimeType: "application/json", temperature: 0.2 } });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash", generationConfig: { responseMimeType: "application/json", temperature: 0.2 } });
       const aiResult = await model.generateContent([
         {
           inlineData: {
