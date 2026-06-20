@@ -264,7 +264,7 @@ router.post('/google', async (req, res) => {
       payload = ticket.getPayload();
     } catch (err) {
       console.error("Google Token Hatası:", err);
-      return res.status(401).json({ message: 'Google ile giriş başarısız oldu.' });
+      return res.status(400).json({ message: 'Google ile giriş başarısız oldu.' }); // 400 instead of 401 to prevent global interceptor redirect
     }
 
     const { email, sub: google_id } = payload;
@@ -318,7 +318,7 @@ router.post('/google', async (req, res) => {
       token 
     });
   } catch (err) {
-    await db.query('ROLLBACK');
+    try { await db.query('ROLLBACK'); } catch(e) {}
     console.error(err);
     res.status(500).json({ message: 'Sunucu hatası' });
   }
