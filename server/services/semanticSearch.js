@@ -1,10 +1,10 @@
 const { OpenAI } = require('openai');
 const db = require('../db');
 
-// Initialize OpenAI. Make sure OPENAI_API_KEY is in .env
-const openai = new OpenAI({
+// Initialize OpenAI if key is present (fallback or migration phase)
+const openai = process.env.OPENAI_API_KEY ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
-});
+}) : null;
 
 /**
  * 1. Intent Extraction (Niyet Analizi)

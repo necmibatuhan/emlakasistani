@@ -2,7 +2,10 @@ const cron = require('node-cron');
 const db = require('../db');
 const { OpenAI } = require('openai');
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// Initialize OpenAI. Make sure OPENAI_API_KEY is in .env
+const openai = process.env.OPENAI_API_KEY ? new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+}) : null;
 
 // Global cache for today's motivation to avoid calling OpenAI for every user
 let todaysMotivation = null;
