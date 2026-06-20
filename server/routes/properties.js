@@ -82,11 +82,22 @@ router.put('/:id', authMiddleware, requireRole(['company_admin', 'office_manager
 });
 
 // Analyze listing image
-router.post('/analyze-listing', authMiddleware, async (req, res) => {
+const jwt = require('jsonwebtoken');
+
+router.post('/analyze-listing', async (req, res) => {
   try {
     const { image, mimeType = 'image/jpeg' } = req.body;
     if (!image) return res.status(400).json({ message: 'Görsel dosyası eksik.' });
     if (!hasValidAiConfig()) return res.status(500).json({ message: 'Yapay zeka yapılandırması eksik.' });
+
+    let userId = null;
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    if (token && token !== 'null' && token !== 'undefined') {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        userId = decoded.id;
+      } catch (e) {}
+    }
 
     const imageBase64 = image;
 
@@ -119,11 +130,13 @@ Bu ilanı incele ve bana sadece aşağıdaki formatta geçerli bir JSON dön:
     
     const parsedResult = JSON.parse(respText);
 
-    // Update onboarding progress
-    try {
-      const { triggerListingAnalyzed } = require('../services/onboardingService');
-      await triggerListingAnalyzed(req.user.id);
-    } catch (e) { console.error('Onboarding update err:', e); }
+    // Update onboarding progress if logged in
+    if (userId) {
+      try {
+        const { triggerListingAnalyzed } = require('../services/onboardingService');
+        await triggerListingAnalyzed(userId);
+      } catch (e) { console.error('Onboarding update err:', e); }
+    }
 
     res.json(parsedResult);
   } catch (err) {
