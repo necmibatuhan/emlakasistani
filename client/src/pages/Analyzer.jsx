@@ -117,24 +117,25 @@ const Analyzer = () => {
       el.style.position = 'absolute';
       el.style.left = '-9999px';
       
-      // Daha hızlı ve sorunsuz render için optimizasyon
-      const canvas = await html2canvas(el, { 
-        scale: 1.5, 
-        useCORS: true, 
-        logging: false,
-        backgroundColor: '#0A0B0D' 
+      // html-to-image, Tailwind v4 CSS (oklab) renkleriyle kusursuz çalışır
+      const imgData = await htmlToImage.toJpeg(el, { 
+        quality: 0.85, 
+        backgroundColor: '#0A0B0D',
+        pixelRatio: 1.5
       });
       
-      const imgData = canvas.toDataURL('image/jpeg', 0.8);
+      // Genişlik ve yükseklik almak için html elementinin boyutlarını kullanabiliriz
+      const width = el.offsetWidth;
+      const height = el.offsetHeight;
       
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'px',
-        format: [canvas.width, canvas.height],
-        compress: true // PDF boyutunu optimize et
+        format: [width * 1.5, height * 1.5],
+        compress: true
       });
       
-      pdf.addImage(imgData, 'JPEG', 0, 0, canvas.width, canvas.height);
+      pdf.addImage(imgData, 'JPEG', 0, 0, width * 1.5, height * 1.5);
       pdf.save('kapora_ilan_analizi.pdf');
       
       el.style.display = 'none';
