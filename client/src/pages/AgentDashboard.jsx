@@ -293,9 +293,11 @@ const AgentDashboard = () => {
           </div>
         )}
 
-        <div className="flex-1 flex flex-col p-4 md:p-6 gap-6 overflow-y-auto custom-scrollbar">
+        <div className="flex-1 flex flex-col p-4 md:p-6 gap-6 overflow-y-auto overflow-x-hidden custom-scrollbar relative w-full max-w-full min-w-0">
           
-          <OnboardingWidget token={token} />
+          <div className="w-full">
+            <OnboardingWidget token={token} />
+          </div>
 
           {/* Mobile Only Header Text */}
           <div className="lg:hidden mb-1 px-1">
