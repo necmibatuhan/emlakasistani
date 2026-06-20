@@ -88,7 +88,10 @@ export default defineConfig({
 
       return paths.flatMap(routePath => {
         if (routePath === '/blog/:slug') {
-          return slugs.map(slug => `/blog/${slug}`);
+          return slugs.map(slug => `/blog/${slug}/`);
+        }
+        if (routePath === '/blog') {
+          return ['/blog/'];
         }
         if (routePath.includes(':') || routePath === '*') {
           return []; // Ignore other dynamic or wildcard routes
