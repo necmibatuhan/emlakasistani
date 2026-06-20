@@ -113,9 +113,6 @@ const Analyzer = () => {
     setIsExporting(true);
     try {
       const el = reportRef.current;
-      el.style.display = 'block';
-      el.style.position = 'absolute';
-      el.style.left = '-9999px';
       
       // Safari/iOS cihazlarda ilk render'ın siyah/boş çıkması kronik bir sorundur.
       // Bunu aşmak için "ısınma" turu atıyoruz:
@@ -147,8 +144,6 @@ const Analyzer = () => {
       pdf.addImage(imgData, 'JPEG', 0, 0, width * 1.5, height * 1.5);
       pdf.save('kapora_ilan_analizi.pdf');
       
-      el.style.display = 'none';
-      el.style.position = 'static';
     } catch (err) {
       console.error('Export failed', err);
       alert(`PDF oluşturulurken bir sorun oluştu: ${err.message || err}. Lütfen tekrar deneyin.`);
@@ -387,7 +382,7 @@ const Analyzer = () => {
       </main>
 
       {/* Hidden container for rendering the image/pdf export */}
-      <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
+      <div style={{ position: 'fixed', left: 0, top: 0, zIndex: -50, opacity: 0.001, pointerEvents: 'none' }}>
          <ReportTemplate reportRef={reportRef} data={analysisResult} />
       </div>
 
