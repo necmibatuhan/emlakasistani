@@ -1,5 +1,6 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { Logo } from '../components/Logo';
 import { BLOG_POSTS, getBlogPostContent } from '../data/blogPosts';
 
@@ -23,6 +24,13 @@ export default function BlogPost() {
 
   return (
     <div className="min-h-screen bg-background text-on-surface font-sans">
+      <Helmet>
+        <title>{post.title} | Kapora Blog</title>
+        <meta name="description" content={post.excerpt} />
+        <meta property="og:title" content={post.title} />
+        <meta property="og:description" content={post.excerpt} />
+        <link rel="canonical" href={`https://kapora.online/blog/${post.slug}`} />
+      </Helmet>
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-outline-variant">
         <div className="max-w-[1200px] mx-auto px-6 h-16 flex items-center justify-between">

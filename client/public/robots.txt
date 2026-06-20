@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /leads
+Disallow: /integrations
+Disallow: /whatsapp
+Disallow: /properties
+Disallow: /profile
+Disallow: /offices
+Disallow: /agents
+Disallow: /reports
+
+Sitemap: https://kapora.online/sitemap.xml
