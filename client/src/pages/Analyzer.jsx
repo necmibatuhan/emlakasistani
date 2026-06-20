@@ -2,7 +2,7 @@ import React, { useState, useRef, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { UploadCloud, Loader2, Sparkles, CheckCircle2, TrendingUp, Share2, Download, Image as ImageIcon, Zap, Activity, Target } from 'lucide-react';
 import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
 import axios from 'axios';
 import ReportTemplate from '../components/ReportTemplate';
 import { AuthContext } from '../contexts/AuthContext';
@@ -141,7 +141,7 @@ const Analyzer = () => {
       el.style.position = 'static';
     } catch (err) {
       console.error('Export failed', err);
-      alert('PDF oluşturulurken bir sorun oluştu. Lütfen tekrar deneyin.');
+      alert(`PDF oluşturulurken bir sorun oluştu: ${err.message || err}. Lütfen tekrar deneyin.`);
     } finally {
       setIsExporting(false);
     }
