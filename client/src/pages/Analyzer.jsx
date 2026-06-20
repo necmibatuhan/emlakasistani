@@ -1,7 +1,7 @@
 import React, { useState, useRef, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { UploadCloud, Loader2, Sparkles, CheckCircle2, TrendingUp, Share2, Download, Image as ImageIcon, Zap, Activity, Target } from 'lucide-react';
-import html2canvas from 'html2canvas';
+import { toJpeg } from 'html-to-image';
 import { jsPDF } from 'jspdf';
 import axios from 'axios';
 import ReportTemplate from '../components/ReportTemplate';
@@ -118,7 +118,7 @@ const Analyzer = () => {
       el.style.left = '-9999px';
       
       // html-to-image, Tailwind v4 CSS (oklab) renkleriyle kusursuz çalışır
-      const imgData = await htmlToImage.toJpeg(el, { 
+      const imgData = await toJpeg(el, { 
         quality: 0.85, 
         backgroundColor: '#0A0B0D',
         pixelRatio: 1.5
