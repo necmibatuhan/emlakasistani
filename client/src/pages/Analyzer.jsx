@@ -27,6 +27,44 @@ const Analyzer = () => {
     }
   };
 
+  const compressImage = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 1200;
+          const MAX_HEIGHT = 1200;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+          resolve(dataUrl);
+        };
+        img.onerror = (err) => reject(err);
+      };
+      reader.onerror = (err) => reject(err);
+    });
+  };
+
   const handleAnalyze = async (e) => {
     e.preventDefault();
     if (!file) return;
@@ -34,16 +72,24 @@ const Analyzer = () => {
     setStatus('analyzing');
     setProgress(10);
 
-    const formData = new FormData();
-    formData.append('image', file);
-
     try {
+      // 1. Resmi tarayıcıda küçült (max 1200px) ve base64 yap
+      const base64DataUrl = await compressImage(file);
+      const base64Image = base64DataUrl.split(',')[1];
+      
+      setProgress(40);
+
       const progressInterval = setInterval(() => {
         setProgress(p => (p < 90 ? p + 5 : p));
       }, 500);
 
-      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/properties/analyze-listing`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+      const payload = {
+        image: base64Image,
+        mimeType: 'image/jpeg'
+      };
+
+      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/properties/analyze-listing`, payload, {
+        headers: { 'Content-Type': 'application/json' },
         withCredentials: true
       });
 
@@ -54,7 +100,8 @@ const Analyzer = () => {
     } catch (err) {
       console.error(err);
       setStatus('idle');
-      alert('Analiz sırasında bir hata oluştu.');
+      const errorMsg = err.response?.data?.message || err.message || 'Bilinmeyen bir hata oluştu.';
+      alert(`Analiz sırasında bir hata oluştu:\n${errorMsg}`);
     }
   };
 

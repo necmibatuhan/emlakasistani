@@ -66,7 +66,7 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-app.use(express.json({ limit: '1mb' })); // Limit body payload to prevent huge payload attacks
+app.use(express.json({ limit: '10mb' })); // Limit body payload, increased to 10mb for image uploads
 
 app.use('/api/auth', authRoutes);
 app.use('/api/leads', leadsRoutes);

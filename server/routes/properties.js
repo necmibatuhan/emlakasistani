@@ -82,19 +82,13 @@ router.put('/:id', authMiddleware, requireRole(['company_admin', 'office_manager
 });
 
 // Analyze listing image
-router.post('/analyze-listing', authMiddleware, upload.single('image'), async (req, res) => {
+router.post('/analyze-listing', authMiddleware, async (req, res) => {
   try {
-    const imageFile = req.file;
-    if (!imageFile) return res.status(400).json({ message: 'Görsel dosyası eksik.' });
+    const { image, mimeType = 'image/jpeg' } = req.body;
+    if (!image) return res.status(400).json({ message: 'Görsel dosyası eksik.' });
     if (!hasValidAiConfig()) return res.status(500).json({ message: 'Yapay zeka yapılandırması eksik.' });
 
-    const imageBase64 = imageFile.buffer.toString('base64');
-    let mimeType = imageFile.mimetype;
-    
-    // Fallback if mimeType is somehow octet-stream
-    if (mimeType === 'application/octet-stream' || !mimeType.startsWith('image/')) {
-        mimeType = 'image/jpeg';
-    }
+    const imageBase64 = image;
 
     const promptText = `Sen usta bir emlak danışmanısın. Ekip arkadaşın sana bir emlak sitesindeki ilanın ekran görüntüsünü (screenshot) yolladı.
 Bu ilanı incele ve bana sadece aşağıdaki formatta geçerli bir JSON dön:
