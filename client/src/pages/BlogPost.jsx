@@ -30,6 +30,32 @@ export default function BlogPost() {
         <meta property="og:title" content={post.title} />
         <meta property="og:description" content={post.excerpt} />
         <link rel="canonical" href={`https://kapora.online/blog/${post.slug}`} />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Article",
+            "headline": post.title,
+            "description": post.excerpt,
+            "author": {
+              "@type": "Organization",
+              "name": "Kapora AI Editör Ekibi"
+            },
+            "publisher": {
+              "@type": "Organization",
+              "name": "Kapora AI",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://www.kapora.online/logo-k.png"
+              }
+            },
+            "datePublished": new Date(post.date).toISOString(),
+            "dateModified": new Date(post.date).toISOString(),
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": `https://kapora.online/blog/${post.slug}`
+            }
+          })}
+        </script>
       </Head>
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-outline-variant">
