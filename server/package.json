@@ -29,7 +29,8 @@
     "pg": "^8.21.0",
     "pgvector": "^0.3.0",
     "resend": "^6.12.4",
-    "shopier-api": "^1.1.4"
+    "shopier-api": "^1.1.4",
+    "twilio": "^6.0.2"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

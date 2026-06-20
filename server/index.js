@@ -21,6 +21,7 @@ const subscriptionRoutes = require('./routes/subscription');
 const socialProofRoutes = require('./routes/socialProof');
 const matchRoutes = require('./routes/match');
 const onboardingRoutes = require('./routes/onboarding');
+const whatsappRoutes = require('./routes/whatsapp');
 require('./services/queue'); // Start background worker
 require('./services/churnPrevention'); // Start cron job
 require('./services/morningBriefing'); // Start daily briefing job
@@ -67,6 +68,9 @@ const limiter = rateLimit({
 app.use('/api', limiter);
 
 app.use(express.json({ limit: '10mb' })); // Limit body payload, increased to 10mb for image uploads
+app.use(express.urlencoded({ extended: true, limit: '10mb' })); // Twilio Webhooks için gerekli!
+
+app.use('/v1/whatsapp-receiver', whatsappRoutes); // Twilio Inbound Webhook
 
 app.use('/api/auth', authRoutes);
 app.use('/api/leads', leadsRoutes);
