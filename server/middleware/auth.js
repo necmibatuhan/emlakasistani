@@ -11,7 +11,7 @@ const authMiddleware = (req, res, next) => {
     req.user = decoded; // { id, role, company_id, office_id, plan, created_at }
 
     // Check 14-day trial
-    if (decoded.created_at && decoded.plan !== 'pro' && decoded.plan !== 'premium') {
+    if (decoded.created_at && !['pro', 'premium', 'proplus', 'enterprise'].includes(decoded.plan)) {
       const createdDate = new Date(decoded.created_at);
       const now = new Date();
       const diffDays = (now - createdDate) / (1000 * 60 * 60 * 24);

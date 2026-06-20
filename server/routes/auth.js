@@ -173,7 +173,7 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password, turnstileToken } = req.body;
 
-    const demoEmails = ['admin@c21.com', 'manager@c21.com', 'agent@c21.com'];
+    const demoEmails = ['admin@c21.com', 'manager@c21.com', 'agent@c21.com', 'demo@kapora.online'];
     const isDemoAccount = email && demoEmails.includes(email.toLowerCase().trim());
 
     if (!isDemoAccount) {
