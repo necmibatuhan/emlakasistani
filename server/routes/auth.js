@@ -189,6 +189,12 @@ router.post('/login', async (req, res) => {
     }
     const user = userRes.rows[0];
 
+    // Demo hesaplara otomatik olarak en üst paketi (proplus) tanımla ki süreleri dolmasın ve tüm özellikleri kullanabilsinler
+    if (isDemoAccount && user.plan !== 'proplus') {
+      await db.query("UPDATE users SET plan = 'proplus' WHERE id = $1", [user.id]);
+      user.plan = 'proplus';
+    }
+
     const validPassword = await bcrypt.compare(password, user.password_hash);
     if (!validPassword) {
       return res.status(400).json({ message: 'Geçersiz e-posta veya şifre' });

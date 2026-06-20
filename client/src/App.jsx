@@ -45,7 +45,7 @@ const ProtectedRoute = ({ children }) => {
     const createdDate = new Date(user.created_at);
     const now = new Date();
     const diffDays = (now - createdDate) / (1000 * 60 * 60 * 24);
-    if (diffDays > 14 && user.plan !== 'pro') {
+    if (diffDays > 14 && user.plan === 'free') {
       return <Navigate to="/pricing?expired=true" replace />;
     }
   }
