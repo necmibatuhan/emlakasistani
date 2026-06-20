@@ -87,7 +87,7 @@ const AppRoutes = () => {
       <Route path="/blog" element={<BlogList />} />
       <Route path="/blog/:slug" element={<BlogPost />} />
       <Route path="/sehir/:slug-emlak-asistani" element={<RegionalLanding />} />
-      <Route path="/ilan-analizi" element={<Analyzer />} />
+      <Route path="/ilan-analizi" element={<ProtectedRoute><Analyzer /></ProtectedRoute>} />
       <Route path="/dashboard" element={<ProtectedRoute><RoleBasedDashboard /></ProtectedRoute>} />
       <Route path="/leads" element={<ProtectedRoute><Leads /></ProtectedRoute>} />
       <Route path="/integrations" element={<ProtectedRoute><Integrations /></ProtectedRoute>} />

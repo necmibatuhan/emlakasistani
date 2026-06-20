@@ -2,8 +2,10 @@ const jwt = require('jsonwebtoken');
 
 const authMiddleware = (req, res, next) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-    if (!token) return res.status(401).json({ message: 'Yetkisiz erişim' });
+    let token = req.header('Authorization')?.replace('Bearer ', '');
+    if (!token || token === 'null' || token === 'undefined') {
+      return res.status(401).json({ message: 'Yetkisiz erişim. Lütfen giriş yapın.' });
+    }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded; // { id, role, company_id, office_id, plan, created_at }
@@ -20,7 +22,7 @@ const authMiddleware = (req, res, next) => {
 
     next();
   } catch (err) {
-    res.status(401).json({ message: 'Geçersiz token' });
+    res.status(401).json({ message: `Geçersiz token: ${err.message}` });
   }
 };
 
