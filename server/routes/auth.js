@@ -261,7 +261,8 @@ router.post('/google', async (req, res) => {
       return res.status(401).json({ message: 'Google ile giriş başarısız oldu.' });
     }
 
-    const { email, name, sub: google_id } = payload;
+    const { email, sub: google_id } = payload;
+    const name = payload.name || email.split('@')[0];
 
     let userRes = await db.query('SELECT * FROM users WHERE email = $1', [email]);
     let user;
@@ -275,24 +276,29 @@ router.post('/google', async (req, res) => {
       }
     } else {
       await db.query('BEGIN');
-      const companyRes = await db.query(
-        'INSERT INTO companies (name) VALUES ($1) RETURNING id',
-        [`${name} Emlak`]
-      );
-      const companyId = companyRes.rows[0].id;
-      const officeRes = await db.query(
-        'INSERT INTO offices (company_id, name, city) VALUES ($1, $2, $3) RETURNING id',
-        [companyId, 'Merkez Ofis', 'İstanbul']
-      );
-      const officeId = officeRes.rows[0].id;
-      const newUser = await db.query(
-        `INSERT INTO users (company_id, office_id, email, name, password_hash, role, is_verified) 
-         VALUES ($1, $2, $3, $4, $5, $6, $7) 
-         RETURNING id, company_id, office_id, role, email, name, plan, is_verified`,
-        [companyId, officeId, email, name, 'google_login_no_password', role, true]
-      );
-      await db.query('COMMIT');
-      user = newUser.rows[0];
+      try {
+        const companyRes = await db.query(
+          'INSERT INTO companies (name) VALUES ($1) RETURNING id',
+          [`${name} Emlak`]
+        );
+        const companyId = companyRes.rows[0].id;
+        const officeRes = await db.query(
+          'INSERT INTO offices (company_id, name, city) VALUES ($1, $2, $3) RETURNING id',
+          [companyId, 'Merkez Ofis', 'İstanbul']
+        );
+        const officeId = officeRes.rows[0].id;
+        const newUser = await db.query(
+          `INSERT INTO users (company_id, office_id, email, name, password_hash, role, is_verified) 
+           VALUES ($1, $2, $3, $4, $5, $6, $7) 
+           RETURNING id, company_id, office_id, role, email, name, plan, is_verified, created_at, referral_code`,
+          [companyId, officeId, email, name, 'google_login_no_password', role, true]
+        );
+        await db.query('COMMIT');
+        user = newUser.rows[0];
+      } catch (err) {
+        await db.query('ROLLBACK');
+        throw err;
+      }
     }
 
     const token = jwt.sign(
