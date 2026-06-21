@@ -21,7 +21,7 @@ const ScoreExplanation = ({ lead }) => {
     e.stopPropagation();
     setIsRefreshing(true);
     try {
-      await axios.post(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/leads/${lead.id}/calculate-score`, {}, {
+      await axios.post(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/leads/${lead.id}/calculate-score`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       await queryClient.invalidateQueries(['leads']);

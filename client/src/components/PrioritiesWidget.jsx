@@ -11,7 +11,7 @@ const PrioritiesWidget = () => {
   const { data: priorities = [], isLoading } = useQuery({
     queryKey: ['dashboard_priorities'],
     queryFn: async () => {
-      const res = await axios.get(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/dashboard/priorities`, {
+      const res = await axios.get(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/dashboard/priorities`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return res.data;

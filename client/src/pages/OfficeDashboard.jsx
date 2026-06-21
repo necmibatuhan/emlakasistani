@@ -7,14 +7,14 @@ import Header from '../components/Header';
 import { CheckCircle } from 'lucide-react';
 
 const fetchOfficeData = async (token, officeId) => {
-  const { data } = await axios.get(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/offices/${officeId}`, {
+  const { data } = await axios.get(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/offices/${officeId}`, {
     headers: { Authorization: `Bearer ${token}` }
   });
   return data;
 };
 
 const fetchOfficeLeads = async (token) => {
-  const { data } = await axios.get(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/leads`, {
+  const { data } = await axios.get(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/leads`, {
     headers: { Authorization: `Bearer ${token}` }
   });
   return data;
@@ -38,7 +38,7 @@ const OfficeDashboard = () => {
   });
 
   const assignMutation = useMutation({
-    mutationFn: ({ leadId, agentId }) => axios.put(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/leads/${leadId}`, { assigned_to: agentId }, {
+    mutationFn: ({ leadId, agentId }) => axios.put(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/leads/${leadId}`, { assigned_to: agentId }, {
       headers: { Authorization: `Bearer ${token}` }
     }),
     onSuccess: () => {

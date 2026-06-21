@@ -60,7 +60,7 @@ const AgendaView = ({ leads }) => {
   });
 
   const handleSyncCalendar = () => {
-    const url = `${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/calendar/sync/${user.id}`;
+    const url = `${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/calendar/sync/${user.id}`;
     window.open(url, '_blank');
   };
 

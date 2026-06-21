@@ -62,13 +62,13 @@ export default function MockCheckout() {
 
       // callback isteği
       await axios.post(
-        `${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/payment/mock-callback`,
+        `${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/payment/mock-callback`,
         { plan: state.plan, success: true },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       // Fetch user again to get the updated plan
-      const userRes = await axios.get(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/auth/me`, {
+      const userRes = await axios.get(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/auth/me`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUser(userRes.data);

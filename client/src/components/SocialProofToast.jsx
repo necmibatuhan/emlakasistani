@@ -10,7 +10,7 @@ const SocialProofToast = () => {
   useEffect(() => {
     const fetchFeed = async () => {
       try {
-        const res = await axios.get(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/social-proof/feed`);
+        const res = await axios.get(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/social-proof/feed`);
         if (res.data && res.data.length > 0) {
           setFeed(res.data);
           // Show first toast after a short delay

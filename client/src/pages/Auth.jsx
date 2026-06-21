@@ -26,7 +26,7 @@ const Auth = () => {
 
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      const res = await axios.post(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/auth/google`, {
+      const res = await axios.post(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/auth/google`, {
         credential: credentialResponse.credential
       });
       setUser(res.data.user);
@@ -82,7 +82,7 @@ const Auth = () => {
     setIsSubmitting(true);
     
     try {
-      const res = await axios.post(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/auth/forgot-password`, { 
+      const res = await axios.post(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/auth/forgot-password`, { 
         email, 
         turnstileToken: captchaToken 
       });

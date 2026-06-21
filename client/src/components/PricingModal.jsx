@@ -13,7 +13,7 @@ const PricingModal = ({ isOpen, onClose, token, onUpgradeSuccess }) => {
     setError('');
     
     try {
-      const res = await axios.post(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/payment/shopier-checkout`, {
+      const res = await axios.post(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/payment/shopier-checkout`, {
         plan: planType
       }, {
         headers: { Authorization: `Bearer ${token}` }
@@ -31,7 +31,7 @@ const PricingModal = ({ isOpen, onClose, token, onUpgradeSuccess }) => {
         setTimeout(async () => {
           try {
             // Simulate the backend callback receiving Shopier's success hook
-            await axios.post(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/payment/shopier-callback`, {
+            await axios.post(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/payment/shopier-callback`, {
               status: 'success',
               order_id: res.data.data.platform_order_id,
               custom_data: planType,

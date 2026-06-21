@@ -17,7 +17,7 @@ const WhatsAppButton = ({ customer, variant = 'icon-text', className = '' }) => 
   const { data: templates = [], isLoading } = useQuery({
     queryKey: ['whatsapp_templates'],
     queryFn: async () => {
-      const res = await axios.get(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/templates`, {
+      const res = await axios.get(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/templates`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return res.data;
@@ -66,7 +66,7 @@ const WhatsAppButton = ({ customer, variant = 'icon-text', className = '' }) => 
 
   const logContact = async (templateId) => {
     try {
-      await axios.post(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/contacts/log`, {
+      await axios.post(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/contacts/log`, {
         customer_id: customer.id,
         template_id: templateId
       }, {

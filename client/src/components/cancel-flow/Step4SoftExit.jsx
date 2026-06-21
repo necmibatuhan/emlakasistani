@@ -5,7 +5,7 @@ export default function Step4SoftExit({ token, onConfirm, onCancel, loading }) {
   
   const handleExport = async () => {
     try {
-      const res = await axios.get(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/subscription/export-data`, {
+      const res = await axios.get(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/subscription/export-data`, {
         headers: { Authorization: `Bearer ${token}` },
         responseType: 'blob'
       });

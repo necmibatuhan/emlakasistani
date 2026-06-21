@@ -65,7 +65,7 @@ const AgentDashboard = () => {
   const { data: leads = [], isLoading: loading } = useQuery({
     queryKey: ['leads'],
     queryFn: async () => {
-      const res = await axios.get(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/leads`, {
+      const res = await axios.get(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/leads`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return res.data;
@@ -87,7 +87,7 @@ const AgentDashboard = () => {
   const { data: leadDetails, isLoading: detailsLoading } = useQuery({
     queryKey: ['lead', selectedLeadId],
     queryFn: async () => {
-      const res = await axios.get(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/leads/${selectedLeadId}`, {
+      const res = await axios.get(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/leads/${selectedLeadId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return res.data;
@@ -98,7 +98,7 @@ const AgentDashboard = () => {
   const { data: externalMatches } = useQuery({
     queryKey: ['externalMatches', selectedLeadId],
     queryFn: async () => {
-      const res = await axios.get(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/leads/${selectedLeadId}/external-matches`, {
+      const res = await axios.get(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/leads/${selectedLeadId}/external-matches`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return res.data;
@@ -117,7 +117,7 @@ const AgentDashboard = () => {
     }
     
     try {
-      await axios.delete(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/leads/${targetId}`, {
+      await axios.delete(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/leads/${targetId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       queryClient.invalidateQueries(['leads']);
@@ -174,10 +174,10 @@ const AgentDashboard = () => {
       let res;
       if (selectedLeadId) {
         // Düzenleme (Update)
-        res = await axios.put(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/leads/${selectedLeadId}/analyze`, payload, { headers: { Authorization: `Bearer ${token}` } });
+        res = await axios.put(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/leads/${selectedLeadId}/analyze`, payload, { headers: { Authorization: `Bearer ${token}` } });
       } else {
         // Yeni Lead Ekleme
-        res = await axios.post(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/leads/analyze`, payload, { headers: { Authorization: `Bearer ${token}` } });
+        res = await axios.post(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/leads/analyze`, payload, { headers: { Authorization: `Bearer ${token}` } });
       }
       
       setName(''); setPhone(''); setMessage('');
@@ -199,7 +199,7 @@ const AgentDashboard = () => {
     try {
       const formData = new FormData();
       formData.append('audio', audioBlob, 'voicenote.webm');
-      await axios.post(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/leads/analyze-voice`, formData, {
+      await axios.post(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/leads/analyze-voice`, formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       await queryClient.invalidateQueries(['leads']);
@@ -216,7 +216,7 @@ const AgentDashboard = () => {
 
   const handleWakeUp = async (leadId) => {
     try {
-      await axios.post(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/leads/${leadId}/wakeup`, {}, {
+      await axios.post(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/leads/${leadId}/wakeup`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       await queryClient.invalidateQueries(['leads']);
@@ -252,7 +252,7 @@ const AgentDashboard = () => {
     setTimeout(() => setShowSuccessTick(false), 1500);
 
     try {
-      await axios.put(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/leads/${leadId}`, { label: newStatus }, {
+      await axios.put(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/leads/${leadId}`, { label: newStatus }, {
         headers: { Authorization: `Bearer ${token}` }
       });
     } catch (err) {

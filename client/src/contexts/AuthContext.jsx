@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     if (token) {
-      axios.get(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/auth/me`, {
+      axios.get(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/auth/me`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       .then(res => {
@@ -45,14 +45,14 @@ export const AuthProvider = ({ children }) => {
   }, [token]);
 
   const login = async (email, password, turnstileToken) => {
-    const res = await axios.post(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/auth/login`, { email, password, turnstileToken });
+    const res = await axios.post(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/auth/login`, { email, password, turnstileToken });
     setToken(res.data.token);
     localStorage.setItem('token', res.data.token);
     setUser(res.data.user);
   };
 
   const register = async (name, email, password, role = 'agent', turnstileToken) => {
-    const res = await axios.post(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/auth/register`, { name, email, password, role, turnstileToken });
+    const res = await axios.post(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/auth/register`, { name, email, password, role, turnstileToken });
     if (res.data.token) {
       setToken(res.data.token);
       localStorage.setItem('token', res.data.token);

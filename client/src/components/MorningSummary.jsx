@@ -10,7 +10,7 @@ export default function MorningSummary() {
   const { data: briefing, isLoading, isError } = useQuery({
     queryKey: ['morningBriefing'],
     queryFn: async () => {
-      const res = await axios.get(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/dashboard/briefing`, {
+      const res = await axios.get(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/dashboard/briefing`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return res.data;

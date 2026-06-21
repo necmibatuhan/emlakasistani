@@ -18,7 +18,7 @@ export default function RemindersWidget({ leads = [], onLeadClick }) {
 
   const handleSyncCalendar = () => {
     if (!user) return;
-    const syncUrl = `${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/calendar/sync/${user.id}`;
+    const syncUrl = `${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/calendar/sync/${user.id}`;
     window.open(syncUrl, '_blank');
   };
 

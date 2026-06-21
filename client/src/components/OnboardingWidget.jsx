@@ -7,7 +7,7 @@ export default function OnboardingWidget({ token }) {
   const { data: progress, isLoading, refetch } = useQuery({
     queryKey: ['onboarding-progress'],
     queryFn: async () => {
-      const res = await axios.get(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/onboarding/progress`, {
+      const res = await axios.get(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/onboarding/progress`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return res.data;

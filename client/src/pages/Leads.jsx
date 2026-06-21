@@ -52,7 +52,7 @@ const Leads = () => {
   const { data: leads = [], isLoading: loading } = useQuery({
     queryKey: ['leads'],
     queryFn: async () => {
-      const res = await axios.get(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/leads`, {
+      const res = await axios.get(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/leads`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return res.data.map(lead => ({
@@ -69,7 +69,7 @@ const Leads = () => {
   const handleDeleteLead = async (idToDelete) => {
     if (!idToDelete) return;
     try {
-      await axios.delete(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/leads/${idToDelete}`, {
+      await axios.delete(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/leads/${idToDelete}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       queryClient.invalidateQueries(['leads']);
@@ -150,7 +150,7 @@ const Leads = () => {
       if (newLeadName) formData.append('name', newLeadName);
       if (newLeadPhone) formData.append('phone', newLeadPhone);
       
-      await axios.post(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/leads/analyze-voice`, formData, {
+      await axios.post(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/leads/analyze-voice`, formData, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
@@ -193,7 +193,7 @@ const Leads = () => {
         payload.locations = newLeadLocations;
       }
 
-      await axios.post(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/leads/analyze`, payload, {
+      await axios.post(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/leads/analyze`, payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setIsNewLeadModalOpen(false);

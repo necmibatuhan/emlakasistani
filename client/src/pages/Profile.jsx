@@ -26,7 +26,7 @@ const Profile = () => {
     try {
       setIsSavingPhone(true);
       const token = localStorage.getItem('token');
-      await axios.put(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/auth/profile`, 
+      await axios.put(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/auth/profile`, 
         { whatsapp_phone: whatsappPhone },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -52,7 +52,7 @@ const Profile = () => {
     try {
       setIsDeleting(true);
       const token = localStorage.getItem('token');
-      await axios.delete(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/auth/me`, {
+      await axios.delete(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/auth/me`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       logout();

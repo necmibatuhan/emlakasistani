@@ -14,7 +14,7 @@ const WhatsApp = () => {
   const { data: status, isLoading: statusLoading } = useQuery({
     queryKey: ['wa_status'],
     queryFn: async () => {
-      const res = await axios.get(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/whatsapp/status`, {
+      const res = await axios.get(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/whatsapp/status`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return res.data;
@@ -34,7 +34,7 @@ const WhatsApp = () => {
   });
 
   const connectMutation = useMutation({
-    mutationFn: (data) => axios.post(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/whatsapp/connect`, data, {
+    mutationFn: (data) => axios.post(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/whatsapp/connect`, data, {
       headers: { Authorization: `Bearer ${token}` }
     }),
     onSuccess: () => {

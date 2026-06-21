@@ -16,7 +16,7 @@ const PaymentResult = () => {
     const fetchUpdatedUser = async () => {
       if (status === 'success' && token) {
         try {
-          const res = await axios.get(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/auth/me`, {
+          const res = await axios.get(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/auth/me`, {
             headers: { Authorization: `Bearer ${token}` }
           });
           setUser(res.data);
