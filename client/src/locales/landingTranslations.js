@@ -31,9 +31,9 @@ export const t = {
       loc4: "Nilüfer, Bursa"
     },
     flow: {
-      title: "Emlak Asistanı Kapora CRM Sistemi Nasıl Çalışır?",
+      title: "Emlak Asistanı Kapora Nasıl Çalışır?",
       step1Title: "1. Sesli Not ile Müşteri (Lead) Takibi",
-      step1Desc: "Sahadayken sadece konuşun. Emlak asistanı sistemimiz müşteri kriterlerini (bütçe, bölge, aciliyet) saniyeler içinde fişler ve CRM ajandanıza işler.",
+      step1Desc: "Sahadayken sadece konuşun. Emlak asistanı sistemimiz müşteri kriterlerini (bütçe, bölge, aciliyet) saniyeler içinde fişler ve ajandanıza işler.",
       step2Title: "2. Yapay Zeka Emlak Asistanı ile Eşleştirin",
       step2Desc: "Müşteriniz daha telefonu kapatmadan gayrimenkul portföy eşleşmesi hazır. Müşteri WhatsApp'tan yazıp telefonu cebine koyana kadar, Kapora uygun evi bulur ve teklif mesajını hazırlar.",
       step3Title: "3. Tek Tıkla WhatsApp Entegrasyonu",
