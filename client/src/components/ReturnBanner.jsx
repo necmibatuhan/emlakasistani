@@ -10,7 +10,7 @@ const ReturnBanner = ({ token }) => {
   const { data: leads = [] } = useQuery({
     queryKey: ['leads'],
     queryFn: async () => {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/leads`, {
+      const res = await axios.get(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/leads`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return res.data;

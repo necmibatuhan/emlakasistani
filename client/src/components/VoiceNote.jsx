@@ -113,7 +113,7 @@ const VoiceNote = ({ leadId, onSaved }) => {
       formData.append('audio', blob, 'voicenote.webm');
       
       const token = localStorage.getItem('token');
-      const transcribeRes = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/voice/transcribe`, formData, {
+      const transcribeRes = await axios.post(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/voice/transcribe`, formData, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
@@ -121,7 +121,7 @@ const VoiceNote = ({ leadId, onSaved }) => {
       if (!transcript) throw new Error('Transkript alınamadı');
       setTranscriptData(transcript);
 
-      const analyzeRes = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/voice/analyze`, {
+      const analyzeRes = await axios.post(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/voice/analyze`, {
         leadId, transcript
       }, {
         headers: { 'Authorization': `Bearer ${token}` }

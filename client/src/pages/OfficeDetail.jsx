@@ -7,7 +7,7 @@ import { Building2, Users, MapPin, Target, Mail } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 
 const fetchOfficeDetail = async (id, token) => {
-  const { data } = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/offices/${id}`, {
+  const { data } = await axios.get(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/offices/${id}`, {
     headers: { Authorization: `Bearer ${token}` }
   });
   return data;

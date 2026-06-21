@@ -23,7 +23,7 @@ const Plans = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/payment/iyzico-checkout`, { 
+      const res = await axios.post(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/payment/iyzico-checkout`, { 
         plan, 
         billingCycle: isYearly ? 'yearly' : 'monthly' 
       }, {
@@ -54,7 +54,7 @@ const Plans = () => {
         throw new Error('Geçersiz beta kodu.');
       }
 
-      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/auth/upgrade`, {}, {
+      const res = await axios.post(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/auth/upgrade`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUser(res.data.user);

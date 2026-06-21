@@ -106,7 +106,7 @@ const VoiceToText = ({ onLeadCreated }) => {
       formData.append('audio', blob, `voicenote.${extension}`);
       
       const token = localStorage.getItem('token');
-      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/voice/create-lead`, formData, {
+      const res = await axios.post(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/voice/create-lead`, formData, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       

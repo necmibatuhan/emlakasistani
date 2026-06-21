@@ -8,7 +8,7 @@ import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 
 const fetchOffices = async (token) => {
-  const { data } = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/offices`, {
+  const { data } = await axios.get(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/offices`, {
     headers: { Authorization: `Bearer ${token}` }
   });
   return data;

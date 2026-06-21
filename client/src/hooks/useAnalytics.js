@@ -45,7 +45,7 @@ export const useAnalytics = () => {
     try {
       const sessionId = getSessionId();
       await axios.post(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/analytics/event`,
+        `${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/analytics/event`,
         { event_name: eventName, properties, session_id: sessionId },
         { headers: { Authorization: `Bearer ${token}` } }
       );

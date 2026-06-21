@@ -25,7 +25,7 @@ export default function CancelFlowModal({ isOpen, onClose, token }) {
     setLoading(true);
     setReason(selectedReason);
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/subscription/cancel-reason`, {
+      const res = await axios.post(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/subscription/cancel-reason`, {
         reason: selectedReason,
         feedback
       }, {
@@ -45,7 +45,7 @@ export default function CancelFlowModal({ isOpen, onClose, token }) {
   const handleAcceptOffer = async () => {
     setLoading(true);
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/subscription/accept-offer`, {
+      await axios.post(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/subscription/accept-offer`, {
         offer_type: offer.type
       }, {
         headers: { Authorization: `Bearer ${token}` }
@@ -63,7 +63,7 @@ export default function CancelFlowModal({ isOpen, onClose, token }) {
   const handleConfirmCancel = async () => {
     setLoading(true);
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/subscription/confirm-cancel`, {}, {
+      await axios.post(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/subscription/confirm-cancel`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setIsCancelled(true);

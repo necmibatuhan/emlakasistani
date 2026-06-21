@@ -9,7 +9,7 @@ export default function Step1LossAversion({ token, onNext, onCancel, onDirectExi
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/subscription/cancel-intent`, {}, {
+        const res = await axios.post(`${(import.meta.env.VITE_API_URL ?? 'http://localhost:5001')}/api/subscription/cancel-intent`, {}, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setStats(res.data);
