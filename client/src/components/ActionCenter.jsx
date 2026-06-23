@@ -74,7 +74,7 @@ export default function ActionCenter({ leads = [], onActionClick }) {
   const handleAction = (actionName, lead, e) => {
     e.stopPropagation();
     if (actionName === 'call') {
-      window.location.href = `tel:${lead.phone.replace(/[^0-9]/g, '')}`;
+      window.location.assign(`tel:${lead.phone.replace(/[^0-9]/g, '')}`);
     } else if (actionName === 'whatsapp') {
       window.open(`https://wa.me/${lead.phone.replace(/[^0-9]/g, '')}`, '_blank');
     } else if (onActionClick) {

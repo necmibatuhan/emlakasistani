@@ -45,7 +45,7 @@ export default function OnboardingWidget({ token }) {
   ];
 
   let currentTasks = [];
-  let teaser = '';
+  let teaser;
   
   if (currentLevel === 1) {
     currentTasks = l2_tasks;
