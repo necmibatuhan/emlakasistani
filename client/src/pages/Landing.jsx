@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Play, X, Menu, Sun, Moon, Globe, Sparkles } from 'lucide-react';
+import { Play, X, Menu, Sun, Moon, Globe, Sparkles, Instagram, Linkedin } from 'lucide-react';
 import { Logo } from '../components/Logo';
 import SocialProofToast from '../components/SocialProofToast';
 import { BLOG_POSTS } from '../data/blogPosts';
@@ -754,9 +754,17 @@ const Landing = () => {
             </div>
           </div>
           
-          <div className="font-body-sm text-on-surface-variant text-left md:text-right">
+          <div className="font-body-sm text-on-surface-variant text-left md:text-right flex flex-col items-start md:items-end">
             <p>© {new Date().getFullYear()} Kapora.</p>
-            <p className="mt-1">{curr.footer.rights}</p>
+            <p className="mt-1 mb-4">{curr.footer.rights}</p>
+            <div className="flex items-center gap-4">
+              <a href="https://www.instagram.com/kapora.online/" target="_blank" rel="noopener noreferrer" className="text-on-surface-variant hover:text-primary transition-colors">
+                <Instagram size={20} />
+              </a>
+              <a href="https://www.linkedin.com/company/kapora/?viewAsMember=true" target="_blank" rel="noopener noreferrer" className="text-on-surface-variant hover:text-primary transition-colors">
+                <Linkedin size={20} />
+              </a>
+            </div>
           </div>
         </div>
       </footer>
