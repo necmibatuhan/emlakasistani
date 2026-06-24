@@ -120,7 +120,7 @@ export const t = {
         period: "",
         features: [
           { type: 'check', text: 'Sınırsız Danışman Hesabı' },
-          { type: 'check', text: 'Özel API & CRM Entegrasyonu' },
+          { type: 'check', text: 'Özel API & Sistem Entegrasyonu' },
           { type: 'check', text: 'WhatsApp Business API Bağlantısı' },
           { type: 'check', text: 'Özel Eğitilmiş Yapay Zeka Modeliniz' }
         ],
@@ -262,7 +262,7 @@ export const t = {
         period: "",
         features: [
           { type: 'check', text: 'Unlimited Agent Accounts' },
-          { type: 'check', text: 'Custom API & CRM Integration' },
+          { type: 'check', text: 'Custom API & Sistem Integration' },
           { type: 'check', text: 'WhatsApp Business API' },
           { type: 'check', text: 'Your Custom Trained AI Model' }
         ],

@@ -142,7 +142,7 @@ const Auth = () => {
               : isLogin 
                 ? 'Emlak asistanınıza tekrar hoş geldiniz.' 
                 : (registerStep === 1 
-                  ? 'Dakikalar içinde yeni nesil emlak CRM\'ini kullanmaya başlayın.'
+                  ? 'Dakikalar içinde yeni nesil Emlak Asistanı\'ini kullanmaya başlayın.'
                   : 'Platformu kullanım amacınıza en uygun rolü belirleyin.')}
           </p>
         </div>

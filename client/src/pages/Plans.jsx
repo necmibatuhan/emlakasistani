@@ -215,7 +215,7 @@ const Plans = () => {
                 
                 <ul className="space-y-4 mb-8 flex-1">
                   <li className="flex items-center gap-2 text-[13px] text-[#F1F2F4]"><Check className="w-4 h-4 text-[#10B981]" /> Sınırsız Danışman Hesabı</li>
-                  <li className="flex items-center gap-2 text-[13px] text-[#F1F2F4]"><Check className="w-4 h-4 text-[#10B981]" /> Özel API & CRM Entegrasyonu</li>
+                  <li className="flex items-center gap-2 text-[13px] text-[#F1F2F4]"><Check className="w-4 h-4 text-[#10B981]" /> Özel API & Sistem Entegrasyonu</li>
                   <li className="flex items-center gap-2 text-[13px] text-[#F1F2F4]"><Check className="w-4 h-4 text-[#10B981]" /> WhatsApp Business API Bağlantısı</li>
                   <li className="flex items-center gap-2 text-[13px] text-[#F1F2F4]"><Check className="w-4 h-4 text-[#10B981]" /> Özel Eğitilmiş Yapay Zeka Modeliniz</li>
                 </ul>

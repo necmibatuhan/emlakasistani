@@ -92,17 +92,17 @@ export const BLOG_POSTS = [
     category: 'Müşteri Takibi'
   },
   {
-    slug: 'musteri-hangi-asamada-takiliyor-crm-ile-satis-asamalarini-gorun',
-    title: 'Müşteri Hangi Aşamada Takılıyor? CRM ile Satış Aşamalarını Görün',
-    excerpt: 'CRM ile hangi aşamada kaybedildiğini analiz etmek, dönüşüm oranını artırmak için kritik stratejiler.',
+    slug: 'musteri-hangi-asamada-takiliyor-Sistem-ile-satis-asamalarini-gorun',
+    title: 'Müşteri Hangi Aşamada Takılıyor? Sistem ile Satış Aşamalarını Görün',
+    excerpt: 'Sistem ile hangi aşamada kaybedildiğini analiz etmek, dönüşüm oranını artırmak için kritik stratejiler.',
     date: '2026-06-20',
     readTime: '5 dk',
     category: 'Satış Kapatma'
   },
   {
-    slug: 'kapora-crm-ile-musteri-yonetimini-tek-platforma-toplama',
-    title: 'Kapora CRM İle Müşteri Yönetimini Tek Platforma Toplama',
-    excerpt: 'Excel ve not defterinden CRM geçişi, modern arayüz avantajları ve yapay zeka entegrasyonu.',
+    slug: 'kapora-Sistem-ile-musteri-yonetimini-tek-platforma-toplama',
+    title: 'Kapora Sistem İle Müşteri Yönetimini Tek Platforma Toplama',
+    excerpt: 'Excel ve not defterinden Sistem geçişi, modern arayüz avantajları ve yapay zeka entegrasyonu.',
     date: '2026-06-21',
     readTime: '3 dk',
     category: 'İş Yönetimi'
@@ -178,7 +178,7 @@ export const getBlogPostContent = (slug) => {
           </p>
           <h2>Gerçek Bir Emlak Programı Neden Şart?</h2>
           <p>
-            Müşteri sizi aradığında, o an trafikte olabilirsiniz. Veya başka bir müşteriye sunum yapıyor olabilirsiniz. O telaşla Excel'e veri girmek imkansızdır. İşte bu noktada <Link to="/" className="text-primary hover:underline font-bold">Kapora emlak programı</Link> devreye giriyor. Sesli not alıyorsunuz, yapay zeka bunu anlıyor ve doğrudan CRM'e kaydediyor. Excel'de filtreleme yapmakla uğraşmıyorsunuz.
+            Müşteri sizi aradığında, o an trafikte olabilirsiniz. Veya başka bir müşteriye sunum yapıyor olabilirsiniz. O telaşla Excel'e veri girmek imkansızdır. İşte bu noktada <Link to="/" className="text-primary hover:underline font-bold">Kapora emlak programı</Link> devreye giriyor. Sesli not alıyorsunuz, yapay zeka bunu anlıyor ve doğrudan Sistem'e kaydediyor. Excel'de filtreleme yapmakla uğraşmıyorsunuz.
           </p>
           <p>
             Eğer bu sorunu yaşamaya devam etmek istemiyorsanız, detaylı stratejiler için <Link to="/blog/gayrimenkul-danismanlari-icin-dogru-musteri-takibi" className="text-primary hover:underline">Müşteri Takibi Nasıl Yapılmalı?</Link> yazıma da mutlaka göz atın.
@@ -234,7 +234,7 @@ export const getBlogPostContent = (slug) => {
           </p>
           <h2>Doğru İkna Cümlesi</h2>
           <p>
-            "Mehmet Bey, sizi anlıyorum. Komisyon ödemek istemiyorsunuz. Ancak evinizi 3 aydır satamadığınızı görüyorum. Biz <Link to="/" className="text-primary hover:underline font-bold">yapay zeka destekli emlak CRM programımızla</Link> sizin evinizin kriterlerini arayan 40 gerçek alıcıyı saniyeler içinde eşleştirdik. Denemesi bedava, yetki belgesi verin, 1 haftada o 40 kişiyle evi gezelim."
+            "Mehmet Bey, sizi anlıyorum. Komisyon ödemek istemiyorsunuz. Ancak evinizi 3 aydır satamadığınızı görüyorum. Biz <Link to="/" className="text-primary hover:underline font-bold">yapay zeka destekli Emlak Asistanı programımızla</Link> sizin evinizin kriterlerini arayan 40 gerçek alıcıyı saniyeler içinde eşleştirdik. Denemesi bedava, yetki belgesi verin, 1 haftada o 40 kişiyle evi gezelim."
           </p>
           <p>
             <strong>Yetki belgesi nasıl alınır</strong> sorusunun cevabı işte bu kadar basittir: Teknoloji ve hazır data sunmak. Portföyü aldıktan sonra hızlı eşleştirme yapmak için <Link to="/" className="text-primary hover:underline">Kapora'nın Portföy Eşleştirme özelliğini</Link> mutlaka deneyin.
@@ -252,7 +252,7 @@ export const getBlogPostContent = (slug) => {
           </p>
           <h2>Temeli Sağlam Atın</h2>
           <p>
-            İleride işler büyüdüğünde "Keşke en baştan not alsaydım" dememek için teknolojiye yaslanın. <Link to="/" className="text-primary hover:underline font-bold">Kapora Emlak Asistanı</Link> gibi bir yazılımla sahada tanıştığınız bakkalı bile sisteme sesli olarak kaydedin. Bir gün mutlaka işinize yarayacaktır. Unutmayın, emlak ofisi açmak için gerekenler sadece masa ve bilgisayar değil, sağlam bir CRM altyapısıdır.
+            İleride işler büyüdüğünde "Keşke en baştan not alsaydım" dememek için teknolojiye yaslanın. <Link to="/" className="text-primary hover:underline font-bold">Kapora Emlak Asistanı</Link> gibi bir yazılımla sahada tanıştığınız bakkalı bile sisteme sesli olarak kaydedin. Bir gün mutlaka işinize yarayacaktır. Unutmayın, emlak ofisi açmak için gerekenler sadece masa ve bilgisayar değil, sağlam bir Sistem altyapısıdır.
           </p>
         </div>
       );
@@ -282,7 +282,7 @@ export const getBlogPostContent = (slug) => {
           <p>
             Sıfır. Çünkü manuel doldurulan formlar sürdürülebilir değildir. Müşterilerinizi; Soğuk, Ilık ve Sıcak olarak anında etiketlemelisiniz.
           </p>
-          <h2>Gerçek Metodoloji: AI Destekli CRM</h2>
+          <h2>Gerçek Metodoloji: AI Destekli Sistem</h2>
           <p>
             Artık Excel tablolarıyla boğuşmayı bırakın. ("<Link to="/blog/excel-ile-emlak-takibi-neden-size-para-kaybettiriyor" className="text-primary hover:underline">Excel ile Emlak Takibi Neden Size Para Kaybettiriyor?</Link>" yazımda anlattım). Bunun yerine, telefonu kapattıktan hemen sonra <Link to="/" className="text-primary hover:underline font-bold">Kapora AI</Link>'ya sesli bir komut verin: "Müşteri Kadıköy 3+1 arıyor, sıcak lead, bütçe 5 milyon." Sistem onu otomatik kategorize etsin. Bu kadar basit.
           </p>
@@ -314,7 +314,7 @@ export const getBlogPostContent = (slug) => {
             Ofisinize gelen müşteri deri koltuğa değil, ona hızlıca uygun evi bulup bulamayacağınıza bakar. Bu yüzden bütçenizin büyük kısmını lüks mobilyalara değil, <strong>emlak ofisi programlarına</strong> ayırmalısınız.
           </p>
           <p>
-            Tüm ekibinizin performansını ölçebileceğiniz, portföyleri ve müşterileri saniyeler içinde eşleştiren <Link to="/" className="text-primary hover:underline font-bold">Kapora Emlak CRM</Link> gibi bir yazılım, lüks bir masadan çok daha fazla para kazandıracaktır. Kapora'nın maliyetlerini merak ediyorsanız hemen <Link to="/" className="text-primary hover:underline">Fiyatlar</Link> sayfamıza göz atın.
+            Tüm ekibinizin performansını ölçebileceğiniz, portföyleri ve müşterileri saniyeler içinde eşleştiren <Link to="/" className="text-primary hover:underline font-bold">Kapora Emlak Asistanı</Link> gibi bir yazılım, lüks bir masadan çok daha fazla para kazandıracaktır. Kapora'nın maliyetlerini merak ediyorsanız hemen <Link to="/" className="text-primary hover:underline">Fiyatlar</Link> sayfamıza göz atın.
           </p>
         </div>
       );
@@ -336,16 +336,16 @@ export const getBlogPostContent = (slug) => {
     case 'emlak-danismanlari-icin-musteri-takibini-kolaylastiran-7-yontem':
       return (
         <div className="prose prose-invert prose-lg max-w-none prose-p:text-on-surface-variant prose-headings:text-on-surface">
-          <p>Müşteri takibi, gayrimenkul satışında başarının anahtarıdır. Birçok danışman ilk temastan sonra müşteriyi unutur veya yanlış zamanda arar.</p><h2>Pipeline Görünümü ve Aşama Analizi</h2><p>Bir <Link to="/" className="text-primary hover:underline font-bold">emlak CRM programı</Link> kullanarak müşterilerinizi "Yeni", "Sunum Yapıldı", "Pazarlık" gibi aşamalara ayırın. Görsel bir pipeline (huni) yönetimi, hangi aşamada tıkanıklık yaşadığınızı anında gösterir.</p><h2>Zaman Sınırları Belirleyin</h2><p>Her müşteri aşamasının bir bekleme süresi olmalıdır. Eğer bir müşteri "Düşünüyor" aşamasında 7 günden fazla kalıyorsa, sistem sizi otomatik olarak uyarmalıdır. Kapora'nın akıllı hatırlatıcıları sayesinde hiçbir müşteriyi soğutmadan doğru zamanda arayabilirsiniz.</p>
+          <p>Müşteri takibi, gayrimenkul satışında başarının anahtarıdır. Birçok danışman ilk temastan sonra müşteriyi unutur veya yanlış zamanda arar.</p><h2>Pipeline Görünümü ve Aşama Analizi</h2><p>Bir <Link to="/" className="text-primary hover:underline font-bold">Emlak Asistanı</Link> kullanarak müşterilerinizi "Yeni", "Sunum Yapıldı", "Pazarlık" gibi aşamalara ayırın. Görsel bir pipeline (huni) yönetimi, hangi aşamada tıkanıklık yaşadığınızı anında gösterir.</p><h2>Zaman Sınırları Belirleyin</h2><p>Her müşteri aşamasının bir bekleme süresi olmalıdır. Eğer bir müşteri "Düşünüyor" aşamasında 7 günden fazla kalıyorsa, sistem sizi otomatik olarak uyarmalıdır. Kapora'nın akıllı hatırlatıcıları sayesinde hiçbir müşteriyi soğutmadan doğru zamanda arayabilirsiniz.</p>
         </div>
       );
-    case 'musteri-hangi-asamada-takiliyor-crm-ile-satis-asamalarini-gorun':
+    case 'musteri-hangi-asamada-takiliyor-Sistem-ile-satis-asamalarini-gorun':
       return (
         <div className="prose prose-invert prose-lg max-w-none prose-p:text-on-surface-variant prose-headings:text-on-surface">
-          <p>Aylık 100 müşteriyle görüşüp sadece 2 satış kapatıyorsanız, sorunun nerede olduğunu bulmalısınız. Acaba sunumdan sonra mı kaybediyorsunuz, yoksa pazarlık aşamasında mı?</p><h2>Veriye Dayalı Analiz</h2><p>Modern bir <strong>gayrimenkul CRM programı</strong>, size sadece rehberlik yapmaz, aynı zamanda kayıp nedenlerinizi analiz eder. Kapora'nın sağladığı detaylı raporlar sayesinde "Bütçe Yetersizliği" veya "Bölge Uyuşmazlığı" gibi ret sebeplerini grafikle görebilir, pazarlama bütçenizi doğru yönlendirebilirsiniz.</p>
+          <p>Aylık 100 müşteriyle görüşüp sadece 2 satış kapatıyorsanız, sorunun nerede olduğunu bulmalısınız. Acaba sunumdan sonra mı kaybediyorsunuz, yoksa pazarlık aşamasında mı?</p><h2>Veriye Dayalı Analiz</h2><p>Modern bir <strong>gayrimenkul asistanı programı</strong>, size sadece rehberlik yapmaz, aynı zamanda kayıp nedenlerinizi analiz eder. Kapora'nın sağladığı detaylı raporlar sayesinde "Bütçe Yetersizliği" veya "Bölge Uyuşmazlığı" gibi ret sebeplerini grafikle görebilir, pazarlama bütçenizi doğru yönlendirebilirsiniz.</p>
         </div>
       );
-    case 'kapora-crm-ile-musteri-yonetimini-tek-platforma-toplama':
+    case 'kapora-Sistem-ile-musteri-yonetimini-tek-platforma-toplama':
       return (
         <div className="prose prose-invert prose-lg max-w-none prose-p:text-on-surface-variant prose-headings:text-on-surface">
           <p>Parçalanmış veriler, kayıp müşteriler demektir. Not defterindeki numaralar, telefondaki WhatsApp mesajları ve bilgisayardaki Excel dosyası arasında mekik dokumak zaman kaybıdır.</p><h2>Tek Platform, Sınırsız Kontrol</h2><p><Link to="/" className="text-primary hover:underline font-bold">Kapora</Link> ile müşteriniz ilk aradığı andan tapu teslimine kadar geçen tüm süreci tek ekrandan yönetin. Sesli notlarla giriş yapın, yapay zeka portföyünüzdeki uygun daireleri saniyeler içinde WhatsApp'tan paylaşılabilir bir sunuma dönüştürsün.</p>
@@ -390,7 +390,7 @@ export const getBlogPostContent = (slug) => {
     case 'ilan-yonetiminde-yapilan-5-kritik-hata-ve-cozum-yollari':
       return (
         <div className="prose prose-invert prose-lg max-w-none prose-p:text-on-surface-variant prose-headings:text-on-surface">
-          <p>Harika bir portföyünüz var ama haftalardır arayan yok mu? Muhtemelen ilanınızı girerken kritik hatalar yaptınız.</p><h2>Görsel ve Metin Uyumu</h2><p>Düşük çözünürlüklü fotoğraflar, eksik m² bilgisi veya yanıltıcı "deniz manzaralı" ibareleri müşterinin güvenini anında kırar. Tüm portföylerinizi tek bir <Link to="/" className="text-primary hover:underline font-bold">emlak CRM sistemi</Link> üzerinden profesyonelce yönetin ve ilan verilerinizi standardize ederek müşteri kaçaklarını önleyin.</p>
+          <p>Harika bir portföyünüz var ama haftalardır arayan yok mu? Muhtemelen ilanınızı girerken kritik hatalar yaptınız.</p><h2>Görsel ve Metin Uyumu</h2><p>Düşük çözünürlüklü fotoğraflar, eksik m² bilgisi veya yanıltıcı "deniz manzaralı" ibareleri müşterinin güvenini anında kırar. Tüm portföylerinizi tek bir <Link to="/" className="text-primary hover:underline font-bold">Emlak Asistanı sistemi</Link> üzerinden profesyonelce yönetin ve ilan verilerinizi standardize ederek müşteri kaçaklarını önleyin.</p>
         </div>
       );
     default:

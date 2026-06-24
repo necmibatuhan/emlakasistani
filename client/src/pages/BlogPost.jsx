@@ -106,7 +106,7 @@ export default function BlogPost() {
         {/* Inline CTA */}
         <div className="mt-16 bg-surface-container border border-primary/30 rounded-2xl p-8 text-center shadow-[0_0_30px_rgba(217,167,74,0.1)]">
           <h3 className="text-[24px] font-bold text-on-surface mb-4">Teoriyi Pratiğe Dökün</h3>
-          <p className="text-on-surface-variant mb-6">Türkiye'nin en gelişmiş emlak CRM'i Kapora AI ile bugün tanışın. Saniyeler içinde kayıt olun, yapay zekanın gücünü ofisinize taşıyın.</p>
+          <p className="text-on-surface-variant mb-6">Türkiye'nin en gelişmiş emlak Sistem'i Kapora AI ile bugün tanışın. Saniyeler içinde kayıt olun, yapay zekanın gücünü ofisinize taşıyın.</p>
           <Link to="/auth" className="inline-block bg-primary text-on-primary font-bold px-8 py-3 rounded-lg hover:bg-primary/90 transition-colors">
             Ücretsiz Başlayın
           </Link>

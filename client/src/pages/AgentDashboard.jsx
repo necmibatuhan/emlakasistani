@@ -338,7 +338,7 @@ const AgentDashboard = () => {
                     <p className="text-on-surface-variant mb-1">
                       Danışman Mehmet Bey, Kadıköy'den 3+1 satılık ev arayan acil bir müşteri için not bıraktı.
                     </p>
-                    <p className="text-sm text-primary font-medium mb-4">Siz manuel veri girmekle uğraşmayın diye, bırakın Kapora'nın yapay zekası bunu saniyeler içinde CRM verisine dönüştürsün!</p>
+                    <p className="text-sm text-primary font-medium mb-4">Siz manuel veri girmekle uğraşmayın diye, bırakın Kapora'nın yapay zekası bunu saniyeler içinde Sistem verisine dönüştürsün!</p>
                     <button 
                       onClick={() => window.dispatchEvent(new CustomEvent('open-new-lead-drawer', { detail: { isDemo: true } }))}
                       className="bg-primary hover:bg-primary/90 text-on-primary font-bold py-3 px-6 rounded-xl transition-all shadow-lg hover:shadow-primary/30 flex items-center gap-2 w-full md:w-auto justify-center"

@@ -10,7 +10,7 @@ export default function BlogList() {
     <div className="min-h-screen bg-background text-on-surface font-sans">
       <Head>
         <title>Kapora Blog | Emlak Profesyonelleri İçin Satış ve Teknoloji Taktikleri</title>
-        <meta name="description" content="Gayrimenkul sektöründeki en son yapay zeka trendleri, CRM stratejileri ve satış artırma taktiklerini keşfedin." />
+        <meta name="description" content="Gayrimenkul sektöründeki en son yapay zeka trendleri, sistem stratejileri ve satış artırma taktiklerini keşfedin." />
         <meta property="og:title" content="Kapora Blog | Emlak Sektörü Taktikleri" />
         <meta property="og:description" content="Emlak danışmanları için teknoloji ve satış rehberi." />
         <link rel="canonical" href="https://kapora.online/blog" />
@@ -36,7 +36,7 @@ export default function BlogList() {
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-[#818cf8]">Bilgi ve Teknoloji Kaynağı</span>
         </h1>
         <p className="font-body-lg text-on-surface-variant max-w-[600px] mx-auto">
-          Gayrimenkul sektöründeki en son yapay zeka trendleri, CRM stratejileri ve satış artırma taktiklerini keşfedin.
+          Gayrimenkul sektöründeki en son yapay zeka trendleri, sistem stratejileri ve satış artırma taktiklerini keşfedin.
         </p>
       </section>
 

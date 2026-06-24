@@ -36,7 +36,7 @@ const INTEGRATIONS = [
   {
     id: 'meta_ads',
     name: 'Meta (Facebook & Instagram) Reklamları',
-    description: 'Sosyal medya formlarından gelen potansiyel müşterileri anında CRM\'e aktarın ve ilk mesajı otomatik atın.',
+    description: 'Sosyal medya formlarından gelen potansiyel müşterileri anında Sistem\'e aktarın ve ilk mesajı otomatik atın.',
     icon: 'campaign',
     iconBg: 'bg-[#1877F2]/10',
     iconColor: 'text-[#1877F2]',

@@ -202,7 +202,7 @@ const Pricing = () => {
             <ul className="space-y-4 mb-10 flex-1">
               {[
                 { text: "Sınırsız Danışman Hesabı", type: "check" },
-                { text: "Özel API & CRM Entegrasyonu", type: "check" },
+                { text: "Özel API & Sistem Entegrasyonu", type: "check" },
                 { text: "WhatsApp Business API Bağlantısı", type: "check" },
                 { text: "Özel Eğitilmiş Yapay Zeka Modeliniz", type: "check" }
               ].map((item, i) => (

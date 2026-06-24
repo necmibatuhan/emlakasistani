@@ -31,7 +31,7 @@ const AydinlatmaMetni = () => {
             <section>
               <h2 className="text-lg font-semibold text-[#F1F2F4] mb-3">1. Veri İşleme Amacımız</h2>
               <p>
-                Kapora olarak öncelikli amacımız, gayrimenkul danışmanlarının iş süreçlerini hızlandırmak, müşteri görüşmelerini (lead) dijital ortamda düzenlemek ve akıllı bir CRM kaydı oluşturmaktır. Toplanan veriler, yalnızca sizin işinizi kolaylaştırmak ve portföy eşleştirmelerini otomatize etmek için kullanılır.
+                Kapora olarak öncelikli amacımız, gayrimenkul danışmanlarının iş süreçlerini hızlandırmak, müşteri görüşmelerini (lead) dijital ortamda düzenlemek ve akıllı bir sistem kaydı oluşturmaktır. Toplanan veriler, yalnızca sizin işinizi kolaylaştırmak ve portföy eşleştirmelerini otomatize etmek için kullanılır.
               </p>
             </section>
 

@@ -20,7 +20,7 @@ export default function RegionalLanding() {
   const schemaMarkup = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    "name": `Kapora AI - ${district.name} Emlak CRM`,
+    "name": `Kapora AI - ${district.name} Emlak Asistanı`,
     "applicationCategory": "BusinessApplication",
     "description": `${district.name} bölgesindeki gayrimenkul danışmanları için özel olarak optimize edilmiş yapay zeka destekli portföy ve müşteri takip programı.`,
     "operatingSystem": "All",
@@ -38,9 +38,9 @@ export default function RegionalLanding() {
   return (
     <div className="min-h-screen bg-background text-on-surface font-sans">
       <Head>
-        <title>Kapora AI: {district.name} Emlak Asistanı ve CRM Programı</title>
+        <title>Kapora AI: {district.name} Emlak Asistanı ve Sistem Programı</title>
         <meta name="description" content={`${district.name} bölgesinde ${district.target} satışlarınızı yapay zeka destekli emlak asistanı ile ${district.verb}. Manuel Excel takibine son verin!`} />
-        <meta name="keywords" content={`${district.name} emlak programı, ${district.name} gayrimenkul crm, emlak asistanı, portföy takip`} />
+        <meta name="keywords" content={`${district.name} emlak programı, ${district.name} gayrimenkul asistanı, emlak asistanı, portföy takip`} />
         <script type="application/ld+json">
           {JSON.stringify(schemaMarkup)}
         </script>
@@ -138,7 +138,7 @@ export default function RegionalLanding() {
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-6 h-6 text-primary shrink-0" />
-                  <span className="text-on-surface-variant">Karmaşık CRM ve Excel tabloları yerine sade, akıllı arayüz.</span>
+                  <span className="text-on-surface-variant">Karmaşık Sistem ve Excel tabloları yerine sade, akıllı arayüz.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-6 h-6 text-primary shrink-0" />
