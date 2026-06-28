@@ -171,11 +171,16 @@ const Auth = () => {
               />
             </div>
             
-            <div className="flex justify-center mt-4">
+            <div className="flex justify-center mt-4 flex-col items-center gap-2">
+              <div className="text-[10px] text-gray-500 font-mono">
+                Key Check: {import.meta.env.VITE_TURNSTILE_SITE_KEY ? `${import.meta.env.VITE_TURNSTILE_SITE_KEY.substring(0,6)}...` : 'YOK'}
+              </div>
               {import.meta.env.VITE_TURNSTILE_SITE_KEY ? (
                 <Turnstile
                   siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
                   onSuccess={(token) => setCaptchaToken(token)}
+                  onError={() => setError('Cloudflare Turnstile yüklenemedi.')}
+                  options={{ theme: 'dark' }}
                 />
               ) : (
                 <div className="p-3 bg-red-900/50 text-red-200 border border-red-500 rounded text-xs text-center w-full">
@@ -253,12 +258,16 @@ const Auth = () => {
                 </div>
               )}
 
-              <div className="flex justify-center mt-4">
+              <div className="flex justify-center mt-4 flex-col items-center gap-2">
+                <div className="text-[10px] text-gray-500 font-mono">
+                  Key Check: {import.meta.env.VITE_TURNSTILE_SITE_KEY ? `${import.meta.env.VITE_TURNSTILE_SITE_KEY.substring(0,6)}...` : 'YOK'}
+                </div>
                 {import.meta.env.VITE_TURNSTILE_SITE_KEY ? (
                   <Turnstile
                     siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
                     onSuccess={(token) => setCaptchaToken(token)}
-                    onError={() => setError('Cloudflare Turnstile bağlantısı engellendi. Lütfen reklam engelleyicinizi (Adblock) kapatın.')}
+                    onError={() => setError('Cloudflare Turnstile yüklenemedi.')}
+                    options={{ theme: 'dark' }}
                   />
                 ) : (
                   <div className="p-3 bg-red-900/50 text-red-200 border border-red-500 rounded text-xs text-center w-full">
