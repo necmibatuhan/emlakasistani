@@ -4,6 +4,7 @@ const db = require('../db');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 const semanticSearch = require('../services/semanticSearch');
 const { getGenAI, hasValidAiConfig } = require('../utils/ai');
+const jwt = require('jsonwebtoken');
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } }); // 10MB limit
@@ -81,13 +82,57 @@ router.put('/:id', authMiddleware, requireRole(['company_admin', 'office_manager
   }
 });
 
-// Analyze listing image
-const jwt = require('jsonwebtoken');
+const { supabase, hasValidSupabaseConfig } = require('../services/supabaseService');
+const { v4: uuidv4 } = require('uuid');
 
+// Generate Presigned Upload URL for Analyzer
+router.post('/generate-upload-url', async (req, res) => {
+  try {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    let userId = 'anonymous';
+    if (token && token !== 'null' && token !== 'undefined') {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        userId = decoded.id;
+      } catch (e) {}
+    }
+
+    if (!hasValidSupabaseConfig()) {
+      // Mock mode: return a fake upload URL
+      return res.json({
+        uploadUrl: 'mock_upload_url',
+        path: `properties/${userId}/mock-image-${uuidv4()}.jpg`
+      });
+    }
+
+    const fileName = `${uuidv4()}.jpg`;
+    const filePath = `analyzer/${userId}/${fileName}`;
+
+    const { data, error } = await supabase
+      .storage
+      .from('properties')
+      .createSignedUploadUrl(filePath);
+
+    if (error) {
+      console.error("Supabase Storage error:", error);
+      return res.status(500).json({ message: "Upload URL oluşturulamadı." });
+    }
+
+    res.json({
+      uploadUrl: data.signedUrl,
+      path: filePath
+    });
+  } catch (err) {
+    console.error('Generate Upload URL Error:', err);
+    res.status(500).json({ message: 'Sunucu hatası' });
+  }
+});
+
+// Analyze listing image
 router.post('/analyze-listing', async (req, res) => {
   try {
-    const { image, mimeType = 'image/jpeg' } = req.body;
-    if (!image) return res.status(400).json({ message: 'Görsel dosyası eksik.' });
+    const { image, imagePath, mimeType = 'image/jpeg' } = req.body;
+    if (!image && !imagePath) return res.status(400).json({ message: 'Görsel dosyası eksik.' });
     if (!hasValidAiConfig()) return res.status(500).json({ message: 'Yapay zeka yapılandırması eksik.' });
 
     let userId = null;
@@ -99,36 +144,29 @@ router.post('/analyze-listing', async (req, res) => {
       } catch (e) {}
     }
 
-    const imageBase64 = image;
-
-    const promptText = `Sen usta bir emlak danışmanısın. Ekip arkadaşın sana bir emlak sitesindeki ilanın ekran görüntüsünü (screenshot) yolladı.
-Bu ilanı incele ve bana sadece aşağıdaki formatta geçerli bir JSON dön:
-{
-  "score": 0-100 arası bir tamsayı (İlanın satılma ihtimali ve çekiciliği),
-  "weaknesses": ["Zayıf yön 1", "Zayıf yön 2", "Örn: Fotoğraf karanlık", "Örn: Açıklama yetersiz"],
-  "strengths": ["Güçlü yön 1", "Güçlü yön 2"],
-  "improved_description": "Bu ilanın daha hızlı satılması için kullanılabilecek SEO uyumlu, dikkat çekici, harika bir taslak ilan başlığı ve açıklaması."
-}`;
-
-    const genAI = getGenAI();
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash", generationConfig: { responseMimeType: "application/json", temperature: 0.3 } });
+    let imageUrlForAI = null;
     
-    const aiResult = await model.generateContent([
-      { inlineData: { mimeType, data: imageBase64 } },
-      { text: promptText }
-    ]);
-
-    let respText = aiResult.response.text().trim();
-    
-    // Robust JSON extraction
-    const jsonMatch = respText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-    if (jsonMatch) {
-      respText = jsonMatch[1];
-    } else if (respText.startsWith('```')) {
-      respText = respText.replace(/^```(json)?/, '').replace(/```$/, '').trim();
+    // If client sent imagePath (Direct Upload), get public URL
+    if (imagePath) {
+      if (hasValidSupabaseConfig()) {
+        const { data } = supabase.storage.from('properties').getPublicUrl(imagePath);
+        imageUrlForAI = data.publicUrl;
+      } else {
+        // Mock mode fallback
+        imageUrlForAI = 'https://mock.com/image.jpg';
+      }
+    } else {
+      // Fallback to Base64 (legacy)
+      imageUrlForAI = `data:${mimeType};base64,${image}`;
     }
+
+    const { analyzeListingImage } = require('../utils/ai');
     
-    const parsedResult = JSON.parse(respText);
+    // Default description if none provided by the frontend right now
+    const description = req.body.description || "Açıklama belirtilmemiş.";
+    
+    // Call OpenAI Vision integration
+    const parsedResult = await analyzeListingImage(imageUrlForAI, description);
 
     // Update onboarding progress if logged in
     if (userId) {

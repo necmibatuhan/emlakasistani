@@ -3,5 +3,8 @@
   "private": true,
   "engines": {
     "node": "22.x"
+  },
+  "dependencies": {
+    "zod": "^4.4.3"
   }
 }

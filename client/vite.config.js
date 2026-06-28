@@ -53,7 +53,7 @@ export default defineConfig({
       }
     }),
     obfuscatorPlugin({
-      include: ['src/**/*.js', 'src/**/*.jsx'],
+      include: ['src/**/*.js', 'src/**/*.jsx', 'src/**/*.ts', 'src/**/*.tsx'],
       exclude: [/node_modules/],
       apply: 'build', // Only obfuscate in production build
       debugger: true, // Enable debugger statements logic in obfuscator
@@ -78,7 +78,12 @@ export default defineConfig({
     formatting: 'none',
     mock: true,
     includedRoutes(paths, routes) {
-      const blogPostsContent = fs.readFileSync(path.resolve(__dirname, 'src/data/blogPosts.jsx'), 'utf-8');
+      let blogPostsContent = '';
+      try {
+        blogPostsContent = fs.readFileSync(path.resolve(__dirname, 'src/data/blogPosts.tsx'), 'utf-8');
+      } catch (e) {
+        console.log("Could not find blogPosts.tsx, skipping SSG for blog posts.");
+      }
       const slugRegex = /slug:\s*['"]([^'"]+)['"]/g;
       const slugs = [];
       let match;

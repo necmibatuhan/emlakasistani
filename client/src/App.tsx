@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { UIProvider } from './contexts/UIContext';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useRouteError } from 'react-router-dom';
 import { AuthContext, AuthProvider } from './contexts/AuthContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { SpeedInsights } from "@vercel/speed-insights/react";
@@ -104,10 +104,47 @@ const RootLayout = () => {
   );
 };
 
+const GlobalErrorBoundary = () => {
+  const error = useRouteError();
+  
+  // If we get a JSON parse error or chunk load error (usually due to stale PWA cache or version mismatch)
+  // We force a hard reload to get the latest assets from the server
+  if (
+    error?.message?.includes('JSON.parse') || 
+    error?.message?.includes('Failed to fetch dynamically imported module') ||
+    error?.message?.includes('Unexpected token') ||
+    error?.message?.includes('Load failed')
+  ) {
+    window.location.reload();
+    return <div className="min-h-screen flex items-center justify-center bg-[#0A0B0D] text-white">Güncelleniyor...</div>;
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#0A0B0D] p-6 text-center">
+      <div className="w-16 h-16 bg-[#EF4444]/20 text-[#EF4444] rounded-full flex items-center justify-center mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+      </div>
+      <h1 className="text-2xl font-bold text-white mb-2">Bir Sorun Oluştu</h1>
+      <p className="text-[#7C8090] mb-6 max-w-md">Uygulama yüklenirken beklenmedik bir hata meydana geldi. Lütfen sayfayı yenileyin.</p>
+      <button 
+        onClick={() => window.location.reload()}
+        className="bg-[#F5A623] hover:bg-[#FF8C00] text-black font-semibold px-6 py-3 rounded-lg transition-colors"
+      >
+        Sayfayı Yenile
+      </button>
+      <details className="mt-8 text-left text-xs text-[#7C8090] bg-[#16181D] p-4 rounded border border-[#2A2D35] max-w-2xl overflow-auto hidden">
+        <summary className="cursor-pointer mb-2">Hata Detayları</summary>
+        <pre>{error?.message || error?.toString()}</pre>
+      </details>
+    </div>
+  );
+};
+
 export const routes = [
   {
     path: '/',
     element: <RootLayout />,
+    errorElement: <GlobalErrorBoundary />,
     children: [
       { index: true, element: <HomeRoute /> },
       { path: '/pricing', element: <Pricing /> },

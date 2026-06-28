@@ -8,9 +8,14 @@ const __dirname = path.dirname(__filename);
 // Domain URL
 const DOMAIN = 'https://kapora.online';
 
-// Read the blogPosts.jsx file as text
-const blogPostsFilePath = path.join(__dirname, '../src/data/blogPosts.jsx');
-const content = fs.readFileSync(blogPostsFilePath, 'utf8');
+// Read the blogPosts.tsx file as text
+const blogPostsFilePath = path.join(__dirname, '../src/data/blogPosts.tsx');
+let content = '';
+try {
+  content = fs.readFileSync(blogPostsFilePath, 'utf8');
+} catch (e) {
+  console.log("Could not find blogPosts.tsx, skipping blog posts sitemap generation.");
+}
 
 // Use Regex to extract all slugs
 const slugRegex = /slug:\s*['"]([^'"]+)['"]/g;

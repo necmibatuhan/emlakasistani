@@ -34,13 +34,13 @@ export async function generateLandlordReport(propertyId: string): Promise<Landlo
     const property = propertyRes.rows[0];
 
     // 2. Son 7 günün aktivitesini getir (lead_property_matches)
-    const recentActivityQuery = \`
+    const recentActivityQuery = `
       SELECT l.name, l.status, l.score, l.reasoning, m.ai_reasoning
       FROM lead_property_matches m
       JOIN leads l ON m.lead_id = l.id
       WHERE m.property_id = $1 
         AND m.created_at >= NOW() - INTERVAL '7 days'
-    \`;
+    `;
     const activityRes = await db.query(recentActivityQuery, [propertyId]);
     const leadsData = activityRes.rows;
 
@@ -68,7 +68,7 @@ export async function generateLandlordReport(propertyId: string): Promise<Landlo
 
       const result = await model.generateContent([
         { text: REPORT_SYSTEM_PROMPT },
-        { text: \`Lütfen bu verilere dayanarak haftalık durumu özetleyen bir metin yaz: \\n\${rawDataContext}\` }
+        { text: `Lütfen bu verilere dayanarak haftalık durumu özetleyen bir metin yaz: \n${rawDataContext}` }
       ]);
 
       reportText = result.response.text().trim();

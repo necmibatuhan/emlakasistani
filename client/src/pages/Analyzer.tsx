@@ -73,22 +73,55 @@ const Analyzer = () => {
     setProgress(10);
 
     try {
-      // 1. Resmi tarayıcıda küçült (max 1200px) ve base64 yap
+      // 1. Resmi tarayıcıda küçült (max 1200px) ve blob/base64'e dönüştür
       const base64DataUrl = await compressImage(file);
       const base64Image = base64DataUrl.split(',')[1];
       
+      setProgress(20);
+
+      // 2. Presigned URL iste
+      let imagePath = null;
+      let finalPayload = {};
+      
+      try {
+        const uploadUrlRes = await axios.post(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/properties/generate-upload-url`, {}, {
+          headers: { 'Authorization': `Bearer ${token}` },
+          withCredentials: true
+        });
+        
+        if (uploadUrlRes.data.uploadUrl && uploadUrlRes.data.uploadUrl !== 'mock_upload_url') {
+          // Gerçek upload url geldi, binary dosyayı doğrudan Supabase'e gönder
+          // base64'den blob'a çevir:
+          const byteString = atob(base64Image);
+          const ab = new ArrayBuffer(byteString.length);
+          const ia = new Uint8Array(ab);
+          for (let i = 0; i < byteString.length; i++) {
+              ia[i] = byteString.charCodeAt(i);
+          }
+          const blob = new Blob([ab], { type: 'image/jpeg' });
+          
+          await axios.put(uploadUrlRes.data.uploadUrl, blob, {
+            headers: { 'Content-Type': 'image/jpeg' }
+          });
+          
+          imagePath = uploadUrlRes.data.path;
+          finalPayload = { imagePath };
+        } else {
+          // Mock modundayız veya Supabase yok, eski base64 yöntemi
+          finalPayload = { image: base64Image, mimeType: 'image/jpeg' };
+        }
+      } catch (e) {
+        console.warn("Upload URL alınamadı, base64'e düşülüyor", e);
+        finalPayload = { image: base64Image, mimeType: 'image/jpeg' };
+      }
+
       setProgress(40);
 
       const progressInterval = setInterval(() => {
         setProgress(p => (p < 90 ? p + 5 : p));
       }, 500);
 
-      const payload = {
-        image: base64Image,
-        mimeType: 'image/jpeg'
-      };
-
-      const res = await axios.post(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/properties/analyze-listing`, payload, {
+      const res = await axios.post(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/properties/analyze-listing`, finalPayload, {
         headers: { 
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`

@@ -1,0 +1,8 @@
+#!/usr/bin/expect -f
+set timeout 10
+spawn npx vercel link
+expect "Set up .*" { send "y\r" }
+expect "Which scope do you want to deploy to?" { send "\r" }
+expect "Link to existing project?" { send "y\r" }
+expect "What's the name of your existing project?" { send "emlakasistani\r" }
+expect eof

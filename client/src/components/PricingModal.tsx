@@ -13,43 +13,19 @@ const PricingModal = ({ isOpen, onClose, token, onUpgradeSuccess }) => {
     setError('');
     
     try {
-      const res = await axios.post(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/payment/shopier-checkout`, {
-        plan: planType
+      const res = await axios.post(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/payment/iyzico-checkout`, {
+        plan: planType,
+        billingCycle: 'monthly'
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      if (res.data.success) {
-        // Mocking Shopier Redirect behavior
-        // In a real scenario, this would post a form to Shopier API
-        // For Kapora MVP, we simulate a successful callback redirect
-        
-        // Let's create a dummy HTML form and submit it, or just simulate success immediately
-        console.log("Mocking shopier checkout for", res.data.data.product_name);
-        
-        // Simulating the shopier callback
-        setTimeout(async () => {
-          try {
-            // Simulate the backend callback receiving Shopier's success hook
-            await axios.post(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/payment/shopier-callback`, {
-              status: 'success',
-              order_id: res.data.data.platform_order_id,
-              custom_data: planType,
-              random_nr: res.data.data.random_nr,
-              signature: res.data.data.signature,
-              currency: 0,
-              total_amount: res.data.data.product_price
-            });
-            
-            setLoadingPlan(null);
-            onUpgradeSuccess(planType);
-            onClose();
-          } catch (cbErr) {
-            console.error("Callback simulation failed", cbErr);
-            setError('Ödeme doğrulaması başarısız oldu.');
-            setLoadingPlan(null);
-          }
-        }, 1500); // 1.5 second loading simulation
+      if (res.data.success && res.data.data.paymentPageUrl) {
+        // Redirect user to Iyzico secure payment page
+        window.location.href = res.data.data.paymentPageUrl;
+      } else {
+        setError('Ödeme sayfası oluşturulamadı.');
+        setLoadingPlan(null);
       }
     } catch (err) {
       console.error(err);

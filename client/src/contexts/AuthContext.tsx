@@ -51,8 +51,8 @@ export const AuthProvider = ({ children }) => {
     setUser(res.data.user);
   };
 
-  const register = async (name, email, password, role = 'agent', turnstileToken) => {
-    const res = await axios.post(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/auth/register`, { name, email, password, role, turnstileToken });
+  const register = async (name, email, password, role = 'agent', turnstileToken, kvkkAccepted = true) => {
+    const res = await axios.post(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/auth/register`, { name, email, password, role, turnstileToken, kvkkAccepted });
     if (res.data.token) {
       setToken(res.data.token);
       localStorage.setItem('token', res.data.token);
