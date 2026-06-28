@@ -21,6 +21,11 @@ const Auth = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [captchaToken, setCaptchaToken] = useState(null);
   
+  // Turnstile Site Key (Public) - Fallback to hardcoded if Vercel env is misconfigured or contains empty quotes
+  const rawTurnstileKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || "";
+  const cleanTurnstileKey = rawTurnstileKey.replace(/['"]/g, '').trim();
+  const activeTurnstileKey = cleanTurnstileKey || "0x4AAAAAADeLgwAIl-4IsR2x";
+
   const { login, register, setUser, setToken } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -173,11 +178,11 @@ const Auth = () => {
             
             <div className="flex justify-center mt-4 flex-col items-center gap-2">
               <div className="text-[10px] text-gray-500 font-mono">
-                Key Check: {import.meta.env.VITE_TURNSTILE_SITE_KEY ? `${import.meta.env.VITE_TURNSTILE_SITE_KEY.substring(0,6)}...` : 'YOK'}
+                Key Check: {activeTurnstileKey ? `${activeTurnstileKey.substring(0,6)}...` : 'YOK'}
               </div>
-              {import.meta.env.VITE_TURNSTILE_SITE_KEY ? (
+              {activeTurnstileKey ? (
                 <Turnstile
-                  siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+                  siteKey={activeTurnstileKey}
                   onSuccess={(token) => setCaptchaToken(token)}
                   onError={() => setError('Cloudflare Turnstile yüklenemedi.')}
                   options={{ theme: 'dark' }}
@@ -260,11 +265,11 @@ const Auth = () => {
 
               <div className="flex justify-center mt-4 flex-col items-center gap-2">
                 <div className="text-[10px] text-gray-500 font-mono">
-                  Key Check: {import.meta.env.VITE_TURNSTILE_SITE_KEY ? `${import.meta.env.VITE_TURNSTILE_SITE_KEY.substring(0,6)}...` : 'YOK'}
+                  Key Check: {activeTurnstileKey ? `${activeTurnstileKey.substring(0,6)}...` : 'YOK'}
                 </div>
-                {import.meta.env.VITE_TURNSTILE_SITE_KEY ? (
+                {activeTurnstileKey ? (
                   <Turnstile
-                    siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+                    siteKey={activeTurnstileKey}
                     onSuccess={(token) => setCaptchaToken(token)}
                     onError={() => setError('Cloudflare Turnstile yüklenemedi.')}
                     options={{ theme: 'dark' }}
