@@ -171,14 +171,19 @@ const Auth = () => {
               />
             </div>
             
-            {import.meta.env.VITE_TURNSTILE_SITE_KEY && import.meta.env.VITE_TURNSTILE_SITE_KEY !== 'GIRILECEK_TURNSTILE_SITE_KEY' && (
-              <div className="flex justify-center mt-4">
+            <div className="flex justify-center mt-4">
+              {import.meta.env.VITE_TURNSTILE_SITE_KEY ? (
                 <Turnstile
                   siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
                   onSuccess={(token) => setCaptchaToken(token)}
                 />
-              </div>
-            )}
+              ) : (
+                <div className="p-3 bg-red-900/50 text-red-200 border border-red-500 rounded text-xs text-center w-full">
+                  ⚠️ <b>Vercel Hatası:</b> VITE_TURNSTILE_SITE_KEY bulunamadı.<br/>
+                  Lütfen Vercel ayarlarından ekleyip <b>Redeploy</b> yapın.
+                </div>
+              )}
+            </div>
             
             <button 
               type="submit" 
@@ -248,14 +253,19 @@ const Auth = () => {
                 </div>
               )}
 
-              {import.meta.env.VITE_TURNSTILE_SITE_KEY && import.meta.env.VITE_TURNSTILE_SITE_KEY !== 'GIRILECEK_TURNSTILE_SITE_KEY' && (
-                <div className="flex justify-center mt-4">
+              <div className="flex justify-center mt-4">
+                {import.meta.env.VITE_TURNSTILE_SITE_KEY ? (
                   <Turnstile
                     siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
                     onSuccess={(token) => setCaptchaToken(token)}
                   />
-                </div>
-              )}
+                ) : (
+                  <div className="p-3 bg-red-900/50 text-red-200 border border-red-500 rounded text-xs text-center w-full">
+                    ⚠️ <b>Vercel Hatası:</b> VITE_TURNSTILE_SITE_KEY bulunamadı.<br/>
+                    Lütfen Vercel ayarlarından ekleyip <b>Redeploy</b> yapın.
+                  </div>
+                )}
+              </div>
 
               <button 
                 type="submit" 
