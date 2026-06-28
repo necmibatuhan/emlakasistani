@@ -132,7 +132,7 @@ const Auth = () => {
         </div>
         
         <h2 className="text-[22px] md:text-[26px] font-bold text-center text-[#F1F2F4] mb-3 md:mb-4">
-          {isForgotPassword ? 'Şifremi Unuttum' : (isLogin ? 'Tekrar Hoşgeldiniz' : (registerStep === 1 ? 'Hesap Oluşturun' : 'Profilinizi Seçin'))}
+          {isForgotPassword ? 'Şifremi Unuttum' : (isLogin ? 'Tekrar Hoşgeldiniz (v2.1)' : (registerStep === 1 ? 'Hesap Oluşturun' : 'Profilinizi Seçin'))}
         </h2>
         
         <div className="text-center mb-8">
@@ -258,6 +258,7 @@ const Auth = () => {
                   <Turnstile
                     siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
                     onSuccess={(token) => setCaptchaToken(token)}
+                    onError={() => setError('Cloudflare Turnstile bağlantısı engellendi. Lütfen reklam engelleyicinizi (Adblock) kapatın.')}
                   />
                 ) : (
                   <div className="p-3 bg-red-900/50 text-red-200 border border-red-500 rounded text-xs text-center w-full">
