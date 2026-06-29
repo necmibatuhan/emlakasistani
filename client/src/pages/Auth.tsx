@@ -137,7 +137,7 @@ const Auth = () => {
         </div>
         
         <h2 className="text-[22px] md:text-[26px] font-bold text-center text-[#F1F2F4] mb-3 md:mb-4">
-          {isForgotPassword ? 'Şifremi Unuttum' : (isLogin ? 'Tekrar Hoşgeldiniz (v2.1)' : (registerStep === 1 ? 'Hesap Oluşturun' : 'Profilinizi Seçin'))}
+          {isForgotPassword ? 'Şifremi Unuttum' : (isLogin ? 'Tekrar Hoşgeldiniz' : (registerStep === 1 ? 'Hesap Oluşturun' : 'Profilinizi Seçin'))}
         </h2>
         
         <div className="text-center mb-8">
@@ -177,9 +177,6 @@ const Auth = () => {
             </div>
             
             <div className="flex justify-center mt-4 flex-col items-center gap-2">
-              <div className="text-[10px] text-gray-500 font-mono">
-                Key Check: {activeTurnstileKey ? `${activeTurnstileKey.substring(0,6)}...` : 'YOK'}
-              </div>
               {activeTurnstileKey ? (
                 <Turnstile
                   siteKey={activeTurnstileKey}
@@ -264,9 +261,6 @@ const Auth = () => {
               )}
 
               <div className="flex justify-center mt-4 flex-col items-center gap-2">
-                <div className="text-[10px] text-gray-500 font-mono">
-                  Key Check: {activeTurnstileKey ? `${activeTurnstileKey.substring(0,6)}...` : 'YOK'}
-                </div>
                 {activeTurnstileKey ? (
                   <Turnstile
                     siteKey={activeTurnstileKey}
