@@ -222,7 +222,7 @@ router.post('/login', validate(loginSchema), async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Sunucu hatası' });
+    res.status(500).json({ message: 'Sunucu hatası: ' + (err.message || 'Bilinmeyen hata') });
   }
 });
 
