@@ -84,8 +84,11 @@ const LoginRoute = () => {
 const queryClient = new QueryClient();
 
 const RootLayout = () => {
+  const rawGoogleId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+  const cleanGoogleId = rawGoogleId.replace(/['"]/g, '').trim() || 'GIRILECEK_GOOGLE_CLIENT_ID';
+
   return (
-    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || 'GIRILECEK_GOOGLE_CLIENT_ID'}>
+    <GoogleOAuthProvider clientId={cleanGoogleId}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <UIProvider>

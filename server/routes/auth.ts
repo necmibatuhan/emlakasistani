@@ -270,9 +270,11 @@ router.post('/google', async (req, res) => {
       };
     } else {
       try {
+        const cleanGoogleClientId = (process.env.GOOGLE_CLIENT_ID || '').replace(/['"]/g, '').trim();
+        const googleClient = new OAuth2Client(cleanGoogleClientId);
         const ticket = await googleClient.verifyIdToken({
           idToken: credential,
-          audience: process.env.GOOGLE_CLIENT_ID,
+          audience: cleanGoogleClientId,
         });
         payload = ticket.getPayload();
       } catch (err) {
