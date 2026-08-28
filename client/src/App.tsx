@@ -85,7 +85,7 @@ const queryClient = new QueryClient();
 
 const RootLayout = () => {
   const rawGoogleId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
-  const cleanGoogleId = rawGoogleId.replace(/['"]/g, '').trim() || 'GIRILECEK_GOOGLE_CLIENT_ID';
+  const cleanGoogleId = rawGoogleId.replace(/['"]/g, '').trim();
 
   return (
     <GoogleOAuthProvider clientId={cleanGoogleId}>
