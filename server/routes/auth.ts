@@ -16,6 +16,42 @@ const { Resend } = require('resend');
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID || 'MOCK_CLIENT_ID');
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
+const smtpTransporter = process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS
+  ? nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT || 587),
+      secure: Number(process.env.SMTP_PORT || 587) === 465,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    })
+  : null;
+
+const sendEmail = async ({ to, subject, html }) => {
+  if (resend) {
+    const { data, error } = await resend.emails.send({
+      from: 'Kapora AI <info@kapora.online>',
+      to,
+      subject,
+      html,
+    });
+    if (error) throw new Error(error.message || 'Resend e-postayı gönderemedi.');
+    return data;
+  }
+
+  if (smtpTransporter) {
+    return smtpTransporter.sendMail({
+      from: process.env.SMTP_FROM || process.env.SMTP_USER,
+      to,
+      subject,
+      html,
+    });
+  }
+
+  throw new Error('E-posta sağlayıcısı yapılandırılmamış.');
+};
+
 const sendVerificationEmail = async (email, token, name) => {
   const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${token}`;
   
@@ -49,23 +85,8 @@ const sendVerificationEmail = async (email, token, name) => {
   console.log(`============================\n`);
 
   try {
-    if (!resend) {
-      throw new Error('RESEND_API_KEY yapılandırılmamış.');
-    }
-
-    const { data, error } = await resend.emails.send({
-      from: 'Kapora AI <info@kapora.online>',
-      to: email,
-      subject: subject,
-      html: htmlContent
-    });
-
-    if (error) {
-      console.error("Resend Email Error:", error);
-      throw new Error(error.message || 'Resend API e-postayı gönderemedi.');
-    } else {
-      console.log(`Doğrulama e-postası (Resend) gönderildi: ${email}`);
-    }
+    await sendEmail({ to: email, subject, html: htmlContent });
+    console.log(`Doğrulama e-postası gönderildi: ${email}`);
   } catch (error) {
     console.error("E-posta gönderme hatası:", error);
     throw error;
@@ -379,8 +400,7 @@ router.post('/forgot-password', async (req, res) => {
     const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${resetToken}&id=${user.id}`;
     
     try {
-      const { data, error } = await resend.emails.send({
-        from: 'Kapora AI <info@kapora.online>',
+      const data = await sendEmail({
         to: user.email,
         subject: 'Kapora - Şifre Sıfırlama Talebi',
         html: `
@@ -392,13 +412,7 @@ router.post('/forgot-password', async (req, res) => {
           </div>
         `
       });
-      
-      if (error) {
-        console.error("Resend Event Error (Password Reset):", error);
-        return res.status(500).json({ message: "Mail gönderilemedi. Hata: " + error.message });
-      } else {
-        console.log(`Şifre sıfırlama maili gönderildi: ${user.email} (ID: ${data?.id})`);
-      }
+      console.log(`Şifre sıfırlama maili gönderildi: ${user.email} (ID: ${data?.id || data?.messageId || 'ok'})`);
     } catch (mailErr) {
       console.error('SMTP/Resend Gönderme Hatası:', mailErr);
       return res.status(500).json({ message: `Mail gönderilemedi. Lütfen sistem yöneticisiyle iletişime geçin. (Hata: ${mailErr.message})` });

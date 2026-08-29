@@ -25,6 +25,8 @@ CREATE TABLE users (
   plan TEXT NOT NULL DEFAULT 'free' CHECK (plan IN ('free','pro','proplus')),
   verification_token TEXT,
   is_verified BOOLEAN DEFAULT false,
+  whatsapp_phone TEXT,
+  kvkk_consent_at TIMESTAMPTZ,
   referral_code TEXT UNIQUE,
   referred_by_id UUID REFERENCES users(id) ON DELETE SET NULL,
   subscription_status VARCHAR(20) DEFAULT 'trial',

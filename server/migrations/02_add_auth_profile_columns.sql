@@ -1,0 +1,3 @@
+ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS whatsapp_phone TEXT,
+  ADD COLUMN IF NOT EXISTS kvkk_consent_at TIMESTAMPTZ;
