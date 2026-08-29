@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const db = require('../db');
 const { authMiddleware } = require('../middleware/auth');
 const { validate } = require('../middleware/validate');
-const { registerSchema, loginSchema } = require('../../shared/validations');
+const { registerSchema, loginSchema } = require('../validations');
 
 const router = express.Router();
 
@@ -14,7 +14,7 @@ const { OAuth2Client } = require('google-auth-library');
 const { Resend } = require('resend');
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID || 'MOCK_CLIENT_ID');
-const resend = new Resend(process.env.RESEND_API_KEY || 're_5qWF7SiQ_2w4j9e68BraaBTZrBu7uSr1L');
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendVerificationEmail = async (email, token, name) => {
   const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${token}`;
