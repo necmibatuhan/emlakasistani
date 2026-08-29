@@ -7,7 +7,25 @@ const PrivacyPipeline = require('../utils/PrivacyPipeline');
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } }); // 10MB limit
-const genAI = getGenAI();
+
+const SUPPORTED_AUDIO_TYPES = new Set([
+  'audio/webm', 'audio/mp4', 'audio/mpeg', 'audio/wav', 'audio/x-wav', 'audio/ogg', 'audio/aac', 'audio/flac'
+]);
+
+const normalizeAudio = (audioFile) => {
+  if (!audioFile || audioFile.buffer.length < 1_000) {
+    const error = new Error('Ses kaydı boş veya çok kısa. En az birkaç saniye konuşup tekrar deneyin.');
+    error.statusCode = 400;
+    throw error;
+  }
+  const mimeType = (audioFile.mimetype || '').split(';')[0].toLowerCase();
+  if (!SUPPORTED_AUDIO_TYPES.has(mimeType)) {
+    const error = new Error('Bu ses biçimi desteklenmiyor. Chrome, Safari veya Edge ile tekrar deneyin.');
+    error.statusCode = 415;
+    throw error;
+  }
+  return { mimeType, audioBase64: audioFile.buffer.toString('base64') };
+};
 
 // POST /api/voice/transcribe
 router.post('/transcribe', authMiddleware, upload.single('audio'), async (req, res) => {
@@ -15,23 +33,15 @@ router.post('/transcribe', authMiddleware, upload.single('audio'), async (req, r
     const audioFile = req.file;
     if (!audioFile) return res.status(400).json({ error: 'Ses dosyası bulunamadı' });
 
-    const audioBase64 = audioFile.buffer.toString('base64');
-    let mimeType = audioFile.mimetype.split(';')[0];
-    if (mimeType === 'application/octet-stream' || !mimeType.startsWith('audio/')) {
-        mimeType = 'audio/webm'; // Fallback for Gemini
-    }
+    const { audioBase64, mimeType } = normalizeAudio(audioFile);
 
     if (!hasValidAiConfig()) {
       return res.status(500).json({ error: 'Yapay zeka (GEMINI_API_KEY) yapılandırması eksik.' });
     }
 
-    if (audioFile.buffer.length === 0) {
-      return res.status(400).json({ error: 'Ses dosyası boş (0 bytes).' });
-    }
-
     try {
       console.log(`[Voice API] Sending audio to Gemini: ${mimeType}, Size: ${audioFile.size} bytes`);
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+      const model = getGenAI().getGenerativeModel({ model: 'gemini-2.5-flash' });
       const result = await model.generateContent([
         {
           inlineData: {
@@ -48,11 +58,11 @@ router.post('/transcribe', authMiddleware, upload.single('audio'), async (req, r
       return res.json({ transcript });
     } catch (apiErr) {
       console.error('Gemini Transcribe API Error Details:', apiErr);
-      return res.status(500).json({ error: `Ses işlenemedi: ${apiErr.message}` });
+      return res.status(502).json({ error: 'Ses servisi şu anda yanıt vermiyor. Birkaç dakika sonra tekrar deneyin.' });
     }
   } catch (err) {
     console.error('Transcribe general error:', err);
-    res.status(500).json({ error: 'Ses metne çevrilemedi' });
+    res.status(err.statusCode || 500).json({ error: err.statusCode ? err.message : 'Ses metne çevrilemedi' });
   }
 });
 
@@ -145,7 +155,7 @@ Danışmanın sesli notu:
       analysis = getMockAnalysis();
     } else {
       try {
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash', generationConfig: { responseMimeType: "application/json", temperature: 0.1 } });
+        const model = getGenAI().getGenerativeModel({ model: 'gemini-2.5-flash', generationConfig: { responseMimeType: "application/json", temperature: 0.1 } });
         const result = await model.generateContent([
           { text: VOICE_SYSTEM_PROMPT },
           { text: userPrompt }
@@ -300,26 +310,23 @@ router.post('/create-lead', authMiddleware, upload.single('audio'), async (req, 
     const audioFile = req.file;
     if (!audioFile) return res.status(400).json({ error: 'Ses dosyası bulunamadı' });
 
-    const audioBase64 = audioFile.buffer.toString('base64');
-    let mimeType = audioFile.mimetype.split(';')[0];
-    if (mimeType === 'application/octet-stream' || !mimeType.startsWith('audio/')) {
-        mimeType = 'audio/webm';
+    const { audioBase64, mimeType } = normalizeAudio(audioFile);
+
+    if (!hasValidAiConfig()) {
+      return res.status(503).json({ error: 'Ses analizi geçici olarak kullanılamıyor. Sistem yöneticisiyle iletişime geçin.' });
     }
 
-    let transcript = "";
-    if (!hasValidAiConfig()) {
-      transcript = "Ahmet Bey aradı, 0532 123 45 67, Kadıköy'den 5 milyona ev bakıyor.";
-    } else {
-      try {
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    let transcript = '';
+    try {
+        const model = getGenAI().getGenerativeModel({ model: 'gemini-2.5-flash' });
         const result = await model.generateContent([
           { inlineData: { mimeType, data: audioBase64 } },
           { text: "Bu ses kaydını Türkçe olarak tam ve doğru şekilde metne çevir. Sadece konuşulan metni yaz." }
         ]);
         transcript = result.response.text().trim();
-      } catch (apiErr) {
-        transcript = "Ahmet Bey aradı, 0532 123 45 67, Kadıköy'den 5 milyona ev bakıyor.";
-      }
+    } catch (apiErr) {
+      console.error('Gemini voice transcription error:', apiErr.message);
+      return res.status(502).json({ error: 'Ses metne çevrilemedi. Lütfen daha net ve kısa bir kayıtla tekrar deneyin.' });
     }
 
     if (!transcript) return res.status(400).json({ error: 'Metne çevrilemedi' });
@@ -345,11 +352,8 @@ ${transcript}
 }`;
 
     let parsedResult;
-    if (!hasValidAiConfig()) {
-      parsedResult = getMockNewLead();
-    } else {
-      try {
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash', generationConfig: { responseMimeType: "application/json" } });
+    try {
+        const model = getGenAI().getGenerativeModel({ model: 'gemini-2.5-flash', generationConfig: { responseMimeType: "application/json" } });
         const aiResult = await model.generateContent(prompt);
         let respText = aiResult.response.text().trim();
         if (respText.startsWith('```json')) {
@@ -362,24 +366,11 @@ ${transcript}
           parsedResult = JSON.parse(respText);
         } catch (parseErr) {
           console.error('Failed to parse new lead AI JSON', respText);
-          parsedResult = getMockNewLead();
-          parsedResult.gerekceler.aciklama = "Sistem Notu: Yapay zeka yapılandırılmış veri dönemedi, bu nedenle geçici mock verisi oluşturuldu. Ham analiz: " + respText.substring(0, 200);
+          return res.status(502).json({ error: 'Ses anlaşıldı ancak müşteri bilgileri çıkarılamadı. Daha açık bir kayıtla tekrar deneyin.' });
         }
-      } catch (err) {
-        console.error('Gemini create-lead AI Error', err);
-        parsedResult = getMockNewLead();
-      }
-    }
-
-    function getMockNewLead() {
-      return { 
-        isim: "Ahmet Yılmaz", telefon: "0532 123 4567",
-        skor: 8, etiket: "Sıcak", 
-        gerekceler: { aciklama: "Net bütçe ve bölge belirtti." }, 
-        onerilen_aksiyon: "Bugün ara", 
-        yanit_taslak: "Merhaba Ahmet Bey, portföyleri iletiyorum.", 
-        mulk_tercihleri: { bolge: "Kadıköy", tip: "Satılık", oda: "Belirsiz", butce: "5M", aciliyet: "Acil" } 
-      };
+    } catch (err) {
+      console.error('Gemini create-lead AI Error', err.message);
+      return res.status(502).json({ error: 'Müşteri analizi tamamlanamadı. Lütfen tekrar deneyin.' });
     }
 
     const pipeline = new PrivacyPipeline();
@@ -428,7 +419,7 @@ ${transcript}
     res.status(201).json(newLead);
   } catch (err) {
     console.error('Create lead from voice error:', err);
-    res.status(500).json({ error: 'Müşteri oluşturulamadı' });
+    res.status(err.statusCode || 500).json({ error: err.statusCode ? err.message : 'Müşteri oluşturulamadı' });
   }
 });
 

@@ -110,7 +110,8 @@ const VoiceNote = ({ leadId, onSaved }) => {
     setStatus('processing');
     try {
       const formData = new FormData();
-      formData.append('audio', blob, 'voicenote.webm');
+      const extension = blob.type.includes('mp4') ? 'm4a' : 'webm';
+      formData.append('audio', blob, `voicenote.${extension}`);
       
       const token = localStorage.getItem('token');
       const transcribeRes = await axios.post(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/voice/transcribe`, formData, {
@@ -134,7 +135,7 @@ const VoiceNote = ({ leadId, onSaved }) => {
 
     } catch (err) {
       setStatus('error');
-      setErrorMsg('Analiz sırasında hata oluştu.');
+      setErrorMsg(err.response?.data?.error || err.response?.data?.message || 'Analiz sırasında hata oluştu.');
     }
   };
 

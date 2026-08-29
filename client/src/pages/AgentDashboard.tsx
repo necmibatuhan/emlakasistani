@@ -195,19 +195,15 @@ const AgentDashboard = () => {
     }
   };
 
-  const handleVoiceNoteComplete = async (audioBlob) => {
-    try {
-      const formData = new FormData();
-      formData.append('audio', audioBlob, 'voicenote.webm');
-      await axios.post(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/leads/analyze-voice`, formData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      await queryClient.invalidateQueries(['leads']);
-      setIsVoiceModalOpen(false);
-    } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.error || err.response?.data?.message || 'Ses metne çevrilemedi veya analiz edilemedi.');
-    }
+  const handleVoiceNoteComplete = async (audioBlob, mimeType) => {
+    const formData = new FormData();
+    const extension = mimeType?.includes('mp4') ? 'm4a' : 'webm';
+    formData.append('audio', audioBlob, `gorusme.${extension}`);
+    const response = await axios.post(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/voice/create-lead`, formData, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    await queryClient.invalidateQueries({ queryKey: ['leads'] });
+    return response.data;
   };
 
   const handleDragStart = (e, leadId) => {
