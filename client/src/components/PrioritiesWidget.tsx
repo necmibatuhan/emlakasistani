@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import WhatsAppButton from './WhatsAppButton';
 
 const PrioritiesWidget = () => {
-  const { token, user } = useContext(AuthContext);
+  const { token } = useContext(AuthContext);
 
   const { data: priorities = [], isLoading } = useQuery({
     queryKey: ['dashboard_priorities'],
@@ -35,10 +35,6 @@ const PrioritiesWidget = () => {
       cleaned = '90' + cleaned;
     }
     return cleaned;
-  };
-
-  const handleWaClick = (lead) => {
-    // Moved to WhatsAppButton
   };
 
   if (isLoading) {
@@ -73,12 +69,12 @@ const PrioritiesWidget = () => {
                 <div className="font-bold text-[#F1F2F4] text-[15px] truncate">{lead.name || 'İsimsiz Müşteri'}</div>
                 <div className={`font-bold text-2xl ${getScoreColor(lead.score)} leading-none flex items-center gap-1.5`}>
                   <span className="text-[10px] text-[#7C8090] font-normal tracking-wider mt-1">SKOR</span>
-                  {lead.score || 0}
+                  {lead.priority_score || 0}
                 </div>
               </div>
               
               <div className="text-[12px] text-[#7C8090] min-h-[36px] line-clamp-2 leading-snug">
-                {lead.reasoning || (typeof lead.properties === 'string' ? JSON.parse(lead.properties)?.ai_insight : lead.properties?.ai_insight) || lead.message || (lead.score_reasons && lead.score_reasons.length > 0 ? lead.score_reasons.join(' · ') : 'Yapay zeka önerisi')}
+                {lead.score_reasons?.length ? lead.score_reasons.join(' · ') : (lead.reasoning || lead.message || 'Takip önerisi')}
               </div>
               
               <div className="text-[11px] text-[#8E929C] mt-2 flex items-center gap-1">

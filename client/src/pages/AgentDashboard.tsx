@@ -199,10 +199,20 @@ const AgentDashboard = () => {
     const formData = new FormData();
     const extension = mimeType?.includes('mp4') ? 'm4a' : 'webm';
     formData.append('audio', audioBlob, `gorusme.${extension}`);
-    const response = await axios.post(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/voice/create-lead`, formData, {
+    const response = await axios.post(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/voice/preview-lead`, formData, {
       headers: { Authorization: `Bearer ${token}` }
     });
-    await queryClient.invalidateQueries({ queryKey: ['leads'] });
+    return response.data;
+  };
+
+  const handleVoiceLeadConfirm = async (transcript, draft) => {
+    const response = await axios.post(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/voice/confirm-lead`, { transcript, draft }, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ['leads'] }),
+      queryClient.invalidateQueries({ queryKey: ['dashboard_priorities'] })
+    ]);
     return response.data;
   };
 
@@ -661,6 +671,7 @@ const AgentDashboard = () => {
         isOpen={isVoiceModalOpen} 
         onClose={() => setIsVoiceModalOpen(false)} 
         onRecordingComplete={handleVoiceNoteComplete} 
+        onConfirm={handleVoiceLeadConfirm}
       />
     </div>
   );

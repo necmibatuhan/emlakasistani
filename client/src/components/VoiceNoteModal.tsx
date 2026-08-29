@@ -17,11 +17,13 @@ const microphoneErrorMessage = (error) => {
   return 'Mikrofon başlatılamadı. Güvenli bağlantıda olduğunuzu ve mikrofon iznini kontrol edin.';
 };
 
-const VoiceNoteModal = ({ isOpen, onClose, onRecordingComplete }) => {
+const VoiceNoteModal = ({ isOpen, onClose, onRecordingComplete, onConfirm }) => {
   const [state, setState] = useState('initial');
   const [recordingTime, setRecordingTime] = useState(0);
   const [error, setError] = useState('');
   const [result, setResult] = useState(null);
+  const [transcript, setTranscript] = useState('');
+  const [draft, setDraft] = useState(null);
   const mediaRecorderRef = useRef(null);
   const streamRef = useRef(null);
   const audioChunksRef = useRef([]);
@@ -39,6 +41,8 @@ const VoiceNoteModal = ({ isOpen, onClose, onRecordingComplete }) => {
     setRecordingTime(0);
     setError('');
     setResult(null);
+    setTranscript('');
+    setDraft(null);
     audioChunksRef.current = [];
   };
 
@@ -65,8 +69,9 @@ const VoiceNoteModal = ({ isOpen, onClose, onRecordingComplete }) => {
     setState('processing');
     try {
       const response = await onRecordingComplete(blob, mimeType);
-      setResult(response);
-      setState('result');
+      setTranscript(response.transcript);
+      setDraft(response.draft);
+      setState('review');
     } catch (requestError) {
       setError(requestError?.response?.data?.error || requestError?.response?.data?.message || 'Ses kaydı işlenemedi. Kaydınız oluşturulmadı; tekrar deneyebilirsiniz.');
       setState('error');
@@ -120,6 +125,25 @@ const VoiceNoteModal = ({ isOpen, onClose, onRecordingComplete }) => {
     if (mediaRecorderRef.current?.state === 'recording') mediaRecorderRef.current.stop();
   };
 
+  const updateDraft = (field, value) => setDraft((current) => ({ ...current, [field]: value }));
+
+  const confirmDraft = async () => {
+    if (!draft?.isim?.trim()) {
+      setError('Müşteri adını kontrol edip doldurun.');
+      return;
+    }
+    setError('');
+    setState('processing');
+    try {
+      const savedLead = await onConfirm(transcript, draft);
+      setResult(savedLead);
+      setState('result');
+    } catch (requestError) {
+      setError(requestError?.response?.data?.error || 'Müşteri kaydedilemedi. Bilgileri kontrol edip tekrar deneyin.');
+      setState('review');
+    }
+  };
+
   const formatTime = (seconds) => `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
   if (!isOpen) return null;
 
@@ -143,6 +167,19 @@ const VoiceNoteModal = ({ isOpen, onClose, onRecordingComplete }) => {
             <button type="button" onClick={stopRecording} className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-500/60 bg-red-500/10 px-4 py-3.5 font-semibold text-red-300 hover:bg-red-500/20"><Square size={17} fill="currentColor" />Kaydı bitir ve işle</button>
           </div> : null}
           {state === 'processing' ? <div className="flex min-h-[340px] flex-col items-center justify-center text-center" aria-live="polite"><Loader2 size={38} className="mb-5 animate-spin text-[#F5A623]" /><h2 id="voice-modal-title" className="mb-2 text-xl font-bold text-white">Görüşme işleniyor</h2><p className="max-w-sm text-sm leading-6 text-[#9CA0AC]">Müşteri bilgileri, talep ve takip aksiyonu çıkarılıyor. Pencereyi açık tutun.</p></div> : null}
+          {state === 'review' && draft ? <div>
+            <div className="mb-5"><p className="mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-[#F5A623]">Kaydetmeden önce kontrol</p><h2 id="voice-modal-title" className="text-xl font-bold text-white">Müşteri taslağı</h2><p className="mt-1 text-sm text-[#9CA0AC]">Yanlış anlaşılan alanları düzeltebilirsiniz.</p></div>
+            {error ? <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-200" role="alert">{error}</div> : null}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="text-xs font-medium text-[#9CA0AC]">Müşteri adı<input value={draft.isim || ''} onChange={(event) => updateDraft('isim', event.target.value)} className="mt-1.5 w-full rounded-lg border border-[#343843] bg-[#101217] p-3 text-sm text-white outline-none focus:border-[#F5A623]" /></label>
+              <label className="text-xs font-medium text-[#9CA0AC]">Telefon<input value={draft.telefon || ''} onChange={(event) => updateDraft('telefon', event.target.value)} placeholder="05xx xxx xx xx" className="mt-1.5 w-full rounded-lg border border-[#343843] bg-[#101217] p-3 text-sm text-white outline-none focus:border-[#F5A623]" /></label>
+              <label className="text-xs font-medium text-[#9CA0AC]">Öncelik<select value={draft.etiket || 'Ilık'} onChange={(event) => updateDraft('etiket', event.target.value)} className="mt-1.5 w-full rounded-lg border border-[#343843] bg-[#101217] p-3 text-sm text-white outline-none focus:border-[#F5A623]"><option>Sıcak</option><option>Ilık</option><option>Soğuk</option></select></label>
+              <label className="text-xs font-medium text-[#9CA0AC]">Sonraki aksiyon<input value={draft.onerilen_aksiyon || ''} onChange={(event) => updateDraft('onerilen_aksiyon', event.target.value)} className="mt-1.5 w-full rounded-lg border border-[#343843] bg-[#101217] p-3 text-sm text-white outline-none focus:border-[#F5A623]" /></label>
+            </div>
+            {draft.calendar_event?.start_date ? <div className="mt-4 rounded-lg border border-[#F5A623]/30 bg-[#F5A623]/5 p-3 text-sm text-[#E8D2A9]"><span className="font-semibold">Ajandaya eklenecek:</span> {draft.calendar_event.title || 'Takip görevi'} · {draft.calendar_event.start_date} {draft.calendar_event.start_time || '09:00'}</div> : null}
+            <details className="mt-4 rounded-lg border border-[#2A2D35] bg-[#101217] p-3 text-xs text-[#9CA0AC]"><summary className="cursor-pointer font-medium text-[#C6C9D0]">Transkripti kontrol et</summary><p className="mt-2 leading-5">{transcript}</p></details>
+            <button type="button" onClick={confirmDraft} className="mt-5 w-full rounded-xl bg-[#F5A623] px-4 py-3 font-bold text-black">Onayla ve müşteri kartını oluştur</button>
+          </div> : null}
           {state === 'error' ? <div className="flex min-h-[340px] flex-col items-center justify-center text-center" aria-live="assertive"><div className="mb-5 rounded-full bg-red-500/10 p-4 text-red-400"><AlertCircle size={30} /></div><h2 id="voice-modal-title" className="mb-3 text-xl font-bold text-white">Kayıt tamamlanamadı</h2><p className="mb-7 max-w-sm text-sm leading-6 text-red-200">{error}</p><button type="button" onClick={reset} className="w-full rounded-xl bg-[#F5A623] px-4 py-3 font-bold text-black">Tekrar dene</button></div> : null}
           {state === 'result' ? <div aria-live="polite">
             <div className="mb-6 flex items-start gap-3"><CheckCircle2 className="mt-0.5 shrink-0 text-emerald-400" size={24} /><div><h2 id="voice-modal-title" className="text-xl font-bold text-white">Müşteri kartı hazır</h2><p className="mt-1 text-sm text-[#9CA0AC]">Kapora kaydı oluşturdu ve takip listenize ekledi.</p></div></div>

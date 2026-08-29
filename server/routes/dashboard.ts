@@ -10,16 +10,24 @@ router.get('/priorities', authMiddleware, async (req, res) => {
     
     // Fetch user's leads
     const result = await pool.query(
-      `SELECT * FROM leads WHERE assigned_to = $1 ORDER BY score DESC LIMIT 10`, 
+      `SELECT l.*,
+        GREATEST(
+          COALESCE((SELECT MAX(created_at) FROM lead_notes WHERE lead_id = l.id), l.created_at),
+          COALESCE((SELECT MAX(created_at) FROM lead_events WHERE lead_id = l.id), l.created_at),
+          l.created_at
+        ) AS last_activity_at
+       FROM leads l
+       WHERE l.assigned_to = $1
+         AND l.status NOT IN ('Satış Tamamlandı', 'İptal')
+       LIMIT 50`,
       [userId]
     );
 
     let priorities = result.rows.map(lead => {
       const reasons = [];
       const now = new Date();
-      // Using created_at since last_contact_date doesn't seem to exist by default
-      const lastContactDate = lead.created_at ? new Date(lead.created_at) : new Date();
-      const diffTime = Math.abs(now - lastContactDate);
+      const lastContactDate = lead.last_activity_at ? new Date(lead.last_activity_at) : new Date(lead.created_at);
+      const diffTime = Math.max(0, now - lastContactDate);
       const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
       if (diffDays > 14) {
@@ -36,8 +44,9 @@ router.get('/priorities', authMiddleware, async (req, res) => {
         catch (e) {}
       }
       
-      const budget = parsedProps.budget || '';
-      if (budget.includes('5M') || budget.includes('10M') || budget.includes('Yüksek')) {
+      const budget = parsedProps.butce || parsedProps.budget || parsedProps.butce_max || '';
+      const numericBudget = typeof budget === 'number' ? budget : Number(String(budget).replace(/[^\d]/g, ''));
+      if (numericBudget >= 5000000 || /5M|10M|Yüksek/i.test(String(budget))) {
         reasons.push('Yüksek bütçe');
       }
 
@@ -45,8 +54,18 @@ router.get('/priorities', authMiddleware, async (req, res) => {
         reasons.push(`${parsedProps.matching_portfolio_count} eşleşen portföy`);
       }
       
+      const scoreOutOf100 = Math.max(0, Math.min(100, Number(lead.score || 0) * 10));
+      const stalenessScore = Math.min(100, diffDays * 5);
+      const reminderAt = lead.reminder_date ? new Date(lead.reminder_date) : null;
+      const reminderDue = reminderAt && reminderAt <= now;
+      const priorityScore = Math.round(
+        scoreOutOf100 * 0.55 + stalenessScore * 0.3 + (reminderDue ? 15 : 0)
+      );
+      if (reminderDue) reasons.unshift('Takip zamanı geldi');
+
       return {
         ...lead,
+        priority_score: Math.min(100, priorityScore),
         score_reasons: reasons,
         last_contact_days: diffDays
       };
@@ -54,7 +73,7 @@ router.get('/priorities', authMiddleware, async (req, res) => {
 
     // Sort: highest score first, then by oldest contact (diffDays descending)
     priorities.sort((a, b) => {
-      if (b.score !== a.score) return b.score - a.score;
+      if (b.priority_score !== a.priority_score) return b.priority_score - a.priority_score;
       return b.last_contact_days - a.last_contact_days;
     });
 

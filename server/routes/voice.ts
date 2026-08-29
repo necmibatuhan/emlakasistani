@@ -304,122 +304,121 @@ Danışmanın sesli notu:
   }
 });
 
-// POST /api/voice/create-lead (Sesli nottan doğrudan yeni müşteri oluşturur)
+const analyzeNewLeadAudio = async (audioFile) => {
+  if (!hasValidAiConfig()) {
+    const error = new Error('Ses analizi geçici olarak kullanılamıyor.');
+    error.statusCode = 503;
+    throw error;
+  }
+  const { audioBase64, mimeType } = normalizeAudio(audioFile);
+  let transcript = '';
+  try {
+    const model = getGenAI().getGenerativeModel({ model: 'gemini-2.5-flash' });
+    const result = await model.generateContent([
+      { inlineData: { mimeType, data: audioBase64 } },
+      { text: 'Bu ses kaydını Türkçe olarak tam ve doğru şekilde metne çevir. Yalnızca konuşulan metni yaz.' }
+    ]);
+    transcript = result.response.text().trim();
+  } catch (error) {
+    console.error('Gemini voice transcription error:', error.message);
+    const serviceError = new Error('Ses metne çevrilemedi. Daha net ve kısa bir kayıtla tekrar deneyin.');
+    serviceError.statusCode = 502;
+    throw serviceError;
+  }
+  if (!transcript) {
+    const error = new Error('Kayıtta anlaşılır bir konuşma bulunamadı.');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const now = new Date().toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul' });
+  const prompt = `Sen bir Türk emlak CRM asistanısın. Aşağıdaki görüşme notundan doğrulanabilir bir müşteri taslağı çıkar.
+Şu an: ${now}. "Yarın", "Pazartesi" gibi ifadeleri Europe/Istanbul saatine göre ISO tarihe dönüştür.
+Bilgi yoksa tahmin etme; boş metin veya null kullan. Yalnızca geçerli JSON döndür.
+
+TRANSKRİPT: ${transcript}
+
+{
+  "isim":"", "telefon":"", "skor":1, "etiket":"Sıcak|Ilık|Soğuk",
+  "gerekceler":{"aciklama":""}, "onerilen_aksiyon":"", "yanit_taslak":"",
+  "mulk_tercihleri":{"bolge":null,"tip":"Satılık|Kiralık|Belirsiz","oda":null,"butce":null,"aciliyet":"Acil|Belirsiz"},
+  "calendar_event":{"title":"","description":"","start_date":"YYYY-MM-DD","start_time":"HH:MM","is_task":true}
+}
+Takvim bilgisi yoksa calendar_event null olsun.`;
+
+  try {
+    const model = getGenAI().getGenerativeModel({ model: 'gemini-2.5-flash', generationConfig: { responseMimeType: 'application/json', temperature: 0.1 } });
+    const result = await model.generateContent(prompt);
+    const draft = JSON.parse(result.response.text().replace(/^```json|```$/g, '').trim());
+    return { transcript, draft };
+  } catch (error) {
+    console.error('Gemini voice lead extraction error:', error.message);
+    const serviceError = new Error('Ses anlaşıldı ancak müşteri taslağı çıkarılamadı.');
+    serviceError.statusCode = 502;
+    throw serviceError;
+  }
+};
+
+const saveVoiceLead = async (user, transcript, draft) => {
+  const name = String(draft.isim || '').trim();
+  const phone = String(draft.telefon || '').trim();
+  if (!name) throw Object.assign(new Error('Müşteri adı gereklidir.'), { statusCode: 400 });
+  if (phone && phone.replace(/\D/g, '').length < 10) throw Object.assign(new Error('Telefon numarası geçersiz.'), { statusCode: 400 });
+
+  const score = Math.max(1, Math.min(10, Number(draft.skor) || 5));
+  const label = ['Sıcak', 'Ilık', 'Soğuk'].includes(draft.etiket) ? draft.etiket : 'Ilık';
+  const calendarEvent = draft.calendar_event?.start_date ? draft.calendar_event : null;
+  const properties = { ...(draft.mulk_tercihleri || {}), calendar_event: calendarEvent };
+  const reminderDate = calendarEvent ? new Date(`${calendarEvent.start_date}T${calendarEvent.start_time || '09:00'}:00+03:00`) : null;
+  const userResult = await db.query('SELECT referral_code FROM users WHERE id = $1', [user.id]);
+  const referralCode = userResult.rows[0]?.referral_code || '';
+  let whatsappDraft = String(draft.yanit_taslak || '').trim();
+  if (whatsappDraft) whatsappDraft += `\n\n📋 Kapora AI ile hazırlandı.\n🔗 ${referralCode ? `kapora.online/davet/${referralCode}` : 'kapora.online'}`;
+
+  const leadResult = await db.query(
+    `INSERT INTO leads (company_id, office_id, assigned_to, source, name, phone, message, score, label, reasoning, recommended_action, whatsapp_draft, properties, reminder_date)
+     VALUES ($1,$2,$3,'voice',$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *`,
+    [user.company_id || null, user.office_id || null, user.id, name, phone || null, transcript, score, label,
+      draft.gerekceler?.aciklama || '', draft.onerilen_aksiyon || '', whatsappDraft, JSON.stringify(properties), reminderDate]
+  );
+  const lead = leadResult.rows[0];
+  await db.query('INSERT INTO lead_notes (lead_id, content) VALUES ($1, $2)', [lead.id, `Sistem (Sesli Kayıt): ${transcript}`]);
+  if (calendarEvent) {
+    await db.query('INSERT INTO lead_events (lead_id, event_type, description) VALUES ($1,$2,$3)',
+      [lead.id, 'calendar_event_created', `${calendarEvent.title || 'Takip görevi'} · ${calendarEvent.start_date} ${calendarEvent.start_time || ''}`]);
+  }
+  require('../services/queue').add('MATCH_PROPERTIES', { leadId: lead.id });
+  return lead;
+};
+
+router.post('/preview-lead', authMiddleware, upload.single('audio'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'Ses dosyası bulunamadı.' });
+    res.json(await analyzeNewLeadAudio(req.file));
+  } catch (error) {
+    res.status(error.statusCode || 500).json({ error: error.statusCode ? error.message : 'Ses kaydı işlenemedi.' });
+  }
+});
+
+router.post('/confirm-lead', authMiddleware, async (req, res) => {
+  try {
+    const { transcript, draft } = req.body;
+    if (!transcript || !draft) return res.status(400).json({ error: 'Onaylanacak müşteri taslağı eksik.' });
+    res.status(201).json(await saveVoiceLead(req.user, String(transcript).slice(0, 10000), draft));
+  } catch (error) {
+    console.error('Confirm voice lead error:', error);
+    res.status(error.statusCode || 500).json({ error: error.statusCode ? error.message : 'Müşteri oluşturulamadı.' });
+  }
+});
+
 router.post('/create-lead', authMiddleware, upload.single('audio'), async (req, res) => {
   try {
-    const audioFile = req.file;
-    if (!audioFile) return res.status(400).json({ error: 'Ses dosyası bulunamadı' });
-
-    const { audioBase64, mimeType } = normalizeAudio(audioFile);
-
-    if (!hasValidAiConfig()) {
-      return res.status(503).json({ error: 'Ses analizi geçici olarak kullanılamıyor. Sistem yöneticisiyle iletişime geçin.' });
-    }
-
-    let transcript = '';
-    try {
-        const model = getGenAI().getGenerativeModel({ model: 'gemini-2.5-flash' });
-        const result = await model.generateContent([
-          { inlineData: { mimeType, data: audioBase64 } },
-          { text: "Bu ses kaydını Türkçe olarak tam ve doğru şekilde metne çevir. Sadece konuşulan metni yaz." }
-        ]);
-        transcript = result.response.text().trim();
-    } catch (apiErr) {
-      console.error('Gemini voice transcription error:', apiErr.message);
-      return res.status(502).json({ error: 'Ses metne çevrilemedi. Lütfen daha net ve kısa bir kayıtla tekrar deneyin.' });
-    }
-
-    if (!transcript) return res.status(400).json({ error: 'Metne çevrilemedi' });
-
-    // Şimdi metinden İsim, Telefon, ve Analiz verilerini çıkaralım
-    const prompt = `# Role
-Sen bir Emlak CRM Asistanısın. Aşağıdaki sesli not transkriptini analiz et ve JSON formatında bir müşteri oluştur.
-Eğer isim yoksa "Bilinmeyen Müşteri", telefon yoksa "Belirtilmemiş" yaz.
-
-# Input:
-${transcript}
-
-# Output JSON:
-{
-  "isim": "<Müşteri İsmi>",
-  "telefon": "<Telefon Numarası>",
-  "skor": <1-10 arası>,
-  "etiket": "<Sıcak|Ilık|Soğuk>",
-  "gerekceler": { "aciklama": "<metin>" },
-  "onerilen_aksiyon": "<Bugün ara|Bu hafta ara|Takip listesine ekle>",
-  "yanit_taslak": "<taslak>",
-  "mulk_tercihleri": { "bolge": "<veya null>", "tip": "<Satılık|Kiralık|Belirsiz>", "oda": "<veya Belirsiz>", "butce": "<veya null>", "aciliyet": "<Acil|Belirsiz>" }
-}`;
-
-    let parsedResult;
-    try {
-        const model = getGenAI().getGenerativeModel({ model: 'gemini-2.5-flash', generationConfig: { responseMimeType: "application/json" } });
-        const aiResult = await model.generateContent(prompt);
-        let respText = aiResult.response.text().trim();
-        if (respText.startsWith('```json')) {
-          respText = respText.substring(7, respText.length - 3).trim();
-        } else if (respText.startsWith('```')) {
-          respText = respText.substring(3, respText.length - 3).trim();
-        }
-        
-        try {
-          parsedResult = JSON.parse(respText);
-        } catch (parseErr) {
-          console.error('Failed to parse new lead AI JSON', respText);
-          return res.status(502).json({ error: 'Ses anlaşıldı ancak müşteri bilgileri çıkarılamadı. Daha açık bir kayıtla tekrar deneyin.' });
-        }
-    } catch (err) {
-      console.error('Gemini create-lead AI Error', err.message);
-      return res.status(502).json({ error: 'Müşteri analizi tamamlanamadı. Lütfen tekrar deneyin.' });
-    }
-
-    const pipeline = new PrivacyPipeline();
-    const customReplacements = [];
-    if (parsedResult.isim) customReplacements.push({ originalValue: parsedResult.isim.trim(), type: 'CLIENT_NAME' });
-    if (parsedResult.telefon) customReplacements.push({ originalValue: parsedResult.telefon.trim(), type: 'PHONE' });
-    
-    // Note: Since we didn't mask before sending to AI for create-lead because we needed the AI to extract name/phone,
-    // we don't strictly need to unmask the result here. The AI already has the raw data.
-    // However, to keep it consistent, we could run the pipeline. But the AI extracted it from raw text.
-    // The previous implementation used maskPII but it was undefined.
-    // I will simply store the AI's result. No need to unmask since we didn't mask it.
-    
-    const unmaskedAciklama = parsedResult.gerekceler?.aciklama || '';
-    
-    const userRes = await db.query('SELECT referral_code FROM users WHERE id = $1', [req.user.id]);
-    const refCode = userRes.rows[0]?.referral_code || '';
-    const refUrl = refCode ? `kapora.online/davet/${refCode}` : `kapora.online`;
-    let unmaskedTaslak = parsedResult.yanit_taslak || '';
-    if (unmaskedTaslak) {
-      unmaskedTaslak += `\n\n📋 Bu sunum Kapora AI ile hazırlanmıştır.\n🔗 Ücretsiz deneyin: ${refUrl}`;
-    }
-    
-    // Veritabanına Ekle
-    const leadInsert = await db.query(
-      `INSERT INTO leads (company_id, office_id, assigned_to, source, name, phone, message, score, label, reasoning, recommended_action, whatsapp_draft, properties) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *`,
-      [
-        req.user.company_id || null, req.user.office_id || null, req.user.id, 'voice', parsedResult.isim || 'Bilinmeyen', parsedResult.telefon || null, transcript || '', 
-        parsedResult.skor || null, parsedResult.etiket || null, unmaskedAciklama || '', 
-        parsedResult.onerilen_aksiyon || null, unmaskedTaslak || '', parsedResult.mulk_tercihleri ? JSON.stringify(parsedResult.mulk_tercihleri) : null
-      ]
-    );
-
-    const newLead = leadInsert.rows[0];
-
-    // Sesli Notu da lead_notes'a ekle
-    await db.query(
-      'INSERT INTO lead_notes (lead_id, content) VALUES ($1, $2)',
-      [newLead.id, `Sistem (Sesli Kayıt): ${transcript}`]
-    );
-
-    const queue = require('../services/queue');
-    queue.add('MATCH_PROPERTIES', { leadId: newLead.id });
-
-    res.status(201).json(newLead);
-  } catch (err) {
-    console.error('Create lead from voice error:', err);
-    res.status(err.statusCode || 500).json({ error: err.statusCode ? err.message : 'Müşteri oluşturulamadı' });
+    if (!req.file) return res.status(400).json({ error: 'Ses dosyası bulunamadı.' });
+    const { transcript, draft } = await analyzeNewLeadAudio(req.file);
+    res.status(201).json(await saveVoiceLead(req.user, transcript, draft));
+  } catch (error) {
+    console.error('Create lead from voice error:', error);
+    res.status(error.statusCode || 500).json({ error: error.statusCode ? error.message : 'Müşteri oluşturulamadı.' });
   }
 });
 
