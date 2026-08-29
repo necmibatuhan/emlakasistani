@@ -14,7 +14,7 @@ const { OAuth2Client } = require('google-auth-library');
 const { Resend } = require('resend');
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID || 'MOCK_CLIENT_ID');
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 const sendVerificationEmail = async (email, token, name) => {
   const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${token}`;
@@ -49,6 +49,10 @@ const sendVerificationEmail = async (email, token, name) => {
   console.log(`============================\n`);
 
   try {
+    if (!resend) {
+      throw new Error('RESEND_API_KEY yapılandırılmamış.');
+    }
+
     const { data, error } = await resend.emails.send({
       from: 'Kapora AI <info@kapora.online>',
       to: email,
