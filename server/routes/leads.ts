@@ -526,7 +526,8 @@ SADECE AŞAĞIDAKİ JSON ARRAY FORMATINDA YANIT DÖN:
     "city": "İstanbul",
     "rooms": "2+1",
     "url": "https://sahibinden.com/ilan/mock-1",
-    "owner_phone": "+905550001122"
+    "owner_phone": "+905550001122",
+    "match_reason": "Müşterinin talebiyle bu portföyün hangi doğal dil özelliklerinin örtüştüğünü tek cümlede açıkla"
   }
 ]
 `;

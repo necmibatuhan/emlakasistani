@@ -4,6 +4,8 @@ import { AlertCircle, CheckCircle2, Loader2, Lock, Mic, Square, X } from 'lucide
 const MAX_RECORDING_SECONDS = 120;
 const MIN_AUDIO_BYTES = 1_000;
 
+const AiBadge = () => <span className="inline-flex items-center gap-1 rounded-full border border-violet-400/25 bg-violet-400/10 px-2 py-0.5 text-[10px] font-semibold text-violet-300"><span className="material-symbols-outlined text-[12px]">auto_awesome</span>AI tarafından dolduruldu</span>;
+
 const getRecorderOptions = () => {
   const candidates = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'];
   const mimeType = candidates.find((type) => MediaRecorder.isTypeSupported(type));
@@ -126,6 +128,7 @@ const VoiceNoteModal = ({ isOpen, onClose, onRecordingComplete, onConfirm }) => 
   };
 
   const updateDraft = (field, value) => setDraft((current) => ({ ...current, [field]: value }));
+  const updatePreference = (field, value) => setDraft((current) => ({ ...current, mulk_tercihleri: { ...(current.mulk_tercihleri || {}), [field]: value } }));
 
   const confirmDraft = async () => {
     if (!draft?.isim?.trim()) {
@@ -149,9 +152,9 @@ const VoiceNoteModal = ({ isOpen, onClose, onRecordingComplete, onConfirm }) => 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" role="dialog" aria-modal="true" aria-labelledby="voice-modal-title">
-      <div className="relative w-full max-w-[520px] overflow-hidden rounded-2xl border border-[#2A2D35] bg-[#16181D] shadow-2xl">
+      <div className="relative max-h-[calc(100dvh-2rem)] w-full max-w-[520px] overflow-hidden rounded-2xl border border-[#2A2D35] bg-[#16181D] shadow-2xl">
         {state !== 'processing' && state !== 'recording' ? <button type="button" onClick={close} aria-label="Ses kaydı penceresini kapat" className="absolute right-4 top-4 z-10 rounded-lg p-2 text-[#8E929C] hover:bg-white/5 hover:text-white"><X size={18} /></button> : null}
-        <div className="p-6 sm:p-8">
+        <div className="max-h-[calc(100dvh-2rem)] overflow-y-auto p-6 sm:p-8">
           {state === 'initial' ? <div className="flex flex-col items-center text-center">
             <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-[#343843] bg-[#20232B] text-[#F5A623]"><Mic size={28} /></div>
             <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#F5A623]">Hızlı müşteri ekle</p>
@@ -175,6 +178,15 @@ const VoiceNoteModal = ({ isOpen, onClose, onRecordingComplete, onConfirm }) => 
               <label className="text-xs font-medium text-[#9CA0AC]">Telefon<input value={draft.telefon || ''} onChange={(event) => updateDraft('telefon', event.target.value)} placeholder="05xx xxx xx xx" className="mt-1.5 w-full rounded-lg border border-[#343843] bg-[#101217] p-3 text-sm text-white outline-none focus:border-[#F5A623]" /></label>
               <label className="text-xs font-medium text-[#9CA0AC]">Öncelik<select value={draft.etiket || 'Ilık'} onChange={(event) => updateDraft('etiket', event.target.value)} className="mt-1.5 w-full rounded-lg border border-[#343843] bg-[#101217] p-3 text-sm text-white outline-none focus:border-[#F5A623]"><option>Sıcak</option><option>Ilık</option><option>Soğuk</option></select></label>
               <label className="text-xs font-medium text-[#9CA0AC]">Sonraki aksiyon<input value={draft.onerilen_aksiyon || ''} onChange={(event) => updateDraft('onerilen_aksiyon', event.target.value)} className="mt-1.5 w-full rounded-lg border border-[#343843] bg-[#101217] p-3 text-sm text-white outline-none focus:border-[#F5A623]" /></label>
+            </div>
+            <div className="mt-5 rounded-xl border border-violet-400/20 bg-violet-400/[0.04] p-4">
+              <div className="mb-3 flex flex-wrap items-center justify-between gap-2"><h3 className="text-sm font-semibold text-white">AI’nın çıkardığı müşteri kriterleri</h3><AiBadge /></div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label className="text-xs font-medium text-[#9CA0AC]"><span className="mb-1.5 flex flex-wrap items-center gap-1.5">Bölge <AiBadge /></span><input value={draft.mulk_tercihleri?.bolge || ''} onChange={(event) => updatePreference('bolge', event.target.value)} placeholder="Belirtilmedi" className="w-full rounded-lg border border-[#343843] bg-[#101217] p-3 text-sm text-white outline-none focus:border-violet-400" /></label>
+                <label className="text-xs font-medium text-[#9CA0AC]"><span className="mb-1.5 flex flex-wrap items-center gap-1.5">Bütçe <AiBadge /></span><input value={draft.mulk_tercihleri?.butce || ''} onChange={(event) => updatePreference('butce', event.target.value)} placeholder="Belirtilmedi" className="w-full rounded-lg border border-[#343843] bg-[#101217] p-3 text-sm text-white outline-none focus:border-violet-400" /></label>
+                <label className="text-xs font-medium text-[#9CA0AC]"><span className="mb-1.5 flex flex-wrap items-center gap-1.5">Oda tercihi <AiBadge /></span><input value={draft.mulk_tercihleri?.oda || ''} onChange={(event) => updatePreference('oda', event.target.value)} placeholder="Belirtilmedi" className="w-full rounded-lg border border-[#343843] bg-[#101217] p-3 text-sm text-white outline-none focus:border-violet-400" /></label>
+                <label className="text-xs font-medium text-[#9CA0AC]"><span className="mb-1.5 flex flex-wrap items-center gap-1.5">Aciliyet <AiBadge /></span><select value={draft.mulk_tercihleri?.aciliyet || 'Belirsiz'} onChange={(event) => updatePreference('aciliyet', event.target.value)} className="w-full rounded-lg border border-[#343843] bg-[#101217] p-3 text-sm text-white outline-none focus:border-violet-400"><option>Belirsiz</option><option>Acil</option><option>Bu hafta</option><option>Bu ay</option></select></label>
+              </div>
             </div>
             {draft.calendar_event?.start_date ? <div className="mt-4 rounded-lg border border-[#F5A623]/30 bg-[#F5A623]/5 p-3 text-sm text-[#E8D2A9]"><span className="font-semibold">Ajandaya eklenecek:</span> {draft.calendar_event.title || 'Takip görevi'} · {draft.calendar_event.start_date} {draft.calendar_event.start_time || '09:00'}</div> : null}
             <details className="mt-4 rounded-lg border border-[#2A2D35] bg-[#101217] p-3 text-xs text-[#9CA0AC]"><summary className="cursor-pointer font-medium text-[#C6C9D0]">Transkripti kontrol et</summary><p className="mt-2 leading-5">{transcript}</p></details>

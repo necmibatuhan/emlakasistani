@@ -41,6 +41,11 @@ export default function ExternalListingCard({ listing }) {
           </div>
         </div>
 
+        <div className="mb-4 rounded-lg border border-violet-400/20 bg-violet-400/[0.06] p-3">
+          <span className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-violet-300">AI · Neden önerildi?</span>
+          <p className="text-xs leading-5 text-zinc-300">{listing.match_reason || listing.aiExplanation || 'Müşterinin doğal dilde belirttiği ihtiyaçlarla bu portföyün açıklaması anlamsal olarak örtüşüyor.'}</p>
+        </div>
+
         <div className="mt-auto pt-4 border-t border-zinc-800/60 flex items-center gap-2">
           <a 
             href={listing.url} 

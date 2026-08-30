@@ -387,6 +387,12 @@ const saveVoiceLead = async (user, transcript, draft) => {
     await db.query('INSERT INTO lead_events (lead_id, event_type, description) VALUES ($1,$2,$3)',
       [lead.id, 'calendar_event_created', `${calendarEvent.title || 'Takip görevi'} · ${calendarEvent.start_date} ${calendarEvent.start_time || ''}`]);
   }
+  try {
+    const { triggerLeadAdded } = require('../services/onboardingService');
+    await triggerLeadAdded(user.id);
+  } catch (error) {
+    console.error('Voice onboarding progress error:', error.message);
+  }
   require('../services/queue').add('MATCH_PROPERTIES', { leadId: lead.id });
   return lead;
 };

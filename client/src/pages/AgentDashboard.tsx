@@ -9,7 +9,6 @@ import Header from '../components/Header';
 import VoiceNoteModal from '../components/VoiceNoteModal';
 import LeadCard from '../components/LeadCard';
 import RemindersWidget from '../components/RemindersWidget';
-import ExternalListingCard from '../components/ExternalListingCard';
 import clsx from 'clsx';
 import { format, isToday } from 'date-fns';
 import { tr } from 'date-fns/locale';
@@ -26,6 +25,7 @@ import ScoreExplanation from '../components/ScoreExplanation';
 import ReferralWidget from '../components/ReferralWidget';
 import OnboardingWidget from '../components/OnboardingWidget';
 import FollowUpPlanPanel from '../components/FollowUpPlanPanel';
+import VoiceFirstCard from '../components/VoiceFirstCard';
 
 const AgentDashboard = () => {
   const { token, user } = useContext(AuthContext);
@@ -82,10 +82,13 @@ const AgentDashboard = () => {
       }
     };
     window.addEventListener('open-new-lead-drawer', handleOpenDrawer);
+    const handleOpenVoiceLead = () => { setIsNewLeadDrawerOpen(false); setIsVoiceModalOpen(true); };
+    window.addEventListener('open-voice-lead', handleOpenVoiceLead);
     const handleOpenLeadDetail = (event) => setSelectedLeadId(event.detail?.leadId || null);
     window.addEventListener('open-lead-detail', handleOpenLeadDetail);
     return () => {
       window.removeEventListener('open-new-lead-drawer', handleOpenDrawer);
+      window.removeEventListener('open-voice-lead', handleOpenVoiceLead);
       window.removeEventListener('open-lead-detail', handleOpenLeadDetail);
     };
   }, []);
@@ -101,15 +104,16 @@ const AgentDashboard = () => {
     enabled: !!selectedLeadId
   });
 
-  const { data: externalMatches } = useQuery({
-    queryKey: ['externalMatches', selectedLeadId],
+  const { data: semanticMatchData, isFetching: semanticMatchesLoading } = useQuery({
+    queryKey: ['semanticMatches', selectedLeadId, leadDetails?.message],
     queryFn: async () => {
-      const res = await axios.get(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/leads/${selectedLeadId}/external-matches`, {
+      const res = await axios.post(`${(import.meta.env.PROD ? "" : "http://localhost:5001")}/api/match`, { query: leadDetails.message }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return res.data;
     },
-    enabled: !!selectedLeadId
+    enabled: !!selectedLeadId && !!leadDetails?.message,
+    retry: false
   });
 
   const handleDeleteLead = async (idToDelete) => {
@@ -469,70 +473,27 @@ const AgentDashboard = () => {
                 <div className="bg-surface-container-high rounded-[8px] border-l-[4px] border-l-[#10B981] border-y border-r border-outline-variant p-5 shadow-lg flex flex-col gap-4">
                   <div>
                     <h4 className="text-[13px] font-bold text-on-surface uppercase tracking-wider flex items-center gap-2">
-                      <span className="text-[16px]">🎯</span> Algoritmik Eşleşmeler
+                      <span className="text-[16px]">✨</span> AI Semantik Eşleşmeler
                     </h4>
-                    <p className="text-[13px] text-[#F1F2F4] mt-1">Bu müşteriye uygun 4 portföy bulundu</p>
+                    <p className="text-[12px] text-on-surface-variant mt-1">Sadece filtreleri değil, müşterinin doğal dilde anlattığı yaşam tarzını ve niyetini de karşılaştırır.</p>
                   </div>
-                  
                   <div className="h-[1px] w-full bg-[#2A2D35]" />
-                  
                   <div className="flex flex-col gap-3">
-                    {/* Mock Item 1 */}
-                    <div className="flex items-center justify-between text-[13px]">
-                      <div className="flex items-center gap-2">
-                        <span>📍</span>
-                        <span className="font-bold text-[#F1F2F4]">Acıbadem 3+1</span>
+                    {semanticMatchesLoading ? <div className="rounded-lg bg-[#0A0B0D] p-4 text-xs text-on-surface-variant animate-pulse">Müşteri niyeti portföylerle karşılaştırılıyor…</div> : null}
+                    {(semanticMatchData?.matches?.length ? semanticMatchData.matches : leadDetails.matches || []).map((match) => (
+                      <div key={match.id || match.property_id} className="rounded-lg border border-[#2A2D35] bg-[#0A0B0D] p-3">
+                        <div className="flex flex-wrap items-start justify-between gap-2">
+                          <div><span className="block text-[13px] font-bold text-[#F1F2F4]">{match.title}</span><span className="mt-0.5 block text-[11px] text-on-surface-variant">{match.location || [match.district, match.city].filter(Boolean).join(', ')}</span></div>
+                          <span className="text-[12px] font-mono text-[#F1F2F4]">{match.price ? new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', maximumFractionDigits: 0 }).format(match.price) : `%${Math.round(Number(match.similarity_score || match.match_score || 0) * (Number(match.similarity_score) <= 1 ? 100 : 1))}`}</span>
+                        </div>
+                        <div className="mt-3 rounded-md border border-violet-400/20 bg-violet-400/[0.06] p-2.5">
+                          <span className="mb-1 flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-violet-300"><span className="material-symbols-outlined text-[13px]">psychology</span>Neden önerildi?</span>
+                          <p className="text-[12px] leading-5 text-[#C7C9D1]">{match.aiExplanation || match.ai_reasoning || `Müşterinin “${leadDetails.message?.slice(0, 70)}${leadDetails.message?.length > 70 ? '…' : ''}” talebiyle portföy açıklaması anlamsal olarak örtüşüyor.`}</p>
+                        </div>
                       </div>
-                      <span className="font-mono text-[#F1F2F4]">11.5M ₺</span>
-                      <span className="text-[#F5A623] text-[12px] font-medium w-[90px]">Bütçeye yakın</span>
-                      <button className="border border-[#2A2D35] hover:bg-[#2A2D35] text-[#F1F2F4] px-2 py-1 rounded text-[11px] transition-colors">
-                        Gör →
-                      </button>
-                    </div>
-
-                    {/* Mock Item 2 */}
-                    <div className="flex items-center justify-between text-[13px]">
-                      <div className="flex items-center gap-2">
-                        <span>📍</span>
-                        <span className="font-bold text-[#F1F2F4]">Kadıköy Merkez</span>
-                      </div>
-                      <span className="font-mono text-[#F1F2F4]">9.8M ₺</span>
-                      <span className="text-[#10B981] text-[12px] font-medium w-[90px]">✓ Bütçe uygun</span>
-                      <button className="border border-[#2A2D35] hover:bg-[#2A2D35] text-[#F1F2F4] px-2 py-1 rounded text-[11px] transition-colors">
-                        Gör →
-                      </button>
-                    </div>
-
-                    {/* Mock Item 3 */}
-                    <div className="flex items-center justify-between text-[13px]">
-                      <div className="flex items-center gap-2">
-                        <span>📍</span>
-                        <span className="font-bold text-[#F1F2F4]">Moda Deniz Manz.</span>
-                      </div>
-                      <span className="font-mono text-[#F1F2F4]">6.2M ₺</span>
-                      <span className="text-[#10B981] text-[12px] font-medium w-[90px]">✓ Tam uyum</span>
-                      <button className="border border-[#2A2D35] hover:bg-[#2A2D35] text-[#F1F2F4] px-2 py-1 rounded text-[11px] transition-colors">
-                        Gör →
-                      </button>
-                    </div>
-
-                    {/* Mock Item 4 */}
-                    <div className="flex items-center justify-between text-[13px]">
-                      <div className="flex items-center gap-2">
-                        <span>📍</span>
-                        <span className="font-bold text-[#F1F2F4]">Fenerbahçe 3+1</span>
-                      </div>
-                      <span className="font-mono text-[#F1F2F4]">5.9M ₺</span>
-                      <span className="text-[#10B981] text-[12px] font-medium w-[90px]">✓ Tam uyum</span>
-                      <button className="border border-[#2A2D35] hover:bg-[#2A2D35] text-[#F1F2F4] px-2 py-1 rounded text-[11px] transition-colors">
-                        Gör →
-                      </button>
-                    </div>
+                    ))}
+                    {!semanticMatchesLoading && !(semanticMatchData?.matches?.length || leadDetails.matches?.length) ? <div className="rounded-lg border border-dashed border-[#343843] p-4 text-center text-xs text-on-surface-variant">Henüz açıklanabilir bir eşleşme yok. Portföy açıklamalarını detaylandırdıkça semantik motor daha güçlü sonuç verir.</div> : null}
                   </div>
-
-                  <button className="w-full mt-2 pt-3 border-t border-[#2A2D35] text-center text-[12px] font-medium text-[#7C8090] hover:text-[#F1F2F4] transition-colors">
-                    Tüm Eşleşmeleri Gör (4)
-                  </button>
                 </div>
               </div>
             </div>
@@ -555,6 +516,10 @@ const AgentDashboard = () => {
             </div>
             <div className="p-6 flex-1 overflow-y-auto flex flex-col gap-6">
               {analyzeError && <div className="p-4 bg-[#EF4444]/10 border border-[#EF4444]/30 text-[#EF4444] rounded-lg text-sm">{analyzeError}</div>}
+
+              {!selectedLeadId ? <VoiceFirstCard onStart={() => { setIsNewLeadDrawerOpen(false); setIsVoiceModalOpen(true); }} /> : null}
+
+              {!selectedLeadId ? <div className="flex items-center gap-3 text-[11px] uppercase tracking-wider text-[#626773]"><span className="h-px flex-1 bg-[#2A2D35]" />ve form ile ekle<span className="h-px flex-1 bg-[#2A2D35]" /></div> : null}
               
               <div className="flex bg-[#1C1E24] p-1 rounded-lg border border-[#2A2D35]">
                 <button
@@ -622,13 +587,7 @@ const AgentDashboard = () => {
               )}
 
               <div className="flex flex-col gap-2 flex-1">
-                <label className="text-[13px] font-bold text-[#8E929C] uppercase tracking-wider flex items-center justify-between">
-                  <span>Mesaj / Not (AI Analizi)</span>
-                  <button onClick={() => { setIsNewLeadDrawerOpen(false); setIsVoiceModalOpen(true); }} className="text-[#3B82F6] hover:text-[#60A5FA] flex items-center gap-1 normal-case text-xs">
-                    <span className="material-symbols-outlined text-[14px]">mic</span>
-                    Sesli Söyle
-                  </button>
-                </label>
+                <label className="text-[13px] font-bold text-[#8E929C] uppercase tracking-wider">Mesaj / Not (AI Analizi)</label>
                 <textarea 
                   className="bg-[#1C1E24] border border-[#2A2D35] text-[#F1F2F4] p-3 rounded-xl flex-1 resize-none focus:outline-none focus:border-[#F5A623] focus:ring-1 focus:ring-[#F5A623] transition-all" 
                   placeholder={activeFormTab === 'detailed' ? "Müşteriyle ilgili detaylı notlar ekleyin..." : "Müşterinin talebini detaylıca yazın, yapay zeka analiz edip puanlasın..."}

@@ -10,6 +10,7 @@ import ScoreExplanation from '../components/ScoreExplanation';
 import WhatsAppButton from '../components/WhatsAppButton';
 import AnimatedLeadList from '../components/AnimatedLeadList';
 import { Logo } from '../components/Logo';
+import VoiceFirstCard from '../components/VoiceFirstCard';
 
 // MOCK_LEADS removed, will fetch from backend
 
@@ -617,7 +618,7 @@ const Leads = () => {
       {/* YENİ LEAD MODALI */}
       {isNewLeadModalOpen && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
-          <div className="bg-[#16181D] border border-[#2A2D35] rounded-[12px] w-full max-w-[480px] shadow-2xl flex flex-col animate-slide-up">
+          <div className="max-h-[calc(100dvh-2rem)] bg-[#16181D] border border-[#2A2D35] rounded-[12px] w-full max-w-[480px] shadow-2xl flex flex-col animate-slide-up overflow-hidden">
             <div className="h-14 border-b border-[#2A2D35] px-6 flex items-center justify-between flex-shrink-0">
               <h2 className="text-[16px] font-medium text-[#F1F2F4]">Yeni Lead Ekle</h2>
               <button 
@@ -628,8 +629,11 @@ const Leads = () => {
               </button>
             </div>
             
-            <div className="p-6 space-y-4">
+            <div className="p-6 space-y-4 overflow-y-auto">
               {analyzeError && <div className="p-4 bg-[#EF4444]/10 border border-[#EF4444]/30 text-[#EF4444] rounded-[6px] text-[13px]">{analyzeError}</div>}
+
+              <VoiceFirstCard onStart={isRecording ? handleStopVoice : handleStartVoice} />
+              <div className="flex items-center gap-3 text-[11px] uppercase tracking-wider text-[#626773]"><span className="h-px flex-1 bg-[#2A2D35]" />ve form ile ekle<span className="h-px flex-1 bg-[#2A2D35]" /></div>
               
               <div className="flex bg-[#0A0B0D] p-1 rounded-lg border border-[#2A2D35] mb-4">
                 <button

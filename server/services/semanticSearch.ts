@@ -155,15 +155,6 @@ Dönüş Formatı (Sadece bir JSON dizisi dön):
 ]
 `;
     
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.3,
-      response_format: { type: "json_object" } 
-      // Not: response_format: json_object kullanılınca root'un JSON Objesi olması beklenir. 
-      // Bu yüzden prompt'u ufak bir key içine alarak değiştiriyorum.
-    });
-
     const fixedPrompt = `...
 Dönüş Formatı (Sadece aşağıdaki JSON formatını dön):
 {

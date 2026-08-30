@@ -30,6 +30,7 @@ export default function OnboardingWidget({ token }) {
 
   // Level 1 -> 2 requirements
   const l2_tasks = [
+    { label: 'İlk müşterini sesle ekle', done: progress.has_voice_lead, action: () => window.dispatchEvent(new CustomEvent('open-voice-lead')) },
     { label: '3 Müşteri Ekle', done: progress.has_added_3_leads },
     { label: 'İlan Analizi Yap', done: progress.has_analyzed_listing }
   ];
@@ -93,12 +94,12 @@ export default function OnboardingWidget({ token }) {
           <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm font-medium">
             <span className="text-on-surface-variant mr-1 shrink-0">Sonraki Seviye Görevleri:</span>
             {currentTasks.map((t, i) => (
-              <div key={i} className={clsx("flex items-center gap-1.5 shrink-0", t.done ? "text-status-hot" : "text-on-surface")}>
+              <button type="button" key={i} disabled={!t.action || t.done} onClick={t.action} className={clsx("flex min-h-8 items-center gap-1.5 rounded-md px-1.5 text-left shrink-0", t.done ? "text-status-hot" : "text-on-surface", t.action && !t.done && "border border-primary/30 bg-primary/10 hover:bg-primary/20")}>
                 <span className="material-symbols-outlined text-[16px]">
                   {t.done ? 'check_circle' : 'radio_button_unchecked'}
                 </span>
                 <span className={clsx(t.done && "line-through opacity-70")}>{t.label}</span>
-              </div>
+              </button>
             ))}
           </div>
         )}

@@ -9,7 +9,8 @@ const getOnboardingProgress = async (userId) => {
       [userId]
     );
   }
-  return progress.rows[0];
+  const voiceLead = await db.query("SELECT EXISTS(SELECT 1 FROM leads WHERE assigned_to=$1 AND source='voice') AS has_voice_lead", [userId]);
+  return { ...progress.rows[0], has_voice_lead: voiceLead.rows[0]?.has_voice_lead || false };
 };
 
 const checkAndLevelUp = async (userId, currentProgress) => {
