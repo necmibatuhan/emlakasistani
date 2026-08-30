@@ -39,7 +39,6 @@ import Analyzer from './pages/Analyzer';
 import RegionalLanding from './pages/RegionalLanding';
 import FollowUpPlans from './pages/FollowUpPlans';
 import EmlakCrm from './pages/EmlakCrm';
-import Comparison from './pages/Comparison';
 import CommissionCalculator from './pages/CommissionCalculator';
 
 const ProtectedRoute = ({ children }) => {
@@ -172,7 +171,6 @@ export const routes = [
       { path: '/sehir/:slug-emlak-asistani', element: <RegionalLanding /> },
       { path: '/ilan-analizi', element: <Analyzer /> },
       { path: '/emlak-crm', element: <EmlakCrm /> },
-      { path: '/karsilastirma/diger-emlak-asistanlari', element: <Comparison slug="diger-emlak-asistanlari" /> },
       { path: '/araclar/emlak-komisyonu-hesaplama', element: <CommissionCalculator /> },
       { path: '/dashboard', element: <ProtectedRoute><RoleBasedDashboard /></ProtectedRoute> },
       { path: '/leads', element: <ProtectedRoute><Leads /></ProtectedRoute> },

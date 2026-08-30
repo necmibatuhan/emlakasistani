@@ -37,7 +37,6 @@ const urls = [
   '/gizlilik-politikasi',
   '/ilan-analizi',
   '/emlak-crm',
-  '/karsilastirma/diger-emlak-asistanlari',
   '/araclar/emlak-komisyonu-hesaplama'
 ];
 
