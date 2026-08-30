@@ -25,6 +25,7 @@ import PrioritiesWidget from '../components/PrioritiesWidget';
 import ScoreExplanation from '../components/ScoreExplanation';
 import ReferralWidget from '../components/ReferralWidget';
 import OnboardingWidget from '../components/OnboardingWidget';
+import FollowUpPlanPanel from '../components/FollowUpPlanPanel';
 
 const AgentDashboard = () => {
   const { token, user } = useContext(AuthContext);
@@ -81,7 +82,12 @@ const AgentDashboard = () => {
       }
     };
     window.addEventListener('open-new-lead-drawer', handleOpenDrawer);
-    return () => window.removeEventListener('open-new-lead-drawer', handleOpenDrawer);
+    const handleOpenLeadDetail = (event) => setSelectedLeadId(event.detail?.leadId || null);
+    window.addEventListener('open-lead-detail', handleOpenLeadDetail);
+    return () => {
+      window.removeEventListener('open-new-lead-drawer', handleOpenDrawer);
+      window.removeEventListener('open-lead-detail', handleOpenLeadDetail);
+    };
   }, []);
 
   const { data: leadDetails, isLoading: detailsLoading } = useQuery({
@@ -313,6 +319,8 @@ const AgentDashboard = () => {
           
           <ReturnBanner token={token} />
 
+          <MorningSummary />
+
           {/* REFERRAL WIDGET (Sadece 'free' plandakiler için görünür) */}
           <ReferralWidget userPlan={currentPlan} />
 
@@ -439,6 +447,8 @@ const AgentDashboard = () => {
                   </div>
                 </div>
               </div>
+
+              <FollowUpPlanPanel leadId={selectedLeadId} token={token} />
 
               {/* Preferences / Tags */}
               {leadDetails.tags && leadDetails.tags.length > 0 && (

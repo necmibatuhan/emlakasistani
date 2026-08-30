@@ -21,6 +21,7 @@ async function generateDailyMotivation() {
   }
 
   try {
+    if (!openai) return 'Bugün en değerli işin yeni müşteri aramak değil, doğru müşteriye zamanında dönmek.';
     const prompt = `
 Bir emlak danışmanı için güne başlarken okuyacağı, enerjisini yükseltecek, satış psikolojisi veya güncel piyasa trendleri hakkında çok kısa (1-2 cümlelik) bir motivasyon sözü veya stratejik öngörü yaz.
 Sadece sözü döndür, tırnak işareti kullanma.
@@ -48,19 +49,42 @@ async function getUserBriefing(userId) {
   try {
     const motivation = await generateDailyMotivation();
 
-    // 1. Sıcak 3 Müşteri (Score >= 7, Satış Tamamlanmadı)
+    // Bugünün satış odağı: sıcak müşteriler, soğuyan ilişkiler ve yeni eşleşmeler.
     const hotLeadsResult = await db.query(`
-      SELECT id, name, phone, message, score, status 
-      FROM leads 
-      WHERE user_id = $1 AND score >= 7 AND status != 'Satış Tamamlandı'
-      ORDER BY score DESC, updated_at DESC
+      SELECT l.id, l.name, l.phone, l.message, l.score, l.status, l.recommended_action,
+        COALESCE((SELECT MAX(created_at) FROM lead_notes WHERE lead_id = l.id), l.created_at) AS last_activity_at
+      FROM leads l
+      WHERE l.assigned_to = $1 AND l.score >= 7 AND l.status NOT IN ('Satış Tamamlandı', 'İptal')
+      ORDER BY l.score DESC, last_activity_at ASC
       LIMIT 3
     `, [userId]);
 
-    // 2. Kayıp Riski Taşıyan 2 Portföy (Örnek: 15 günden eski ve durumu Aktif olan)
-    // properties tablosunda listed_by kullanıcısı için
+    const dormantResult = await db.query(`
+      SELECT l.id, l.name, l.phone, l.score, l.whatsapp_draft,
+        FLOOR(EXTRACT(EPOCH FROM (NOW() - COALESCE(
+          (SELECT MAX(created_at) FROM lead_notes WHERE lead_id = l.id), l.created_at
+        ))) / 86400)::int AS silent_days
+      FROM leads l
+      WHERE l.assigned_to = $1
+        AND l.status NOT IN ('Satış Tamamlandı', 'İptal')
+        AND COALESCE((SELECT MAX(created_at) FROM lead_notes WHERE lead_id = l.id), l.created_at) < NOW() - INTERVAL '7 days'
+      ORDER BY silent_days DESC, l.score DESC
+      LIMIT 3
+    `, [userId]);
+
+    const matchResult = await db.query(`
+      SELECT l.id AS lead_id, l.name AS lead_name, p.id AS property_id, p.title AS property_title,
+        m.match_score, m.ai_reasoning
+      FROM lead_property_matches m
+      JOIN leads l ON l.id = m.lead_id
+      JOIN properties p ON p.id = m.property_id
+      WHERE l.assigned_to = $1 AND m.shown_to_lead = false
+      ORDER BY m.match_score DESC, m.created_at DESC
+      LIMIT 3
+    `, [userId]);
+
     const atRiskResult = await db.query(`
-      SELECT id, title, type, location, price, created_at
+      SELECT id, title, type, city, district, price, created_at
       FROM properties
       WHERE listed_by = $1 AND status != 'Satıldı' AND created_at < NOW() - INTERVAL '15 days'
       ORDER BY created_at ASC
@@ -70,6 +94,8 @@ async function getUserBriefing(userId) {
     return {
       motivation,
       hotLeads: hotLeadsResult.rows,
+      dormantLeads: dormantResult.rows,
+      newMatches: matchResult.rows,
       atRiskProperties: atRiskResult.rows
     };
   } catch (err) {

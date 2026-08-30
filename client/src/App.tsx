@@ -37,6 +37,7 @@ import GizlilikPolitikasi from './pages/GizlilikPolitikasi';
 import MockCheckout from './pages/MockCheckout';
 import Analyzer from './pages/Analyzer';
 import RegionalLanding from './pages/RegionalLanding';
+import FollowUpPlans from './pages/FollowUpPlans';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
@@ -67,6 +68,12 @@ const RoleBasedDashboard = () => {
   } else {
     return <AgentDashboard />;
   }
+};
+
+const ManagerRoute = ({ children }) => {
+  const { user, loading } = useContext(AuthContext);
+  if (loading) return null;
+  return ['office_manager', 'company_admin', 'super_admin'].includes(user?.role) ? children : <Navigate to="/dashboard" replace />;
 };
 
 const HomeRoute = () => {
@@ -173,6 +180,7 @@ export const routes = [
       { path: '/reports', element: <ProtectedRoute><Reports /></ProtectedRoute> },
       { path: '/stats', element: <ProtectedRoute><Stats /></ProtectedRoute> },
       { path: '/plans', element: <ProtectedRoute><Plans /></ProtectedRoute> },
+      { path: '/follow-up-plans', element: <ProtectedRoute><ManagerRoute><FollowUpPlans /></ManagerRoute></ProtectedRoute> },
       { path: '/payment-result', element: <ProtectedRoute><PaymentResult /></ProtectedRoute> },
       { path: '/mock-checkout', element: <ProtectedRoute><MockCheckout /></ProtectedRoute> },
       { path: '*', element: <Navigate to="/" /> }

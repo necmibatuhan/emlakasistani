@@ -98,6 +98,51 @@ setInterval(async () => {
         console.error("Queue matching error:", err);
       }
     }
+    if (job.name === 'MATCH_LEADS_FOR_PROPERTY') {
+      try {
+        const propertyResult = await db.query('SELECT * FROM properties WHERE id = $1', [job.data.propertyId]);
+        if (propertyResult.rows.length === 0) return;
+        const property = propertyResult.rows[0];
+        const candidates = await db.query(
+          `SELECT * FROM leads
+           WHERE office_id = $1 AND status NOT IN ('Satış Tamamlandı', 'İptal')
+           ORDER BY score DESC LIMIT 100`,
+          [property.office_id]
+        );
+
+        for (const lead of candidates.rows) {
+          let preferences = lead.properties || {};
+          if (typeof preferences === 'string') {
+            try { preferences = JSON.parse(preferences); } catch { preferences = {}; }
+          }
+          const location = String(preferences.bolge || preferences.location_preferences?.[0] || '').toLocaleLowerCase('tr-TR');
+          const rooms = String(preferences.oda || preferences.rooms || '');
+          const budgetValue = preferences.butce_max || preferences.budget?.max || preferences.butce || 0;
+          const budget = Number(String(budgetValue).replace(/[^\d]/g, '')) || 0;
+          let score = 45;
+          const reasons = [];
+          if (location && `${property.city || ''} ${property.district || ''}`.toLocaleLowerCase('tr-TR').includes(location)) { score += 25; reasons.push('bölge uyuyor'); }
+          if (rooms && property.rooms && String(property.rooms).includes(rooms)) { score += 15; reasons.push('oda sayısı uyuyor'); }
+          if (budget && Number(property.price) <= budget) { score += 15; reasons.push('bütçe içinde'); }
+          if (score < 60) continue;
+
+          const inserted = await db.query(
+            `INSERT INTO lead_property_matches (lead_id, property_id, match_score, ai_reasoning)
+             SELECT $1,$2,$3,$4 WHERE NOT EXISTS (
+               SELECT 1 FROM lead_property_matches WHERE lead_id = $1 AND property_id = $2
+             ) RETURNING id`,
+            [lead.id, property.id, Math.min(100, score), `Yeni portföy eşleşmesi: ${reasons.join(', ') || 'müşteri profiline yakın'}`]
+          );
+          if (inserted.rows.length > 0) {
+            await db.query('INSERT INTO lead_events (lead_id, event_type, description) VALUES ($1,$2,$3)',
+              [lead.id, 'new_property_match', `${property.title} için %${Math.min(100, score)} eşleşme bulundu.`]);
+          }
+        }
+        console.log(`Processed new property ${property.id} against ${candidates.rows.length} leads.`);
+      } catch (error) {
+        console.error('Queue lead matching error:', error);
+      }
+    }
   }
 }, 3000);
 

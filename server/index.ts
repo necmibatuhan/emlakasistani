@@ -22,9 +22,11 @@ const socialProofRoutes = require('./routes/socialProof');
 const matchRoutes = require('./routes/match');
 const onboardingRoutes = require('./routes/onboarding');
 const whatsappRoutes = require('./routes/whatsapp');
+const followUpPlanRoutes = require('./routes/followUpPlans');
 require('./services/queue'); // Start background worker
 require('./services/churnPrevention'); // Start cron job
 require('./services/morningBriefing'); // Start daily briefing job
+require('./services/followUpPlan.service'); // Persistent follow-up scheduler
 
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
@@ -91,6 +93,7 @@ app.use('/api/subscription', subscriptionRoutes);
 app.use('/api/social-proof', socialProofRoutes);
 app.use('/api/match', matchRoutes);
 app.use('/api/onboarding', onboardingRoutes);
+app.use('/api/follow-up-plans', followUpPlanRoutes);
 
 app.get('/', (req, res) => {
   res.send('Kapora API');

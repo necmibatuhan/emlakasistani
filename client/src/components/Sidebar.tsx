@@ -20,6 +20,7 @@ const Sidebar = () => {
     { to: '/properties', label: 'Portföy', icon: 'home_work' },
     { to: '/integrations', label: 'Entegrasyonlar', icon: 'sync' },
     { to: '/stats', label: 'İstatistikler', icon: 'analytics', badge: 'Beta' },
+    ...(['office_manager', 'company_admin', 'super_admin'].includes(user?.role) ? [{ to: '/follow-up-plans', label: 'Takip Planları', icon: 'schedule_send' }] : []),
   ];
 
   return (

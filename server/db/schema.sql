@@ -100,3 +100,21 @@ CREATE TABLE lead_events (
   description TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+CREATE TABLE follow_up_plans (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(), company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+  office_id UUID REFERENCES offices(id) ON DELETE CASCADE, name TEXT NOT NULL, description TEXT, is_active BOOLEAN DEFAULT TRUE,
+  created_by UUID REFERENCES users(id) ON DELETE SET NULL, created_at TIMESTAMPTZ DEFAULT NOW(), updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE TABLE follow_up_plan_steps (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(), plan_id UUID NOT NULL REFERENCES follow_up_plans(id) ON DELETE CASCADE,
+  step_order INTEGER NOT NULL, delay_minutes INTEGER NOT NULL DEFAULT 0,
+  action_type TEXT NOT NULL CHECK (action_type IN ('whatsapp_draft','reminder','score_adjust')), action_params JSONB DEFAULT '{}',
+  UNIQUE(plan_id, step_order)
+);
+CREATE TABLE lead_active_plans (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(), plan_id UUID NOT NULL REFERENCES follow_up_plans(id) ON DELETE CASCADE,
+  lead_id UUID NOT NULL REFERENCES leads(id) ON DELETE CASCADE, current_step INTEGER DEFAULT 1, next_run_at TIMESTAMPTZ,
+  status TEXT DEFAULT 'active', pause_reason TEXT, started_by UUID REFERENCES users(id) ON DELETE SET NULL,
+  started_at TIMESTAMPTZ DEFAULT NOW(), updated_at TIMESTAMPTZ DEFAULT NOW(), completed_at TIMESTAMPTZ
+);

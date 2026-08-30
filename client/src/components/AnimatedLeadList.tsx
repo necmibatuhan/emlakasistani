@@ -84,6 +84,13 @@ function AnimatedLeadCard({ lead, onDelete }) {
         </motion.div>
         
         {/* Risk Badge (Red Flag) */}
+        {lead.follow_up_plan_name && (
+          <motion.div layout className="flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 text-blue-300 p-2.5 rounded-lg text-xs">
+            <Clock className="w-4 h-4" />
+            <span><strong>{lead.follow_up_plan_name}</strong> · Adım {lead.follow_up_current_step} · {lead.follow_up_status === 'paused' ? 'Duraklatıldı' : lead.follow_up_status === 'completed' ? 'Tamamlandı' : lead.follow_up_next_run_at ? new Date(lead.follow_up_next_run_at).toLocaleString('tr-TR') : 'Bekliyor'}</span>
+          </motion.div>
+        )}
+
         {hasRedFlag && (
           <motion.div layout className="flex items-start gap-2 bg-red-500/10 border border-red-500/20 text-red-400 p-2.5 rounded-lg">
             <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
@@ -129,6 +136,17 @@ function AnimatedLeadCard({ lead, onDelete }) {
                   {lead.reasoning || props?.ai_insight || lead.message || 'Özet bulunmuyor.'}
                 </p>
               </div>
+
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  window.dispatchEvent(new CustomEvent('open-lead-detail', { detail: { leadId: lead.id } }));
+                }}
+                className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm font-medium text-zinc-100 hover:border-blue-500"
+              >
+                Lead detayını ve takip planını yönet
+              </button>
 
             </motion.div>
           )}

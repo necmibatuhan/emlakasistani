@@ -57,7 +57,15 @@ async function updateLeadScore(leadId, scoreData) {
   );
 }
 
+async function adjustLeadScoreForOverdue(lead, delta = -1, queryable = pool) {
+  const score = Math.max(1, Math.min(10, Number(lead.score || 5) + Number(delta)));
+  const label = score >= 8 ? 'Sıcak' : score >= 5 ? 'Ilık' : 'Soğuk';
+  await queryable.query('UPDATE leads SET score=$1,label=$2,updated_at=NOW() WHERE id=$3', [score, label, lead.id]);
+  return { previous_score: lead.score, score, label, delta: Number(delta), signal: 'overdue_follow_up' };
+}
+
 module.exports = {
   calculateScoreForLead,
-  updateLeadScore
+  updateLeadScore,
+  adjustLeadScoreForOverdue
 };

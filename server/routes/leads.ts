@@ -5,6 +5,7 @@ const db = require('../db');
 const { authMiddleware } = require('../middleware/auth');
 const PrivacyPipeline = require('../utils/PrivacyPipeline');
 const scoreService = require('../services/scoreService');
+const { pauseForManualContact } = require('../services/followUpPlan.service');
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } }); // 10MB limit
@@ -27,21 +28,26 @@ const checkRateLimit = (userId) => {
 router.get('/', authMiddleware, async (req, res) => {
   try {
     const { role, company_id, office_id, id: user_id } = req.user;
-    let query = 'SELECT * FROM leads WHERE ';
+    let query = `SELECT leads.*,
+      ap.status AS follow_up_status, ap.current_step AS follow_up_current_step,
+      ap.next_run_at AS follow_up_next_run_at, fp.name AS follow_up_plan_name
+      FROM leads
+      LEFT JOIN LATERAL (SELECT * FROM lead_active_plans WHERE lead_id=leads.id ORDER BY started_at DESC LIMIT 1) ap ON TRUE
+      LEFT JOIN follow_up_plans fp ON fp.id=ap.plan_id WHERE `;
     let values = [];
 
     if (role === 'super_admin' || role === 'company_admin') {
-      query += 'company_id = $1';
+      query += 'leads.company_id = $1';
       values.push(company_id);
     } else if (role === 'office_manager') {
-      query += 'office_id = $1';
+      query += 'leads.office_id = $1';
       values.push(office_id);
     } else { // agent or viewer
-      query += 'assigned_to = $1';
+      query += 'leads.assigned_to = $1';
       values.push(user_id);
     }
 
-    query += ' ORDER BY created_at DESC';
+    query += ' ORDER BY leads.created_at DESC';
 
     const leads = await db.query(query, values);
     res.json(leads.rows);
@@ -94,6 +100,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
 
     if (status && status !== lead.rows[0].status) {
       await db.query('INSERT INTO lead_notes (lead_id, content) VALUES ($1, $2)', [req.params.id, `Sistem: Durum güncellendi -> ${status}`]);
+      if (['Arandı', 'Randevu Alındı', 'Satış Tamamlandı'].includes(status)) await pauseForManualContact(req.params.id);
     }
 
     res.json(updatedLead.rows[0]);
@@ -114,6 +121,7 @@ router.post('/:id/notes', authMiddleware, async (req, res) => {
       'INSERT INTO lead_notes (lead_id, content) VALUES ($1, $2) RETURNING *',
       [req.params.id, content]
     );
+    await pauseForManualContact(req.params.id);
 
     res.json(newNote.rows[0]);
   } catch (err) {

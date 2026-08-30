@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { AuthContext } from '../contexts/AuthContext';
-import { Loader2, Phone, TrendingDown, Sparkles } from 'lucide-react';
+import { ArrowRight, Home, Loader2, Phone, Sparkles } from 'lucide-react';
 
 export default function MorningSummary() {
   const { user, token } = useContext(AuthContext);
@@ -79,31 +79,34 @@ export default function MorningSummary() {
           )}
         </div>
 
-        {/* At Risk Properties Section */}
+        {/* Dormant relationships */}
         <div>
           <h3 className="text-[13px] font-bold text-[#F1F2F4] uppercase tracking-wider mb-3 flex items-center gap-2">
-            ⚠️ Kayıp Riski (Portföyler)
+            ⚠️ Soğumadan Geri Dön
           </h3>
-          {briefing.atRiskProperties?.length > 0 ? (
+          {briefing.dormantLeads?.length > 0 ? (
             <div className="flex flex-col gap-2">
-              {briefing.atRiskProperties.map(prop => (
-                <div key={prop.id} className="flex items-center justify-between bg-[#0A0B0D] border border-[#2A2D35] p-2.5 rounded-md">
+              {briefing.dormantLeads.map(lead => (
+                <button type="button" key={lead.id} onClick={() => window.dispatchEvent(new CustomEvent('open-lead-detail', { detail: { leadId: lead.id } }))} className="flex w-full items-center justify-between bg-[#0A0B0D] border border-[#2A2D35] p-2.5 rounded-md text-left hover:border-[#F5A623]/40 transition-colors">
                   <div className="flex flex-col overflow-hidden pr-2">
-                    <span className="font-semibold text-[13px] text-white truncate">{prop.title}</span>
-                    <span className="text-[11px] text-[#EF4444] mt-0.5">15+ gündür pasif</span>
+                    <span className="font-semibold text-[13px] text-white truncate">{lead.name}</span>
+                    <span className="text-[11px] text-[#EF4444] mt-0.5">{lead.silent_days} gündür temas yok</span>
                   </div>
-                  <button className="shrink-0 bg-[#F5A623]/10 hover:bg-[#F5A623]/20 text-[#F5A623] px-3 py-1.5 rounded flex items-center gap-1.5 text-[12px] font-bold transition-colors">
-                    <TrendingDown size={12} /> İncele
-                  </button>
-                </div>
+                  <ArrowRight size={15} className="shrink-0 text-[#F5A623]" />
+                </button>
               ))}
             </div>
           ) : (
-            <p className="text-[12px] text-[#7C8090]">Harika! Risk taşıyan eski portföyünüz yok.</p>
+            <p className="text-[12px] text-[#7C8090]">Harika! Takipsiz kalan müşteriniz yok.</p>
           )}
         </div>
 
       </div>
+
+      {briefing.newMatches?.length > 0 ? <div className="border-t border-[#2A2D35] pt-4">
+        <h3 className="mb-3 flex items-center gap-2 text-[13px] font-bold uppercase tracking-wider text-[#F1F2F4]"><Home size={15} className="text-[#3B82F6]" /> Yeni Portföy Eşleşmeleri</h3>
+        <div className="grid gap-2 md:grid-cols-3">{briefing.newMatches.map((match) => <button type="button" key={`${match.lead_id}-${match.property_id}`} onClick={() => window.dispatchEvent(new CustomEvent('open-lead-detail', { detail: { leadId: match.lead_id } }))} className="rounded-md border border-[#2A2D35] bg-[#0A0B0D] p-3 text-left hover:border-[#3B82F6]/50"><span className="block truncate text-xs font-semibold text-white">{match.lead_name} ↔ {match.property_title}</span><span className="mt-1 block text-[11px] text-[#3B82F6]">%{match.match_score} eşleşme · İncele</span></button>)}</div>
+      </div> : null}
     </div>
   );
 }
