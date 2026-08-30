@@ -25,17 +25,19 @@ export default function BlogPost() {
   return (
     <div className="min-h-screen bg-background text-on-surface font-sans">
       <Head>
-        <title>{post.title} | Kapora Blog</title>
-        <meta name="description" content={post.excerpt} />
+        <title>{post.seoTitle || `${post.title} | Kapora`}</title>
+        <meta name="description" content={post.metaDescription || post.excerpt} />
         <meta property="og:title" content={post.title} />
-        <meta property="og:description" content={post.excerpt} />
+        <meta property="og:description" content={post.metaDescription || post.excerpt} />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={`https://kapora.online/blog/${post.slug}`} />
         <link rel="canonical" href={`https://kapora.online/blog/${post.slug}`} />
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Article",
             "headline": post.title,
-            "description": post.excerpt,
+            "description": post.metaDescription || post.excerpt,
             "author": {
               "@type": "Organization",
               "name": "Kapora AI Editör Ekibi"
@@ -56,6 +58,17 @@ export default function BlogPost() {
             }
           })}
         </script>
+        {post.faq?.length > 0 && <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": post.faq.map((item) => ({
+              "@type": "Question",
+              "name": item.question,
+              "acceptedAnswer": { "@type": "Answer", "text": item.answer }
+            }))
+          })}
+        </script>}
       </Head>
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-outline-variant">
@@ -82,6 +95,7 @@ export default function BlogPost() {
             {post.category}
           </span>
           <span className="text-on-surface-variant text-[13px]">{post.readTime} okuma</span>
+          {post.status === 'draft' && <span className="rounded-full border border-primary/30 px-2.5 py-1 text-[11px] font-bold text-primary">TASLAK</span>}
         </div>
         
         <h1 className="font-display-lg text-[36px] md:text-[48px] font-semibold leading-[1.2] text-on-surface mb-6">

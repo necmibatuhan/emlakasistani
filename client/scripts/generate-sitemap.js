@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import process from 'node:process';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -9,10 +10,11 @@ const __dirname = path.dirname(__filename);
 const DOMAIN = 'https://kapora.online';
 
 // Read the blogPosts.tsx file as text
-const blogPostsFilePath = path.join(__dirname, '../src/data/blogPosts.tsx');
 let content = '';
 try {
-  content = fs.readFileSync(blogPostsFilePath, 'utf8');
+  content = ['../src/data/blogPosts.tsx', '../src/data/seoBlogDrafts.js']
+    .map(file => fs.readFileSync(path.join(__dirname, file), 'utf8'))
+    .join('\n');
 } catch (e) {
   console.log("Could not find blogPosts.tsx, skipping blog posts sitemap generation.");
 }
@@ -33,7 +35,11 @@ const urls = [
   '/blog',
   '/aydinlatma-metni',
   '/gizlilik-politikasi',
-  '/ilan-analizi'
+  '/ilan-analizi',
+  '/emlak-crm',
+  '/karsilastirma/arveya-alternatifi',
+  '/karsilastirma/emlakcrmx-alternatifi',
+  '/araclar/emlak-komisyonu-hesaplama'
 ];
 
 // Combine with blog slugs
@@ -47,7 +53,7 @@ const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${allUrls.map(url => `  <url>
     <loc>${url}</loc>
-    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+    <lastmod>${process.env.SITEMAP_LAST_MODIFIED || new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>${url === DOMAIN + '/' ? '1.0' : '0.8'}</priority>
   </url>`).join('\n')}

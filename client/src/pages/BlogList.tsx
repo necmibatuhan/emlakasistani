@@ -9,11 +9,14 @@ export default function BlogList() {
   return (
     <div className="min-h-screen bg-background text-on-surface font-sans">
       <Head>
-        <title>Kapora Blog | Emlak Profesyonelleri İçin Satış ve Teknoloji Taktikleri</title>
-        <meta name="description" content="Gayrimenkul sektöründeki en son yapay zeka trendleri, sistem stratejileri ve satış artırma taktiklerini keşfedin." />
+        <title>Kapora Blog | Emlak Satış ve Teknoloji Rehberi</title>
+        <meta name="description" content="Emlak danışmanları için müşteri takibi, mevzuat, kariyer, yapay zekâ ve satış süreçlerine yönelik rehberleri keşfedin." />
         <meta property="og:title" content="Kapora Blog | Emlak Sektörü Taktikleri" />
         <meta property="og:description" content="Emlak danışmanları için teknoloji ve satış rehberi." />
         <link rel="canonical" href="https://kapora.online/blog" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://kapora.online/blog" />
+        <script type="application/ld+json">{JSON.stringify({ '@context': 'https://schema.org', '@type': 'Organization', name: 'Kapora', url: 'https://kapora.online', logo: 'https://kapora.online/logo-k.png' })}</script>
       </Head>
 
       {/* Navbar */}
@@ -51,6 +54,7 @@ export default function BlogList() {
                     {post.category}
                   </span>
                   <span className="text-on-surface-variant text-[13px]">{post.readTime} okuma</span>
+                  {post.status === 'draft' && <span className="rounded-full border border-primary/30 px-2 py-1 text-[10px] font-bold text-primary">TASLAK</span>}
                 </div>
                 
                 <h2 className="text-[20px] font-semibold text-on-surface mb-3 group-hover:text-primary transition-colors leading-tight">

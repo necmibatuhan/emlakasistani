@@ -80,7 +80,10 @@ export default defineConfig({
     includedRoutes(paths, routes) {
       let blogPostsContent = '';
       try {
-        blogPostsContent = fs.readFileSync(path.resolve(__dirname, 'src/data/blogPosts.tsx'), 'utf-8');
+        blogPostsContent = [
+          'src/data/blogPosts.tsx',
+          'src/data/seoBlogDrafts.js'
+        ].map(file => fs.readFileSync(path.resolve(__dirname, file), 'utf-8')).join('\n');
       } catch (e) {
         console.log("Could not find blogPosts.tsx, skipping SSG for blog posts.");
       }
@@ -97,6 +100,9 @@ export default defineConfig({
         }
         if (routePath === '/blog') {
           return ['/blog/'];
+        }
+        if (routePath === '/karsilastirma/:slug') {
+          return ['/karsilastirma/arveya-alternatifi/', '/karsilastirma/emlakcrmx-alternatifi/'];
         }
         if (routePath.includes(':') || routePath === '*') {
           return []; // Ignore other dynamic or wildcard routes

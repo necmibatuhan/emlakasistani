@@ -38,6 +38,9 @@ import MockCheckout from './pages/MockCheckout';
 import Analyzer from './pages/Analyzer';
 import RegionalLanding from './pages/RegionalLanding';
 import FollowUpPlans from './pages/FollowUpPlans';
+import EmlakCrm from './pages/EmlakCrm';
+import Comparison from './pages/Comparison';
+import CommissionCalculator from './pages/CommissionCalculator';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
@@ -168,6 +171,9 @@ export const routes = [
       { path: '/blog/:slug', element: <BlogPost /> },
       { path: '/sehir/:slug-emlak-asistani', element: <RegionalLanding /> },
       { path: '/ilan-analizi', element: <Analyzer /> },
+      { path: '/emlak-crm', element: <EmlakCrm /> },
+      { path: '/karsilastirma/:slug', element: <Comparison /> },
+      { path: '/araclar/emlak-komisyonu-hesaplama', element: <CommissionCalculator /> },
       { path: '/dashboard', element: <ProtectedRoute><RoleBasedDashboard /></ProtectedRoute> },
       { path: '/leads', element: <ProtectedRoute><Leads /></ProtectedRoute> },
       { path: '/integrations', element: <ProtectedRoute><Integrations /></ProtectedRoute> },

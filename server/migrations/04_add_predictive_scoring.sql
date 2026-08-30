@@ -1,7 +1,49 @@
 ALTER TABLE leads
+  ADD COLUMN IF NOT EXISTS company_id UUID REFERENCES companies(id),
+  ADD COLUMN IF NOT EXISTS office_id UUID REFERENCES offices(id),
+  ADD COLUMN IF NOT EXISTS assigned_to UUID REFERENCES users(id),
   ADD COLUMN IF NOT EXISTS predicted_conversion_score SMALLINT CHECK (predicted_conversion_score BETWEEN 0 AND 100),
   ADD COLUMN IF NOT EXISTS predicted_conversion_at TIMESTAMPTZ,
   ADD COLUMN IF NOT EXISTS predictive_model_version TEXT;
+
+-- Some early installations were created before semantic match persistence was
+-- added. Keep this migration self-contained so predictive features can be
+-- calculated safely on those databases too.
+CREATE TABLE IF NOT EXISTS properties (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  company_id UUID REFERENCES companies(id),
+  office_id UUID REFERENCES offices(id),
+  listed_by UUID REFERENCES users(id),
+  external_listing_id TEXT,
+  title TEXT NOT NULL,
+  type TEXT CHECK (type IN ('Satılık','Kiralık')),
+  category TEXT,
+  city TEXT,
+  district TEXT,
+  address TEXT,
+  price NUMERIC,
+  currency TEXT DEFAULT 'TRY',
+  sqm INTEGER,
+  rooms TEXT,
+  floor INTEGER,
+  status TEXT DEFAULT 'Aktif' CHECK (status IN ('Aktif','Rezerve','Satıldı','Pasif')),
+  photos JSONB,
+  features JSONB,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS lead_property_matches (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  lead_id UUID NOT NULL REFERENCES leads(id) ON DELETE CASCADE,
+  property_id UUID NOT NULL REFERENCES properties(id) ON DELETE CASCADE,
+  match_score SMALLINT,
+  ai_reasoning TEXT,
+  shown_to_lead BOOLEAN DEFAULT FALSE,
+  shown_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_lead_property_match ON lead_property_matches(lead_id, property_id);
+CREATE INDEX IF NOT EXISTS idx_matches_lead ON lead_property_matches(lead_id, match_score DESC);
 
 CREATE TABLE IF NOT EXISTS lead_score_history (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

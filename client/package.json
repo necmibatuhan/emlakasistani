@@ -9,7 +9,8 @@
   "scripts": {
     "dev": "vite",
     "prebuild": "node scripts/generate-sitemap.js",
-    "build": "vite-react-ssg build",
+    "build": "vite-react-ssg build && node scripts/finalize-ssg-seo.js && node scripts/verify-seo.js",
+    "seo:check": "node scripts/generate-sitemap.js && node scripts/verify-seo.js",
     "lint": "eslint .",
     "preview": "vite preview"
   },

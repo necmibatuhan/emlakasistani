@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { SEO_BLOG_DRAFTS } from './seoBlogDrafts';
 
-export const BLOG_POSTS = [
+const LEGACY_BLOG_POSTS = [
   {
     slug: 'excel-ile-emlak-takibi-neden-size-para-kaybettiriyor',
     title: 'Excel ile Emlak Takibi Neden Size Para Kaybettiriyor? (Ve Gerçek Çözüm)',
@@ -165,7 +166,61 @@ export const BLOG_POSTS = [
   }
 ];
 
+export const BLOG_POSTS = [...SEO_BLOG_DRAFTS, ...LEGACY_BLOG_POSTS];
+
+const BlogDraftOutline = ({ draft }) => (
+  <div className="space-y-10 text-on-surface-variant leading-7">
+    <div className="rounded-xl border border-primary/30 bg-primary/5 p-5">
+      <div className="mb-2 flex flex-wrap items-center gap-2">
+        <span className="rounded-full bg-primary/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary">Editoryal taslak</span>
+        <span className="text-xs text-on-surface-variant">Hukuk ve güncellik kontrolü bekliyor</span>
+      </div>
+      <p className="m-0">{draft.summary}</p>
+    </div>
+
+    {draft.outline.map((section) => (
+      <section key={section.heading}>
+        <h2 className="mb-4 text-2xl font-bold text-on-surface">{section.heading}</h2>
+        <ul className="space-y-2 pl-5">
+          {section.points.map((point) => <li key={point} className="list-disc">{point}</li>)}
+        </ul>
+      </section>
+    ))}
+
+    {draft.sourceNotes?.length > 0 && (
+      <section className="rounded-xl border border-outline bg-surface-container p-5">
+        <h2 className="mb-3 text-xl font-bold text-on-surface">Resmî kaynak notları</h2>
+        <ul className="space-y-2">
+          {draft.sourceNotes.map((source) => (
+            <li key={source.href}>
+              <a className="text-primary hover:underline" href={source.href} target="_blank" rel="noreferrer">{source.label}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <section>
+      <h2 className="mb-4 text-2xl font-bold text-on-surface">İlgili kaynaklar</h2>
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+        {draft.relatedLinks?.map((item) => (
+          <Link key={item.to} to={item.to} className="rounded-lg border border-primary/30 px-4 py-3 font-semibold text-primary hover:bg-primary/10">
+            {item.label} →
+          </Link>
+        ))}
+      </div>
+    </section>
+
+    <p className="border-t border-outline pt-6 text-sm">
+      Bu sayfa genel bilgilendirme amaçlı bir içerik taslağıdır; hukuki, mali veya mesleki danışmanlık değildir. Yayımlanmadan önce güncel resmî kaynaklar ve uzman görüşüyle kontrol edilmelidir.
+    </p>
+  </div>
+);
+
 export const getBlogPostContent = (slug) => {
+  const draft = SEO_BLOG_DRAFTS.find((post) => post.slug === slug);
+  if (draft) return <BlogDraftOutline draft={draft} />;
+
   switch (slug) {
     case 'excel-ile-emlak-takibi-neden-size-para-kaybettiriyor':
       return (

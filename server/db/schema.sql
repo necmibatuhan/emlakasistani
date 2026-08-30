@@ -65,6 +65,9 @@ CREATE TABLE cancel_flow_events (
 CREATE TABLE leads (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  company_id UUID REFERENCES companies(id),
+  office_id UUID REFERENCES offices(id),
+  assigned_to UUID REFERENCES users(id),
   name TEXT NOT NULL,
   phone TEXT NOT NULL,
   message TEXT NOT NULL,
@@ -118,6 +121,41 @@ CREATE TABLE lead_prediction_history (
   model_version TEXT NOT NULL,
   feature_snapshot JSONB DEFAULT '{}',
   predicted_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE properties (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  company_id UUID REFERENCES companies(id),
+  office_id UUID REFERENCES offices(id),
+  listed_by UUID REFERENCES users(id),
+  external_listing_id TEXT,
+  title TEXT NOT NULL,
+  type TEXT CHECK (type IN ('Satılık','Kiralık')),
+  category TEXT,
+  city TEXT,
+  district TEXT,
+  address TEXT,
+  price NUMERIC,
+  currency TEXT DEFAULT 'TRY',
+  sqm INTEGER,
+  rooms TEXT,
+  floor INTEGER,
+  status TEXT DEFAULT 'Aktif' CHECK (status IN ('Aktif','Rezerve','Satıldı','Pasif')),
+  photos JSONB,
+  features JSONB,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE lead_property_matches (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  lead_id UUID NOT NULL REFERENCES leads(id) ON DELETE CASCADE,
+  property_id UUID NOT NULL REFERENCES properties(id) ON DELETE CASCADE,
+  match_score SMALLINT,
+  ai_reasoning TEXT,
+  shown_to_lead BOOLEAN DEFAULT FALSE,
+  shown_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(lead_id, property_id)
 );
 
 CREATE TABLE follow_up_plans (
