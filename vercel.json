@@ -3,34 +3,17 @@
   "outputDirectory": "client/dist",
   "cleanUrls": true,
   "trailingSlash": false,
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/(.*)",
-      "destination": "https://emlakasistani.onrender.com/api/$1"
+      "src": "/api/(.*)",
+      "dest": "https://emlakasistani.onrender.com/api/$1"
     },
     {
-      "source": "/blog",
-      "destination": "/blog/index.html"
+      "handle": "filesystem"
     },
     {
-      "source": "/blog/(.*)",
-      "destination": "/blog/$1/index.html"
-    },
-    {
-      "source": "/emlak-crm",
-      "destination": "/emlak-crm.html"
-    },
-    {
-      "source": "/karsilastirma/(.*)",
-      "destination": "/karsilastirma/$1/index.html"
-    },
-    {
-      "source": "/araclar/emlak-komisyonu-hesaplama",
-      "destination": "/araclar/emlak-komisyonu-hesaplama.html"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
