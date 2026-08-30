@@ -172,7 +172,7 @@ export const routes = [
       { path: '/sehir/:slug-emlak-asistani', element: <RegionalLanding /> },
       { path: '/ilan-analizi', element: <Analyzer /> },
       { path: '/emlak-crm', element: <EmlakCrm /> },
-      { path: '/karsilastirma/:slug', element: <Comparison /> },
+      { path: '/karsilastirma/diger-emlak-asistanlari', element: <Comparison slug="diger-emlak-asistanlari" /> },
       { path: '/araclar/emlak-komisyonu-hesaplama', element: <CommissionCalculator /> },
       { path: '/dashboard', element: <ProtectedRoute><RoleBasedDashboard /></ProtectedRoute> },
       { path: '/leads', element: <ProtectedRoute><Leads /></ProtectedRoute> },

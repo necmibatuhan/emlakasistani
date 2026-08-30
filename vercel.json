@@ -17,10 +17,6 @@
       "dest": "/blog/$1/index.html"
     },
     {
-      "src": "/karsilastirma/(.*)",
-      "dest": "/karsilastirma/$1/index.html"
-    },
-    {
       "handle": "filesystem"
     },
     {

@@ -101,9 +101,6 @@ export default defineConfig({
         if (routePath === '/blog') {
           return ['/blog/'];
         }
-        if (routePath === '/karsilastirma/:slug') {
-          return ['/karsilastirma/diger-emlak-asistanlari/'];
-        }
         if (routePath.includes(':') || routePath === '*') {
           return []; // Ignore other dynamic or wildcard routes
         }
