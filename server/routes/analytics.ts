@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db');
-const { authMiddleware } = require('../middleware/auth');
+const { authMiddleware, requireRole } = require('../middleware/auth');
+const predictiveConfig = require('../config/predictiveScoring.config');
 
 // Simple in-memory rate limiting for events
 const eventRateLimits = new Map();
@@ -80,6 +81,47 @@ router.get('/funnel', authMiddleware, async (req, res) => {
   } catch (error) {
     console.error('Error generating funnel report:', error);
     res.status(500).json({ error: 'Server error' });
+  }
+});
+
+router.get('/predictive-scoring', authMiddleware, requireRole(['office_manager', 'company_admin', 'super_admin']), async (req, res) => {
+  try {
+    const params = [req.user.company_id];
+    let scope = 'l.company_id=$1';
+    if (req.user.role === 'office_manager') { params.push(req.user.office_id); scope += ' AND l.office_id=$2'; }
+    const modelParam = params.length + 1;
+    params.push(predictiveConfig.modelVersion);
+    const report = await pool.query(`WITH latest_predictions AS (
+      SELECT DISTINCT ON (ph.lead_id) ph.lead_id,ph.predicted_score,ph.model_version,ph.predicted_at
+      FROM lead_prediction_history ph JOIN leads l ON l.id=ph.lead_id
+      WHERE ${scope} AND ph.model_version=$${modelParam} AND l.status IN ('Satış Tamamlandı','İptal') AND ph.predicted_at<=l.updated_at
+      ORDER BY ph.lead_id,ph.predicted_at DESC
+    ), evaluated AS (
+      SELECT lp.*,CASE WHEN l.status='Satış Tamamlandı' THEN 1.0 ELSE 0.0 END AS outcome
+      FROM latest_predictions lp JOIN leads l ON l.id=lp.lead_id
+    ) SELECT COUNT(*)::INTEGER AS sample_size,
+      AVG(ABS(predicted_score/100.0-outcome))::NUMERIC(8,4) AS mean_absolute_error,
+      AVG(POWER(predicted_score/100.0-outcome,2))::NUMERIC(8,4) AS brier_score,
+      AVG(CASE WHEN (predicted_score>=50)=(outcome=1) THEN 1.0 ELSE 0.0 END)::NUMERIC(8,4) AS threshold_accuracy
+      FROM evaluated`, params);
+    const sampleSize = report.rows[0].sample_size;
+    if (sampleSize < predictiveConfig.minimumOutcomes) {
+      return res.json({ status: 'insufficient_data', sample_size: sampleSize, required_sample_size: predictiveConfig.minimumOutcomes,
+        message: `Model doğruluğunu ölçmek için en az ${predictiveConfig.minimumOutcomes} sonuçlanmış ve önceden tahmin edilmiş lead gerekir.` });
+    }
+    const calibration = await pool.query(`WITH latest_predictions AS (
+      SELECT DISTINCT ON (ph.lead_id) ph.lead_id,ph.predicted_score
+      FROM lead_prediction_history ph JOIN leads l ON l.id=ph.lead_id
+      WHERE ${scope} AND ph.model_version=$${modelParam} AND l.status IN ('Satış Tamamlandı','İptal') AND ph.predicted_at<=l.updated_at
+      ORDER BY ph.lead_id,ph.predicted_at DESC
+    ) SELECT LEAST(90,FLOOR(predicted_score/10.0)*10)::INTEGER AS score_band,
+      COUNT(*)::INTEGER AS sample_size,AVG(predicted_score)::NUMERIC(6,2) AS average_prediction,
+      AVG(CASE WHEN l.status='Satış Tamamlandı' THEN 100.0 ELSE 0.0 END)::NUMERIC(6,2) AS actual_conversion_rate
+      FROM latest_predictions lp JOIN leads l ON l.id=lp.lead_id GROUP BY 1 ORDER BY 1`, params);
+    res.json({ status: 'ready', model_version: predictiveConfig.modelVersion, ...report.rows[0], calibration: calibration.rows });
+  } catch (error) {
+    console.error('Predictive scoring report error:', error);
+    res.status(500).json({ message: 'Tahminsel skor raporu oluşturulamadı.' });
   }
 });
 

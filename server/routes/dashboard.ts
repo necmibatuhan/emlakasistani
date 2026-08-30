@@ -3,10 +3,12 @@ const router = express.Router();
 const pool = require('../db');
 const { authMiddleware } = require('../middleware/auth');
 const morningBriefing = require('../services/morningBriefing');
+const { getDataSufficiency } = require('../services/predictiveScoring.service');
 
 router.get('/priorities', authMiddleware, async (req, res) => {
   try {
     const userId = req.user.id;
+    const predictiveSufficiency = await getDataSufficiency(req.user.company_id);
     
     // Fetch user's leads
     const result = await pool.query(
@@ -63,11 +65,20 @@ router.get('/priorities', authMiddleware, async (req, res) => {
       );
       if (reminderDue) reasons.unshift('Takip zamanı geldi');
 
+      const predictedScore = lead.predicted_conversion_score == null ? null : Number(lead.predicted_conversion_score);
+      let scoreConflict = null;
+      if (predictedScore !== null && priorityScore >= 70 && predictedScore < 40) scoreConflict = 'high_priority_low_conversion';
+      if (predictedScore !== null && priorityScore < 50 && predictedScore >= 70) scoreConflict = 'low_priority_high_conversion';
+
       return {
         ...lead,
         priority_score: Math.min(100, priorityScore),
         score_reasons: reasons,
-        last_contact_days: diffDays
+        last_contact_days: diffDays,
+        predicted_conversion_score: predictedScore,
+        predictive_score_status: predictedScore !== null ? 'ready' : (predictiveSufficiency.sufficient ? 'not_calculated' : 'insufficient_data'),
+        predictive_data_sufficiency: predictiveSufficiency,
+        score_conflict: scoreConflict
       };
     });
 

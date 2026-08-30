@@ -76,6 +76,9 @@ CREATE TABLE leads (
   status TEXT NOT NULL DEFAULT 'Takipte'
     CHECK (status IN ('Takipte','Arandı','Randevu Alındı','Satış Tamamlandı')),
   reminder_date TIMESTAMPTZ,
+  predicted_conversion_score SMALLINT CHECK (predicted_conversion_score BETWEEN 0 AND 100),
+  predicted_conversion_at TIMESTAMPTZ,
+  predictive_model_version TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -99,6 +102,22 @@ CREATE TABLE lead_events (
   event_type TEXT NOT NULL,
   description TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE lead_score_history (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  lead_id UUID NOT NULL REFERENCES leads(id) ON DELETE CASCADE,
+  score SMALLINT NOT NULL,
+  recorded_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE lead_prediction_history (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  lead_id UUID NOT NULL REFERENCES leads(id) ON DELETE CASCADE,
+  predicted_score SMALLINT NOT NULL CHECK (predicted_score BETWEEN 0 AND 100),
+  model_version TEXT NOT NULL,
+  feature_snapshot JSONB DEFAULT '{}',
+  predicted_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE TABLE follow_up_plans (

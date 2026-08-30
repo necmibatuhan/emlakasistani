@@ -65,13 +65,22 @@ const PrioritiesWidget = () => {
             </div>
 
             <div>
-              <div className="flex justify-between items-start mb-2 pr-10">
+              <div className="flex justify-between items-start mb-3 pr-10">
                 <div className="font-bold text-[#F1F2F4] text-[15px] truncate">{lead.name || 'İsimsiz Müşteri'}</div>
-                <div className={`font-bold text-2xl ${getScoreColor(lead.score)} leading-none flex items-center gap-1.5`}>
-                  <span className="text-[10px] text-[#7C8090] font-normal tracking-wider mt-1">SKOR</span>
-                  {lead.priority_score || 0}
+              </div>
+
+              <div className="mb-3 grid grid-cols-2 gap-2">
+                <div className="rounded-lg border border-[#F5A623]/20 bg-[#F5A623]/5 p-2.5">
+                  <span className="block text-[9px] font-semibold uppercase tracking-wider text-[#8E929C]">Bugünkü öncelik</span>
+                  <strong className={`mt-1 block text-xl ${getScoreColor(lead.priority_score)}`}>{lead.priority_score || 0}<span className="ml-0.5 text-[10px] font-normal text-[#7C8090]">/100</span></strong>
+                </div>
+                <div className="rounded-lg border border-violet-400/20 bg-violet-400/[0.06] p-2.5">
+                  <span className="block text-[9px] font-semibold uppercase tracking-wider text-[#8E929C]">Dönüşüm olasılığı</span>
+                  {lead.predicted_conversion_score !== null ? <strong className={`mt-1 block text-xl ${getScoreColor(lead.predicted_conversion_score)}`}>%{lead.predicted_conversion_score}</strong> : <span className="mt-1 block text-[11px] font-medium leading-5 text-[#A7AAB4]">{lead.predictive_score_status === 'insufficient_data' ? 'Yetersiz veri' : 'Hesaplanıyor'}</span>}
                 </div>
               </div>
+
+              {lead.score_conflict ? <div className="mb-3 flex items-start gap-1.5 rounded-md border border-amber-400/25 bg-amber-400/10 p-2 text-[11px] leading-4 text-amber-200"><span className="material-symbols-outlined text-[14px]">warning</span><span>{lead.score_conflict === 'high_priority_low_conversion' ? 'Yüksek öncelik, düşük dönüşüm olasılığı: ilişkiyi yeniden canlandırmak için bugün temas kur.' : 'Düşük günlük öncelik, yüksek dönüşüm olasılığı: fırsatı gözden kaçırma.'}</span></div> : null}
               
               <div className="text-[12px] text-[#7C8090] min-h-[36px] line-clamp-2 leading-snug">
                 {lead.score_reasons?.length ? lead.score_reasons.join(' · ') : (lead.reasoning || lead.message || 'Takip önerisi')}

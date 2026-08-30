@@ -319,6 +319,9 @@ Gerçek değerleri repoya eklemeyin. Secret değerlerini yerel `.env`, Vercel En
 | Değişkenler | Kullanım |
 |---|---|
 | `OPENAI_API_KEY` | Embedding, semantik arama ve ilan analizi |
+| `PREDICTIVE_SCORING_ENABLED` | Tahminsel dönüşüm katmanını açar/kapatır (`true`/`false`) |
+| `PREDICTIVE_SCORING_MIN_OUTCOMES`, `PREDICTIVE_SCORING_MIN_CONVERSIONS` | Modelin sayı üretmeden önce bekleyeceği minimum gerçek sonuçlar |
+| `PREDICTIVE_WEIGHT_INTERCEPT`, `PREDICTIVE_WEIGHT_CRM_SCORE`, `PREDICTIVE_WEIGHT_CONTACT_FREQUENCY`, `PREDICTIVE_WEIGHT_RESPONSE_SPEED`, `PREDICTIVE_WEIGHT_MATCH_STRENGTH`, `PREDICTIVE_WEIGHT_RECENCY` | Merkezi tahminsel skor ağırlıkları |
 | `GEMINI_API_KEY_2` | İkinci Gemini anahtarı / yedek kapasite |
 | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | Supabase Storage işlemleri |
 | `RESEND_API_KEY` | Resend üzerinden e-posta |
@@ -344,6 +347,9 @@ Ana tablolar:
 | `lead_events` | Durum, görev ve aktivite zaman çizelgesi |
 | `properties` | Gayrimenkul portföyleri |
 | `lead_property_matches` | Müşteri–portföy eşleşmeleri |
+| `lead_score_history` | CRM skor değişim geçmişi |
+| `lead_prediction_history` | Tahmin snapshot’ları ve geriye dönük doğruluk verisi |
+| `lead_conversion_features` | Temas, yanıt, eşleşme ve sonuç özelliklerini birleştiren SQL view |
 | `subscriptions` | Abonelik bilgileri |
 | `crm_integrations` | Harici CRM bağlantıları |
 

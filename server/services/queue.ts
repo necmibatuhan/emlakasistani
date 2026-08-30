@@ -143,6 +143,14 @@ setInterval(async () => {
         console.error('Queue lead matching error:', error);
       }
     }
+    if (job.name === 'RECALCULATE_PREDICTIVE_SCORES') {
+      try {
+        const result = await require('./predictiveScoring.service').recalculateAllPredictions();
+        console.log('[PredictiveScoring] Daily recalculation completed:', result);
+      } catch (error) {
+        console.error('[PredictiveScoring] Recalculation failed:', error.message);
+      }
+    }
   }
 }, 3000);
 

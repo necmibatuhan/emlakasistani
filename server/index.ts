@@ -27,6 +27,7 @@ require('./services/queue'); // Start background worker
 require('./services/churnPrevention'); // Start cron job
 require('./services/morningBriefing'); // Start daily briefing job
 require('./services/followUpPlan.service'); // Persistent follow-up scheduler
+require('./services/predictiveScoringScheduler'); // Daily predictive score refresh
 
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
