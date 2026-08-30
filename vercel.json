@@ -9,6 +9,18 @@
       "dest": "https://emlakasistani.onrender.com/api/$1"
     },
     {
+      "src": "/blog",
+      "dest": "/blog/index.html"
+    },
+    {
+      "src": "/blog/(.*)",
+      "dest": "/blog/$1/index.html"
+    },
+    {
+      "src": "/karsilastirma/(.*)",
+      "dest": "/karsilastirma/$1/index.html"
+    },
+    {
       "handle": "filesystem"
     },
     {
