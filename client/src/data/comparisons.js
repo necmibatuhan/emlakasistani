@@ -8,21 +8,12 @@ const sharedRows = [
 ];
 
 export const COMPARISONS = {
-  'arveya-alternatifi': {
-    competitor: 'Arveya',
-    title: 'Arveya Alternatifi: Kapora Emlak CRM',
-    seoTitle: 'Arveya Alternatifi: Kapora Emlak CRM',
-    description: 'Arveya alternatifi arayan emlak profesyonelleri için Kapora’nın sesli kayıt, yapay zekâ eşleştirme ve takip özelliklerini inceleyin.',
-    intro: 'Arveya alternatifi değerlendirirken yalnızca özellik sayısına değil, danışmanın günlük işini ne kadar hızlandırdığına ve kritik aksiyonlarda insan kontrolünü koruyup korumadığına bakın.',
-    rows: sharedRows,
-  },
-  'emlakcrmx-alternatifi': {
-    competitor: 'EmlakCRMx',
-    title: 'EmlakCRMx Alternatifi: Kapora',
-    seoTitle: 'EmlakCRMx Alternatifi: Kapora',
-    description: 'EmlakCRMx alternatifi arayan ekipler için Kapora’nın müşteri takibi, sesli lead girişi ve semantik portföy eşleştirmesini keşfedin.',
-    intro: 'EmlakCRMx alternatifi seçerken veri girişi hızı, mobil saha deneyimi, takip otomasyonu ve yapay zekâ çıktılarının açıklanabilirliği birlikte değerlendirilmelidir.',
+  'diger-emlak-asistanlari': {
+    competitor: 'Diğer emlak asistanları',
+    title: 'Diğer Emlak Asistanları ile Kapora Karşılaştırması',
+    seoTitle: 'Kapora ve Diğer Emlak Asistanları',
+    description: 'Kapora’yı diğer emlak asistanlarıyla sesli kayıt, yapay zekâ eşleştirme, takip planları ve mobil kullanım ölçütleri üzerinden kıyaslayın.',
+    intro: 'Emlak asistanı seçerken marka iddiaları yerine danışmanın günlük işini ne kadar hızlandırdığına, veri kontrolüne ve kritik aksiyonlarda insan onayını koruyup korumadığına bakın.',
     rows: sharedRows,
   },
 };
-

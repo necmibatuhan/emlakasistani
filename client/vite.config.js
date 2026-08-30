@@ -102,7 +102,7 @@ export default defineConfig({
           return ['/blog/'];
         }
         if (routePath === '/karsilastirma/:slug') {
-          return ['/karsilastirma/arveya-alternatifi/', '/karsilastirma/emlakcrmx-alternatifi/'];
+          return ['/karsilastirma/diger-emlak-asistanlari/'];
         }
         if (routePath.includes(':') || routePath === '*') {
           return []; // Ignore other dynamic or wildcard routes
